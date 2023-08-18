@@ -55,7 +55,7 @@ class BasicTokenModifier(TokenModifier):
         @return: modified token.
         """
 
-        environ.get("DIRACJOBID")
+        dirac_jobid = environ.get("DIRACJOBID")
         lock_content = {
             'hostname': socket.gethostname(),
             'lock': int(time.time()),
