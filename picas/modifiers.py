@@ -163,7 +163,7 @@ class NestedTokenModifier(TokenModifier):
 
     def _update_record(self, ref, record, token):
         r = record
-        if (isintance(ref, list)):
+        if (isinstance(ref, list)):
             for k in ref[1:-1]:
                 r = r[k]
             r[ref[-1]] = token
