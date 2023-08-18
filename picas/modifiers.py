@@ -8,6 +8,8 @@
 # Python imports
 import socket
 import time
+
+from os import environ
 from . import batchid
 
 
