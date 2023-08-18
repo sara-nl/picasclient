@@ -15,7 +15,7 @@ class ExampleActor(RunActor):
     def prepare_run(self, *kargs, **kvargs):
         pass
 
-    def process_token(self, ref, token):
+    def process_task(self, ref, token):
         # this is where all the work gets done. Start editing here.
         print(token)
 

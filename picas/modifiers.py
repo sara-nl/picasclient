@@ -52,9 +52,12 @@ class BasicTokenModifier(TokenModifier):
         @param token: the token content.
         @return: modified token.
         """
+
+        environ.get("DIRACJOBID")
         lock_content = {
             'hostname': socket.gethostname(),
-            'lock': int(time.time())
+            'lock': int(time.time()),
+            'dirac_jobid': dirac_jobid
         }
 
         # try to include glite wms job id if present
@@ -148,7 +151,7 @@ class NestedTokenModifier(TokenModifier):
         return record[ref]
 
     def _get_token(self, ref, record):
-        if(type(ref) == list):
+        if (isinstance(ref, list)):
             return self._get_token_from_list(ref, record)
         else:
             return self._get_token_from_value(ref, record)
@@ -158,7 +161,7 @@ class NestedTokenModifier(TokenModifier):
 
     def _update_record(self, ref, record, token):
         r = record
-        if(type(ref)) == list:
+        if (isintance(ref, list)):
             for k in ref[1:-1]:
                 r = r[k]
             r[ref[-1]] = token

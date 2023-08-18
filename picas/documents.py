@@ -259,7 +259,7 @@ class Task(Document):
     def get_errors(self):
         try:
             return self.doc['error']
-        except:
+        except KeyError():
             return []
 
     def is_done(self):

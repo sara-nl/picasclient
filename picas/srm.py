@@ -84,16 +84,16 @@ class Downloader(threading.Thread):
             f = self.q.get()
             count = 0
             done = False
-            while(count < 25 and not done):
+            while (count < 25 and not done):
                 try:
                     self.srm.download(f)
                     done = True
-                except:
+                except Exception():
                     count += 1
 
             self.q.task_done()
 
-            if(count > 24):
+            if (count > 24):
                 self.logger.error("Download of " + f +
                                   " failed after multiple tries.")
                 raise EnvironmentError("Download failed of: " + f)

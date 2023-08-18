@@ -52,7 +52,7 @@ class CouchDBLogger(logging.Handler):
 
         count = 0
         done = False
-        while(count < 10 and not done):
+        while (count < 10 and not done):
             try:
                 id = self.hostname + ":" + str(int(time.time()))
                 self.db[id] = log_dict

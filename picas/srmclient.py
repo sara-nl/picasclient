@@ -45,13 +45,13 @@ class Downloader(threading.Thread):
             f = self.q.get()
             count = 0
             done = False
-            while(count < 10 and not done):
+            while (count < 10 and not done):
                 try:
                     self.srm.download(f)
                     done = True
-                except:
+                except Exception():
                     count += 1
-            if(count > 9):
+            if (count > 9):
                 raise EnvironmentError("Download failed.")
             self.q.task_done()
         print("Exiting while loop, thread should close itself...")
