@@ -94,7 +94,20 @@ echo "bash-echo"
 >>> bash-echo
 ```
 
+Once the script is running, it will start polling the CouchDB instance for work. Once the work is complete, the script will finish.
+
 ## Running on Slurm
+
+To run on slurm, first open the `slurm-example.sh` file and make sure your python virtual env or conda/mamba environment is loaded.
+Then you have to add tokens to CouchDB using the same setup procedure as mentioned above, with the pushTokens methods.
+
+To start the slurm job that runs the PiCaS client do:
+
+```
+sbatch slurm-example.sh
+```
+
+Now in a slurm job array (you can set the number of array jobs in the script at `--array`) and each job will start polling the CouchDB instance for work. Once the work is complete, the jobs will finish.
 
 ## Running on Grid
 
