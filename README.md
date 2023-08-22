@@ -1,6 +1,8 @@
 picasclient
 -----------
 
+https://github.com/sara-nl/picasclient/actions/workflows/python-app/badge.svg
+
 Python client using CouchDB as a token pool server.
 
 Installation
