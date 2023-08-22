@@ -17,6 +17,5 @@
 cd $PWD
 # You need to load your environment here
 # mamba activate MAMBA-ENV
-mamba activate snakemake-picas
 # source /PATH/TO/VENV/bin/activate
 python local-example.py
