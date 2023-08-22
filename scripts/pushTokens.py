@@ -1,10 +1,10 @@
 '''
 @helpdesk: SURFsara helpdesk <helpdesk@surfsara.nl>
 
-usage: python createTokens.py [path to tokens file]	
-description:									
+usage: python createTokens.py [path to tokens file]
+description:
    Connects to PiCaS server
-   Creates one token for each line in [tokens file]				
+   Creates one token for each line in [tokens file]
    Loads the tokens
 '''
 
@@ -14,13 +14,22 @@ import couchdb
 import random
 import picasconfig
 
+def getNextIndex():
+    db = get_db()
+    
+    index = 0
+    while db.get(f"token_{index}") is not None:
+        index+=1
+
+    return index
+
 def loadTokens(db):
     tokens = []
     tokensfile = sys.argv[1]
     with open(tokensfile) as f:
         input = f.read().splitlines()
 
-    i = 0
+    i = getNextIndex()
     for fractal in input:
         token = {
             '_id': 'token_' + str(i),
