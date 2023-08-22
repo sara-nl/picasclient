@@ -1,5 +1,4 @@
 [
-  JobType="Parametric";
   ParameterStart=0;
   ParameterStep=1;
   Parameters=5;
