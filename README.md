@@ -8,7 +8,7 @@ Python client using CouchDB as a token pool server.
 Installation
 ============
 
-Run
+To install run
 ```
 pip install -U .
 ```
@@ -111,11 +111,23 @@ Now in a slurm job array (you can set the number of array jobs in the script at 
 
 ## Running on Grid
 
+First we need to create a tar of the picas code, so that it can be sent to the Grid:
+
+```
+tar cfv grid-sandbox/picas.tar ../picas/
+```
+
+Secondly, the CouchDB python API needs to be available too, so download and extract it:
+
+```
+wget https://files.pythonhosted.org/packages/7c/c8/f94a107eca0c178e5d74c705dad1a5205c0f580840bd1b155cd8a258cb7c/CouchDB-1.2.tar.gz
+```
+
 
 ## Running the long jobs
 
 ```
-cc ../../fractals.c -o fractals -lm
+cc src/fractals.c -o bin/fractals -lm
 ```
 
 ## Travis build status
