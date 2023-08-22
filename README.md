@@ -1,7 +1,7 @@
 picasclient
 -----------
 
-https://github.com/sara-nl/picasclient/actions/workflows/python-app/badge.svg
+![Test](https://github.com/sara-nl/picasclient/actions/workflows/python-app.yml/badge.svg)
 
 Python client using CouchDB as a token pool server.
 
