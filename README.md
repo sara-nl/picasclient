@@ -1,7 +1,7 @@
 picasclient
 -----------
 
-![Test](https://github.com/sara-nl/picasclient/actions/workflows/python-app.yml/badge.svg)
+![CICD](https://github.com/sara-nl/picasclient/actions/workflows/python-app.yml/badge.svg)
 
 Python client using CouchDB as a token pool server.
 
@@ -98,6 +98,12 @@ echo "bash-echo"
 
 ## Running on Grid
 
+
+## Running the long jobs
+
+```
+cc ../../fractals.c -o fractals -lm
+```
 
 ## Travis build status
 
