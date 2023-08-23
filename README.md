@@ -140,13 +140,22 @@ Now the tokens are available in the database. Now, the binary for the calculatio
 cc src/fractals.c -o bin/fractals -lm
 ```
 
-And finally, the `*-example.py` code needs to call a different command:
+And finally, the `process_task.py` code needs to call a different command. Replace
 
 ```
-command = "/usr/bin/time -v ./process_task.sh " + "\"" +token['input'] + "\" " + token['_id'] + " 2> logs_" + str(token['_id']) + ".err 1> logs_" + str(token['_id']) + ".out"
+eval $INPUT
 ```
 
-So adjust the `*-example.py` python code for whichever way you want to run it (locally, slurm, grid) and start running the way described above!
+with:
+
+```
+./fractals -o $OUTPUT $INPUT
+```
+
+to ensure the fractal code is called.
+
+Now, you can run your jobs whichever way you want (locally, slurm, grid) and start running using the general instructions as described above!
+
 
 
 ## QuantifiedCode Automated code review  
