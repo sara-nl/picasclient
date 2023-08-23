@@ -96,7 +96,7 @@ class Document(object):
 
         b64data = base64.b64encode(data)
         self.doc['_attachments'][name] = {
-            'content_type': mimetype, 'data': b64data}
+            'content_type': mimetype, 'data': b64data.decode()}
 
     def get_attachment(self, name, retrieve_from_database=None):
         ''' Gets an attachment dict from the document.
