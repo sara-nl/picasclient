@@ -148,9 +148,6 @@ command = "/usr/bin/time -v ./process_task.sh " + "\"" +token['input'] + "\" " +
 
 So adjust the `*-example.py` python code for whichever way you want to run it (locally, slurm, grid) and start running the way described above!
 
-## Travis build status
-
-[![Build Status](https://travis-ci.org/sara-nl/picasclient.svg?branch=master)](https://travis-ci.org/sara-nl/picasclient)
 
 ## QuantifiedCode Automated code review  
 
