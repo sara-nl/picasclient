@@ -47,18 +47,6 @@ Next you have to send some tokens with work to the CouchDB instance. You can sen
 python pushTokens.py quickExample.txt
 ```
 
-To send more longer running code (it takes up to 30 minutes per token), do:
-
-```
-./createTokens
->>> /tmp/tmp.JoLqcdYZRD
-```
-
-And pass the output file to the push tokens code:
-
-```
-python pushTokens.py /tmp/tmp.abc123
-```
 
 Now we are ready to run the examples!
 
@@ -123,12 +111,42 @@ Secondly, the CouchDB python API needs to be available too, so download and extr
 wget https://files.pythonhosted.org/packages/7c/c8/f94a107eca0c178e5d74c705dad1a5205c0f580840bd1b155cd8a258cb7c/CouchDB-1.2.tar.gz
 ```
 
+Now you can start the example from a grid login node with (in this case DIRAC is used for job submission):
+
+```
+dirac-wms-job-submit fractals.jdl
+```
+
+And the status and output can be retrieved with the usual DIRAC commands, while in the token you see the status of the token and the attachments with the log files.
 
 ## Running the long jobs
+
+To send longer running code (it takes up to 30 minutes per token), do:
+
+```
+./createTokens
+>>> /tmp/tmp.JoLqcdYZRD
+```
+
+And pass the output file to the push tokens code:
+
+```
+python pushTokens.py /tmp/tmp.abc123
+```
+
+Now the tokens are available in the database. Now, the binary for the calculation needs to be built:
 
 ```
 cc src/fractals.c -o bin/fractals -lm
 ```
+
+And finally, the `*-example.py` code needs to call a different command:
+
+```
+command = "/usr/bin/time -v ./process_task.sh " + "\"" +token['input'] + "\" " + token['_id'] + " 2> logs_" + str(token['_id']) + ".err 1> logs_" + str(token['_id']) + ".out"
+```
+
+So adjust the `*-example.py` python code for whichever way you want to run it (locally, slurm, grid) and start running the way described above!
 
 ## Travis build status
 

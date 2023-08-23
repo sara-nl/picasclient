@@ -42,7 +42,7 @@ class ExampleActor(RunActor):
 
         # Start running the main job
         # /usr/bin/time -v ./process_task.sh [input] [tokenid] 2> logs_[token_id].err 1> logs_[token_id].out
-        command = "/usr/bin/time -v " +token['input'] + " 2> logs_" + str(token['_id']) + ".err 1> logs_" + str(token['_id']) + ".out"
+        command = "/usr/bin/time -v ./process_task.sh " + "\"" +token['input'] + "\" " + token['_id'] + " 2> logs_" + str(token['_id']) + ".err 1> logs_" + str(token['_id']) + ".out"
 
         out = execute(command,shell=True)
 
@@ -62,7 +62,6 @@ class ExampleActor(RunActor):
             log_handle = open(logserr, 'rb')
             token.put_attachment(logserr, log_handle.read())
         except:
-            print("excepted attachemnt")
             pass
 
 def main():
