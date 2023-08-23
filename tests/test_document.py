@@ -36,7 +36,7 @@ def test_attachment():
     assert_equals(attach['content_type'], 'text/plain')
     assert_equals(attach['data'], data)
     assert_equals(doc['_attachments']['mytext.txt']['data'],
-                  b'VGhpcyBpcyBpdA==')
+                  'VGhpcyBpcyBpdA==')
     doc.remove_attachment('mytext.txt')
     assert_true('mytext.txt' not in doc['_attachments'])
     assert_equals(attach['data'], data)
