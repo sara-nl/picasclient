@@ -1,7 +1,7 @@
 '''
-@helpdesk: SURFsara helpdesk <helpdesk@surf.nl>
+@helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
-usage: python example_SLURM.py
+usage: python grid-example.py
 description:
     Connect to PiCaS server
     Get the next token in todo View

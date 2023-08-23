@@ -1,4 +1,4 @@
-# @helpdesk: SURFsara helpdesk <helpdesk@surfsara.nl>
+# @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 #
 # usage: . startpilot.sh
 # description: 								
