@@ -1,7 +1,7 @@
 '''
 @helpdesk: SURFsara helpdesk <helpdesk@surfsara.nl>
 
-usage: python createTokens.py [path to tokens file]
+usage: python pushTokens.py [path to tokens file]
 description:
    Connects to PiCaS server
    Creates one token for each line in [tokens file]
