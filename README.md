@@ -23,7 +23,7 @@ pip install ".[test]"
 To test, run
 ```
 flake8 picas tests
-nosetests tests
+pytest tests
 ```
 
 Examples
@@ -31,17 +31,18 @@ Examples
 
 ## Setting up the examples
 
-The scripts directory contains examples to use the picasclient. There are examples for running locally (laptop, cluster login), slurm and the Grid (https://www.egi.eu/). 
-To run the examples, first you need to have a CouchDB instance running that functions as the token broker that keeps the tokens and then worker machines can approach the broker to get work. To set up this db, see the [SURF documentation](https://doc.grid.surfsara.nl/en/latest/Pages/Practices/picas/picas_overview.html#picas-server-1).
+The examples directory contains examples to use the picasclient. There are examples for running locally (laptop, cluster login), slurm and the Grid (https://www.egi.eu/), and in principle the jobs can be sent to any machine that can run this client.
+
+To run the examples, first you need to have a CouchDB instance running that functions as the token broker that stores the tokens which the worker machines can approach to get work execute. To set up this CouchDB instance, see the [SURF documentation](https://doc.grid.surfsara.nl/en/latest/Pages/Practices/picas/picas_overview.html#picas-server-1), these examples assume you have an instance running and access to a DB on this instance.
 
 Once this server is running, you can run the PiCaS examples:
  - Local
  - Slurm
  - Grid
 
-To approach the DB, you have to fill in the `script/picasconfig.py` with the information to log in to your CouchDB instance and the database you want use for storing the work tokens.
+To approach the DB, you have to fill in the `examples/picasconfig.py` with the information to log in to your CouchDB instance and the database you want use for storing the work tokens.
 
-Once you can approach the server, you have to define "view" logic, so that you can easily go through large numbers of tokens and select new, running and finished tokens. To create these views, run:
+Once you can approach the server, you have to define "view" logic, so that you can easily view large numbers of tokens and filter on new, running and finished tokens. To create these views, run:
 
 ```
 python createViews.py
@@ -90,10 +91,12 @@ echo "bash-echo"
 
 Once the script is running, it will start polling the CouchDB instance for work. Once the work is complete, the script will finish.
 
+To do more work, you will have to add new tokens that are not in a "done" state yet, otherwise the example script will just stop after finding no work to do.
+
 ## Running on Slurm
 
 To run on slurm, first open the `slurm-example.sh` file and make sure your python virtual env or conda/mamba environment is loaded.
-Then you have to add tokens to CouchDB using the same setup procedure as mentioned above, with the pushTokens methods.
+Then you have to add tokens to CouchDB using the same setup procedure as mentioned above, with the pushTokens script.
 
 To start the slurm job that runs the PiCaS client do:
 
@@ -105,6 +108,7 @@ Now in a slurm job array (you can set the number of array jobs in the script at 
 
 ## Running on Grid
 
+On the grid, in our screnario, you need to supply the entire environment through the sandbox (CVMFS goes beyond the scope of these examples). The binaries and python code need to be in this sandbox.
 First we need to create a tar of the picas code, so that it can be sent to the Grid:
 
 ```
@@ -123,15 +127,17 @@ Now you can start the example from a grid login node with (in this case DIRAC is
 dirac-wms-job-submit fractals.jdl
 ```
 
-And the status and output can be retrieved with the usual DIRAC commands, while in the token you see the status of the token and the attachments with the log files.
+And the status and output can be retrieved with the usual DIRAC commands, while in the token you see the status of the token and the tokens' attachments contain the log files.
+
+As we have seen, through PiCaS you have a single interface that can store tokens with work to be done (the CouchDB instance). Then on any machine where you can deploy the PiCaS client, one can perform the tasks hand.
 
 ## Running the long jobs
 
-To send longer running code (it takes up to 30 minutes per token), do:
+To send longer running code (it takes from 10 seconds up to 30 minutes per token), do:
 
 ```
 ./createTokens
->>> /tmp/tmp.JoLqcdYZRD
+>>> /tmp/tmp.abc123
 ```
 
 And pass the output file to the push tokens code:
@@ -140,13 +146,13 @@ And pass the output file to the push tokens code:
 python pushTokens.py /tmp/tmp.abc123
 ```
 
-Now the tokens are available in the database. Now, the binary for the calculation needs to be built:
+Now the tokens are available in the database. Next, the binary for the calculation needs to be built:
 
 ```
 cc src/fractals.c -o bin/fractals -lm
 ```
 
-And finally, the `process_task.py` code needs to call a different command. Replace
+And finally, the `process_task.sh` code needs to call a different command. Replace
 
 ```
 eval $INPUT
