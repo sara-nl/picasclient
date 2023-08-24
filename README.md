@@ -108,7 +108,7 @@ Now in a slurm job array (you can set the number of array jobs in the script at 
 
 ## Running on Grid
 
-On the grid, in our screnario, you need to supply the entire environment through the sandbox (CVMFS goes beyond the scope of these examples). The binaries and python code need to be in this sandbox.
+On the grid, in our screnario, you need to supply the entire environment through the sandbox (the alternative CVMFS goes beyond the scope of these examples). The binaries and python code need to be in this sandbox.
 First we need to create a tar of the picas code, so that it can be sent to the Grid:
 
 ```

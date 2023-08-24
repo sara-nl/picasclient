@@ -156,6 +156,7 @@ class EndlessViewIterator(ViewIterator):
             except StopIteration:
                 self.iterator.reset()
                 time.sleep(self.sleep_sec)
+                print("Iterator is waiting for work...")
 
         # no longer continue
         self.iterator.stop()
