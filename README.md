@@ -41,7 +41,13 @@ Once this server is running, you can run the PiCaS examples:
 
 To approach the DB, you have to fill in the `script/picasconfig.py` with the information to log in to your CouchDB instance and the database you want use for storing the work tokens.
 
-Next you have to send some tokens with work to the CouchDB instance. You can send two types of work in this example. For very fast running jobs, send the `quickExample.txt` file with:
+Once you can approach the server, you have to define "view" logic, so that you can easily go through large numbers of tokens and select new, running and finished tokens. To create these views, run:
+
+```
+python createViews.py
+```
+
+Next you have to send some tokens containing work to the CouchDB instance. You can send two types of work in this example. For very fast running jobs, send the `quickExample.txt` file with:
 
 ```
 python pushTokens.py quickExample.txt
