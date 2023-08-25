@@ -29,10 +29,14 @@ from picas.executers import execute
 from picas.util import Timer
 
 class ExampleActor(RunActor):
+    """
+    The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
+    Feel free to adjust to whatever you need, a template can be found at: example-template.py
+    """
     def __init__(self, db, modifier, view="todo", **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
-        self.iterator = EndlessViewIterator(self.iterator, stop_callback=self.time_passed_bool) # overwrite default iterator from super().init()
+        self.iterator = EndlessViewIterator(self.iterator, stop_callback=self.time_elapsed) # overwrite default iterator from super().init()
         self.modifier = modifier
         self.client = db
 
@@ -68,7 +72,7 @@ class ExampleActor(RunActor):
         except:
             pass
 
-    def time_passed_bool(self, elapsed=300.):
+    def time_elapsed(self, elapsed=30.):
         """
         This function returns whether the class has been alive for more than `elapsed` seconds. This is needed because currently the maxtime argument in RunActor.run is broken:
         The run method will break when the iterator is non-empty and then it checks if the maxtime has passed. If the iterator stays empty, it will run until a new token is 

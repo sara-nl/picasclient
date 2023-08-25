@@ -23,12 +23,20 @@ import picasconfig
 from picas.actors import RunActor
 from picas.clients import CouchDB
 from picas.iterators import TaskViewIterator
+from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
 from picas.executers import execute
+from picas.util import Timer
 
 class ExampleActor(RunActor):
+    """
+    The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
+    Feel free to adjust to whatever you need, a template can be found at: example-template.py
+    """
     def __init__(self, db, modifier, view="todo", **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
+        self.timer = Timer()
+        self.iterator = EndlessViewIterator(self.iterator, stop_callback=self.time_elapsed) # overwrite default iterator from super().init()
         self.modifier = modifier
         self.client = db
 
@@ -62,8 +70,19 @@ class ExampleActor(RunActor):
             log_handle = open(logserr, 'rb')
             token.put_attachment(logserr, log_handle.read())
         except:
-            print("excepted attachemnt")
             pass
+
+    def time_elapsed(self, elapsed=30.):
+        """
+        This function returns whether the class has been alive for more than `elapsed` seconds. This is needed because currently the maxtime argument in RunActor.run is broken:
+        The run method will break when the iterator is non-empty and then it checks if the maxtime has passed. If the iterator stays empty, it will run until a new token is 
+        processed, and after processing the if statement is true, and run breaks.
+
+        @param elapsed: lifetime of the Actor in seconds
+
+        @returns: bool
+        """
+        return self.timer.elapsed() > elapsed
 
 def main():
     # setup connection to db

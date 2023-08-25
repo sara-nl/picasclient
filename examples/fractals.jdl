@@ -7,6 +7,6 @@
   Arguments = "startpilot.sh";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
-  InputSandbox = {"grid-sandbox/CouchDB-1.2.tar.gz", "grid-sandbox/picas.tar", "grid-sandbox/startpilot.sh", "grid-sandbox/grid-example.py", "grid-sandbox/process_task.sh", "bin/fractals", "picasconfig.py"};  
+  InputSandbox = {"grid-sandbox/CouchDB-1.2.tar.gz", "grid-sandbox/picas.tar", "grid-sandbox/startpilot.sh", "local-example.py", "grid-sandbox/process_task.sh", "bin/fractals", "picasconfig.py"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
 ]

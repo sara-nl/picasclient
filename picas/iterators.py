@@ -161,4 +161,5 @@ class EndlessViewIterator(ViewIterator):
         # no longer continue
         self.iterator.stop()
         self.stop()
+        print("Iterator is finishing.")
         raise StopIteration

@@ -22,7 +22,8 @@ echo $TOKENID
 echo $OUTPUT
 
 #Start processing
-./fractals -o $OUTPUT $INPUT
+eval $INPUT
+#./fractals -o $OUTPUT $INPUT
 if [[ "$?" != "0" ]]; then
     echo "Program interrupted. Exit now..."
     exit 1
