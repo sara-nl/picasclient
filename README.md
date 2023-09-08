@@ -110,7 +110,9 @@ Now in a slurm job array (you can set the number of array jobs in the script at 
 
 ## Running on Grid
 
-On the grid, in our screnario, you need to supply the entire environment through the sandbox (the alternative CVMFS goes beyond the scope of these examples). The binaries and python code need to be in this sandbox.
+### Fractal example
+
+On the grid, in our screnario, you need to supply the entire environment through the sandbox (the alternative CVMFS is used in the advanced grid example). The binaries and python code need to be in this sandbox.
 First we need to create a tar of the picas code, so that it can be sent to the Grid:
 
 ```
@@ -132,6 +134,76 @@ dirac-wms-job-submit fractals.jdl
 And the status and output can be retrieved with the usual DIRAC commands, while in the token you see the status of the token and the tokens' attachments contain the log files.
 
 As we have seen, through PiCaS you have a single interface that can store tokens with work to be done (the CouchDB instance). Then on any machine where you can deploy the PiCaS client, one can perform the tasks hand.
+
+### Advanced example (snakemake)
+
+To run the Snakemake turorial example on the grid using PiCaS, there are some prerequisites. It helps to be up to speed with the full tutorial, so read it [here](https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html).
+
+First, setup the snakemake stack and profile as described above and in [the profile readme](https://github.com/sara-nl/picas-profile) on a Grid UI machine. Snakemake will be run from this machine, which then pushes the work to the CouchDB back-end. You can use the usual Snakefile from the tutorial for steering snakemake.
+This work is subsequently pulled by a pilot job on the Grid, performed, and stored on Grid Storage.
+
+Second, a CVMFS repository needs to be available for the snakemake calls that are done on the Grid Compute Element. To distribute the snakemake code, connect to a CVMFS distribution machine and create a new conda/mamba environment in `/cvmfs/path/to/your/space`.
+For brevity, here are example steps for a simple snakemake environment that should have all the components needed to run on the Grid:
+
+```
+conda create -c conda-forge -c bioconda -n snakemake-picas snakemake
+conda install -c bioconda samtools
+conda install -c bioconda bcftools
+conda install python-gfal2
+```
+
+Gfal2 is used for interacting with Grid Storage. Now publish the conda environment and wait until its available on CVMFS.
+
+Next, set up the data needed for the snakemake example on your grid storage, see the tutorial linked at the top of this subsection.
+The data will look something like this on your storage cluster:
+
+```
+rclone ls token:/path/to/snakemake/files/
+
+   234112 data/genome.fa
+     2598 data/genome.fa.amb
+       83 data/genome.fa.ann
+   230320 data/genome.fa.bwt
+       18 data/genome.fa.fai
+    57556 data/genome.fa.pac
+   115160 data/genome.fa.sa
+  5752788 data/samples/A.fastq
+  5775000 data/samples/B.fastq
+  5775000 data/samples/C.fastq
+```
+
+We will distribute the `plot-quals.py` to shortly show how the sandbox works. Also the Snakefile is needed in the sandbox, so creatae two links, one to each of the files:
+
+```
+cd /path/to/picasclient/
+cd examples/grid-sandbox
+ln -s  /path/to/snakemake/scripts/plot-quals.py plot-quals.py
+ln -s  /path/to/snakemake/Snakefile Snakefile
+```
+
+To properly call `plot-quals.py` on the Grid, the Snakefile has to be updated. On the grid the `scripts` folder will not exist in the sandbox, as the files are placed in the root of the Grid machine. So remove the `scripts` from the Snakefile.
+
+Now you need to do two things after one another to get Snakemake to run on the Grid:
+
+1. Start a job on the grid running the picas client
+2. Start snakemake using the picas profile installed before
+
+```
+cd /path/to/picasclient/examples
+dirac-wms-job-submit snakemake.jdl
+```
+
+Now wait until this job is running. The picas client will wait for a time for jobs in the DB before quitting. If it times out too quickly, change the `time_elapsed` in `example/local-example.py` to something more managable (for example, 10 minutes).
+
+Once the Grid job is running, start snakemake:
+
+```
+snakemake --profile picas -j 1
+```
+
+If all is set well, you will see the regular snakemake logging output in green.
+
+
 
 ## Running the long jobs
 
