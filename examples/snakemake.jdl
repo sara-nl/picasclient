@@ -3,6 +3,7 @@
   ParameterStep=1;
   Parameters=1;
 
+  Site = GRID.SURF.nl;
   Executable = "/bin/sh";
   Arguments = "startpilot.sh";
   Stdoutput = "parametricjob.out";
