@@ -1,7 +1,7 @@
 [
   ParameterStart=0;
   ParameterStep=1;
-  Parameters=5;
+  Parameters=1;
 
   Executable = "/bin/sh";
   Arguments = "startpilot.sh";
