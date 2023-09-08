@@ -135,7 +135,7 @@ And the status and output can be retrieved with the usual DIRAC commands, while 
 
 As we have seen, through PiCaS you have a single interface that can store tokens with work to be done (the CouchDB instance). Then on any machine where you can deploy the PiCaS client, one can perform the tasks hand.
 
-### Advanced example (snakemake)
+### Advanced Grid example (snakemake)
 
 To run the Snakemake turorial example on the grid using PiCaS, there are some prerequisites. It helps to be up to speed with the full tutorial, so read it [here](https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html).
 
@@ -201,7 +201,30 @@ Once the Grid job is running, start snakemake:
 snakemake --profile picas -j 1
 ```
 
-If all is set well, you will see the regular snakemake logging output in green.
+If all is set well, you will see the regular snakemake logging output in green. After the processing is finished, you will find the output files in your Grid storage:
+
+```
+rclone ls token:/path/to/snakemake/files/
+  2183986 sorted_reads/A.bam
+      344 sorted_reads/A.bam.bai
+  2188317 sorted_reads/B.bam
+      344 sorted_reads/B.bam.bai
+  2200439 mapped_reads/A.bam
+  2203496 mapped_reads/B.bam
+    13008 plots/quals.svg
+    69995 calls/all.vcf
+   234112 data/genome.fa
+     2598 data/genome.fa.amb
+       83 data/genome.fa.ann
+   230320 data/genome.fa.bwt
+       18 data/genome.fa.fai
+    57556 data/genome.fa.pac
+   115160 data/genome.fa.sa
+  5752788 data/samples/A.fastq
+  5775000 data/samples/B.fastq
+  5775000 data/samples/C.fastq
+```
+
 
 
 
