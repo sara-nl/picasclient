@@ -19,7 +19,7 @@ from .iterators import (ViewIterator, TaskViewIterator, EndlessViewIterator,
 from .actors import RunActor
 
 
-version = "0.2.10"
+version = "0.3.0"
 
 picaslogger = logging.getLogger("PiCaS")
 formatter = logging.Formatter(
