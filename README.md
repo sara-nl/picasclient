@@ -1,4 +1,4 @@
-![Logo](logo.png)
+<img src="logo.png" width="250">
 
 picasclient
 -----------
