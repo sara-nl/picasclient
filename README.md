@@ -1,9 +1,5 @@
-<div align="center">
-  <img src="logo.png" width="100">
 picasclient
 -----------
-</div>
-
 
 ![CICD](https://github.com/sara-nl/picasclient/actions/workflows/python-app.yml/badge.svg) [![License - MIT](https://img.shields.io/github/license/sara-nl/picasclient)](https://github.com/sara-nl/picasclient/blob/main/LICENSE)
 
