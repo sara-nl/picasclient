@@ -173,3 +173,9 @@ to ensure the fractal code is called.
 Now, you can run your jobs whichever way you want (locally, slurm, grid) and start running using the general instructions as described above!
 
 
+Picas overview
+==============
+
+Here is an overview of the layers in picas and how they relate to the code in the `examples` folder.
+
+![picas layers](./docs/picas-layers.pdf)
