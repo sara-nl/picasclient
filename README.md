@@ -178,4 +178,4 @@ Picas overview
 
 Here is an overview of the layers in picas and how they relate to the code in the `examples` folder.
 
-![picas layers](./docs/picas-layers.pdf)
+![picas layers](./docs/picas-layers.png)
