@@ -127,7 +127,7 @@ wget https://files.pythonhosted.org/packages/7c/c8/f94a107eca0c178e5d74c705dad1a
 Now you can start the example from a grid login node with (in this case DIRAC is used for job submission):
 
 ```
-dirac-wms-job-submit fractals.jdl
+dirac-wms-job-submit grid-example.jdl
 ```
 
 And the status and output can be retrieved with DIRAC commands, while in the token you see the status of the token and the tokens' attachments contain the log files. Once all tokens have been processed (this can be seen in the CouchDB instance) the grid job will finish.
