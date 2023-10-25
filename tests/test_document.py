@@ -1,3 +1,4 @@
+import base64
 
 from picas.documents import Document, Task
 from picas.util import seconds
@@ -31,19 +32,20 @@ def test_empty():
 def test_attachment():
     doc = Document()
     data = b"This is it"
-    doc.put_attachment('mytext.txt', data)
-    attach = doc.get_attachment('mytext.txt')
+    textfile = "mytest.txt"
+    jsonfile = "mytest.json"
+    doc.put_attachment(textfile, data)
+    attach = doc.get_attachment(textfile)
     assert_equals(attach['content_type'], 'text/plain')
     assert_equals(attach['data'], data)
-    assert_equals(doc['_attachments']['mytext.txt']['data'],
-                  'VGhpcyBpcyBpdA==')
-    doc.remove_attachment('mytext.txt')
-    assert_true('mytext.txt' not in doc['_attachments'])
+    assert_equals(doc['_attachments'][textfile]['data'],
+                  base64.b64encode(data).decode())
+    doc.remove_attachment(textfile)
+    assert_true(textfile not in doc['_attachments'])
     assert_equals(attach['data'], data)
-    doc.put_attachment('mytext.json', b'{}')
-    attach = doc.get_attachment('mytext.json')
+    doc.put_attachment(jsonfile, b'{}')
+    attach = doc.get_attachment(jsonfile)
     assert_equals(attach['content_type'], 'application/json')
-
 
 class TestTask:
 

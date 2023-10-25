@@ -94,6 +94,12 @@ class Document(object):
             if mimetype is None:
                 mimetype = 'text/plain'
 
+        # Ensure that the entered string is encoded as bytestring for base64
+        if isinstance(data, bytes):
+            pass
+        else:
+            data = data.encode()
+
         b64data = base64.b64encode(data)
         self.doc['_attachments'][name] = {
             'content_type': mimetype, 'data': b64data.decode()}
