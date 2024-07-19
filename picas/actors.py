@@ -4,6 +4,8 @@
 @Copyright (c) 2016, Jan Bot
 @author: Jan Bot, Joris Borgdorff
 """
+import logging
+
 from .util import Timer
 from .iterators import TaskViewIterator
 
@@ -30,9 +32,9 @@ class RunActor(object):
         else:
             self.iterator = iterator
 
-    def _run(self, maxtime, avg_time_factor, max_tasks, stop_function):
+    def _run(self, task):
         """
-        Iterator part of the run method of the actor, with preparation and cleanup
+        Execution of the work on the iterator used in the run method.
         """
         self.prepare_run()
 
@@ -58,7 +60,7 @@ class RunActor(object):
         self.tasks_processed += 1
 
 
-    def run(self, maxtime=None, avg_time_factor=0.0, max_tasks=0, stop_function=None):
+    def run(self):
         """
         Run method of the actor, executes the application code by iterating
         over the available tasks in CouchDB.
@@ -67,51 +69,58 @@ class RunActor(object):
         self.prepare_env()
         try:
             for task in self.iterator:
-                self._run(maxtime=maxtime, avg_time_factor=avg_time_factor, max_tasks=max_tasks, stop_function=stop_function):
+                self._run(task)
         finally:
             self.cleanup_env()
 
     def prepare_env(self, *args, **kwargs):
-        """Method to be called to prepare the environment to run the
+        """
+        Method to be called to prepare the environment to run the
         application.
         """
         pass
 
     def prepare_run(self, *args, **kwargs):
-        """Code to run before a task gets processed. Used e.g. for fetching
+        """
+        Code to run before a task gets processed. Used e.g. for fetching
         inputs.
         """
         pass
 
     def process_task(self, task):
-        """The function to override, which processes the tasks themselves.
+        """
+        The function to override, which processes the tasks themselves.
         @param task: the task to process
         """
         raise NotImplementedError
 
     def cleanup_run(self, *args, **kwargs):
-        """Code to run after a task has been processed.
+        """
+        Code to run after a task has been processed.
         """
         pass
 
     def cleanup_env(self, *args, **kwargs):
-        """Method which gets called after the run method has completed.
+        """
+        Method which gets called after the run method has completed.
         """
         pass
 
-class RunActorWithStop(RunActorBase):
-    """RunActor class with added stopping functionality.
+class RunActorWithStop(RunActor):
+    """
+    RunActor class with added stopping functionality.
     """
 
-    def run(self, maxtime=None, avg_time_factor=0.0, max_tasks=0, stop_function=None):
-        """Run method of the actor, executes the application code by iterating
-        over the available tasks in CouchDB.
+    def run(self, maxtime=None, avg_time_factor=0.0, max_tasks=0, stop_function=None, **stop_function_args):
+        """
+        Run method of the actor, executes the application code by iterating
+        over the available tasks in CouchDB, including stop logic.
         """
         time = Timer()
         self.prepare_env()
         try:
             for task in self.iterator:
-                _run()
+                self._run(task)
 
                 #TODO: remove print, its for testing
                 #print("run actor tasks", self.tasks_processed)

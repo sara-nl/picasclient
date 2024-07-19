@@ -20,7 +20,7 @@ import couchdb
 import picasconfig
 
 #picas imports
-from picas.actors import RunActor
+from picas.actors import RunActor, RunActorWithStop
 from picas.clients import CouchDB
 from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
@@ -28,7 +28,7 @@ from picas.modifiers import BasicTokenModifier
 from picas.executers import execute
 from picas.util import Timer
 
-class ExampleActor(RunActor):
+class ExampleActor(RunActorWithStop):
     """
     The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
     Feel free to adjust to whatever you need, a template can be found at: example-template.py
@@ -36,7 +36,7 @@ class ExampleActor(RunActor):
     def __init__(self, db, modifier, view="todo", **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
-        self.iterator = EndlessViewIterator(self.iterator, stop_callback=self.time_elapsed) # overwrite default iterator from super().init()
+        self.iterator = EndlessViewIterator(self.iterator)#, stop_callback=self.time_elapsed, elapsed=15) # overwrite default iterator from super().init()
         self.modifier = modifier
         self.client = db
 
@@ -93,7 +93,7 @@ def main():
     # Create actor
     actor = ExampleActor(client, modifier)
     # Start work!
-    actor.run()
+    actor.run(stop_function=actor.time_elapsed, elapsed=11)
 
 if __name__ == '__main__':
     main()
