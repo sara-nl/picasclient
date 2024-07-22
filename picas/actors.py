@@ -7,7 +7,7 @@
 import logging
 
 from .util import Timer
-from .iterators import TaskViewIterator
+from .iterators import TaskViewIterator, EndlessViewIterator
 
 from couchdb.http import ResourceConflict
 
@@ -114,17 +114,28 @@ class RunActorWithStop(RunActor):
     def run(self, maxtime=None, avg_time_factor=0.0, max_tasks=0, stop_function=None, **stop_function_args):
         """
         Run method of the actor, executes the application code by iterating
-        over the available tasks in CouchDB, including stop logic.
+        over the available tasks in CouchDB, including stop logic. The stop
+        logic is also extended into the EndlessViewIterator to break it when
+        the condition is met, otherwise it never stops.
         """
         time = Timer()
         self.prepare_env()
+        # Special case to break the while loop of the EndlessViewIterator: 
+        # The while loop cant reach the stop condition in the for loop below, 
+        # so pass the condition into the stop mechanism of the EVI, then the
+        # iterator is stopped from EVI and not the RunActorWithStop
+        if isinstance(self.iterator, EndlessViewIterator):
+            self.iterator.stop_callback = stop_function
+            self.iterator.stop_callback_args = stop_function_args
         try:
             for task in self.iterator:
                 self._run(task)
 
-                #TODO: remove print, its for testing
-                #print("run actor tasks", self.tasks_processed)
-                logging.debug("Tasks executed: " + self.tasks_processed)
+                logging.debug("Tasks executed: ", self.tasks_processed)
+
+                if (stop_function is not None and 
+                    stop_function(**stop_function_args)):
+                    break
 
                 # break if number of tasks processed is max set
                 if max_tasks and self.tasks_processed == max_tasks:

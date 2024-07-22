@@ -93,7 +93,7 @@ def main():
     # Create actor
     actor = ExampleActor(client, modifier)
     # Start work!
-    actor.run(stop_function=actor.time_elapsed, elapsed=11)
+    actor.run(max_tasks=2, stop_function=actor.time_elapsed, elapsed=11)
 
 if __name__ == '__main__':
     main()
