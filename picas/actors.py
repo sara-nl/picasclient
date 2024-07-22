@@ -111,12 +111,18 @@ class RunActorWithStop(RunActor):
     RunActor class with added stopping functionality.
     """
 
-    def run(self, maxtime=None, avg_time_factor=0.0, max_tasks=0, stop_function=None, **stop_function_args):
+    def run(self, max_time=None, avg_time_factor=0.0, max_tasks=0, stop_function=None, **stop_function_args):
         """
         Run method of the actor, executes the application code by iterating
         over the available tasks in CouchDB, including stop logic. The stop
         logic is also extended into the EndlessViewIterator to break it when
         the condition is met, otherwise it never stops.
+
+        @param max_time:
+        @param avg_time_factor:
+        @param max_tasks:
+        @param stop_function: custom function to stop the execution, mustt return bool
+        @param stop_function_args: kwargs to supply to stop_function
         """
         time = Timer()
         self.prepare_env()
@@ -141,10 +147,12 @@ class RunActorWithStop(RunActor):
                 if max_tasks and self.tasks_processed == max_tasks:
                     break
 
-                if maxtime is not None:
-                    will_elapse = ((avg_time_factor + self.tasks_processed) *
-                                   time.elapsed() / self.tasks_processed)
-                    if will_elapse > maxtime:
+                if max_time is not None:
+                    # for a large number of tokens the avg time will be better (due to statistics)
+                    # resulting in a better estimate of whether time.elapsed + avg_time (what will
+                    # be added on the next iteration) is larger than the max_time.
+                    will_elapse = (time.elapsed() + avg_time_factor)
+                    if will_elapse > max_time:
                         break
         finally:
             self.cleanup_env()
