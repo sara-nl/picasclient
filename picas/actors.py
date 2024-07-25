@@ -18,9 +18,10 @@ class RunActor(object):
     Executor class to be overwritten in the client implementation.
     """
 
-    def __init__(self, db, iterator=None, view='todo', token_kill_values=[0,0], **view_params):
+    def __init__(self, db, iterator=None, view='todo', token_reset_values=[0,0], **view_params):
         """
         @param database: the database to get the tasks from.
+        @param token_reset_values: values to use in the token when PiCaS is terminated, defaults to values of 'todo' ([0,0])
         """
         if db is None:
             raise ValueError("Database must be initialized")
@@ -28,7 +29,7 @@ class RunActor(object):
         # current task is needed to reset it when PiCaS is killed
         self.current_task = None
         self.tasks_processed = 0
-        self.token_kill_values = token_kill_values
+        self.token_reset_values = token_reset_values
 
         self.iterator = iterator
         if iterator is None:
@@ -71,7 +72,7 @@ class RunActor(object):
         over the available tasks in CouchDB.
         """
         # The error handler for when SLURM (or other scheduler / user) kills PiCaS, to reset the 
-        # token back to 'todo' state (or other state defined through the token_kill_values)
+        # token back to 'todo' state (or other state defined through the token_reset_values)
         self.setup_handler()
 
         time = Timer()
@@ -84,7 +85,7 @@ class RunActor(object):
 
     def handler(self, signum, frame):
         """
-        Signal handler method. It sets the tokens values of 'lock' and 'done' to the values passed to token_kill_values.
+        Signal handler method. It sets the tokens values of 'lock' and 'done' to the values passed to token_reset_values.
         This method ensures that when PiCaS is killed by the scheduler or user, it automatically resets the token that
         was being worked on back to some state (default: 'todo' state).
 
@@ -93,8 +94,8 @@ class RunActor(object):
         """
         log.info(f'PiCaS shutting down: called with signal {signum}')
         if self.current_task:
-            self.current_task['lock'] = self.token_kill_values[0]
-            self.current_task['exit_code'] = self.token_kill_values[1]
+            self.current_task['lock'] = self.token_reset_values[0]
+            self.current_task['exit_code'] = self.token_reset_values[1]
             self.db.save(self.current_task)
         self.cleanup_env()
         exit(0)
