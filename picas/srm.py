@@ -120,7 +120,7 @@ class SRMClient(object):
         surl = self.srm_host + loc
         cmd = ['srmls', surl]
         print(" ".join(cmd))
-        (returncode, stdout, stderr) = execute(cmd)
+        (proc, returncode, stdout, stderr) = execute(cmd)
         if returncode == 0:
             bn = path.basename(loc)
             lines = stdout.split("\n")
@@ -152,7 +152,7 @@ class SRMClient(object):
         cmd = ['srmcp', '-2', '-server_mode=passive',
                'file:///' + local_file, srm_url]
         print(cmd)
-        (returncode, stdout, stderr) = execute(cmd)
+        (proc, returncode, stdout, stderr) = execute(cmd)
         if returncode == 0:
             pass
         else:
