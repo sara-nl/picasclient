@@ -52,7 +52,7 @@ class ExampleActor(RunActorWithStop):
         # /usr/bin/time -v ./process_task.sh [input] [tokenid] 2> logs_[token_id].err 1> logs_[token_id].out
         command = "/usr/bin/time -v ./process_task.sh " + "\"" +token['input'] + "\" " + token['_id'] + " 2> logs_" + str(token['_id']) + ".err 1> logs_" + str(token['_id']) + ".out"
 
-        out = execute(command,shell=True)
+        out = execute(command, shell=True)
 
         ## Get the job exit code in the token
         token['exit_code'] = out[0]

@@ -5,6 +5,7 @@
 @author: Jan Bot, Joris Borgdorff
 """
 import logging
+import signal
 
 from .util import Timer
 from .iterators import TaskViewIterator, EndlessViewIterator
@@ -17,14 +18,17 @@ class RunActor(object):
     Executor class to be overwritten in the client implementation.
     """
 
-    def __init__(self, db, iterator=None, view='todo', **view_params):
+    def __init__(self, db, iterator=None, view='todo', token_kill_values=[0,0], **view_params):
         """
         @param database: the database to get the tasks from.
         """
         if db is None:
             raise ValueError("Database must be initialized")
         self.db = db
+        # current task is needed to reset it when PiCaS is killed
+        self.current_task = None
         self.tasks_processed = 0
+        self.token_kill_values = token_kill_values
 
         self.iterator = iterator
         if iterator is None:
@@ -37,6 +41,8 @@ class RunActor(object):
         Execution of the work on the iterator used in the run method.
         """
         self.prepare_run()
+        # current task is set s.t. the handler can reset the task that is being worked on
+        self.current_task = task
 
         try:
             self.process_task(task)
@@ -44,7 +50,7 @@ class RunActor(object):
             msg = ("Exception {0} occurred during processing: {1}"
                    .format(type(ex), ex))
             task.error(msg, exception=ex)
-            print(msg)
+            log.info(msg)
 
         while True:
             try:
@@ -59,12 +65,15 @@ class RunActor(object):
         self.cleanup_run()
         self.tasks_processed += 1
 
-
     def run(self):
         """
         Run method of the actor, executes the application code by iterating
         over the available tasks in CouchDB.
         """
+        # The error handler for when SLURM (or other scheduler / user) kills PiCaS, to reset the 
+        # token back to 'todo' state (or other state defined through the token_kill_values)
+        self.setup_handler()
+
         time = Timer()
         self.prepare_env()
         try:
@@ -72,6 +81,28 @@ class RunActor(object):
                 self._run(task)
         finally:
             self.cleanup_env()
+
+    def handler(self, signum, frame):
+        """
+        Signal handler method. It sets the tokens values of 'lock' and 'done' to the values passed to token_kill_values.
+        This method ensures that when PiCaS is killed by the scheduler or user, it automatically resets the token that
+        was being worked on back to some state (default: 'todo' state).
+
+        @param signum: signal to listen to and act upon
+        @param frame: stack frame, defaults to None, see https://docs.python.org/3/library/signal.html#signal.signal
+        """
+        log.info(f'PiCaS shutting down: called with signal {signum}')
+        if self.current_task:
+            self.current_task['lock'] = self.token_kill_values[0]
+            self.current_task['exit_code'] = self.token_kill_values[1]
+            self.db.save(self.current_task)
+        self.cleanup_env()
+        exit(0)
+
+    def setup_handler(self):
+        log.info('Setting up signal handlers')
+        signal.signal(signal.SIGTERM, self.handler)
+        signal.signal(signal.SIGINT, self.handler)
 
     def prepare_env(self, *args, **kwargs):
         """
@@ -126,6 +157,10 @@ class RunActorWithStop(RunActor):
         """
         time = Timer()
         self.prepare_env()
+
+        # handler needs to be setup in overwritten method
+        self.setup_handler()
+
         # Special case to break the while loop of the EndlessViewIterator: 
         # The while loop cant reach the stop condition in the for loop below, 
         # so pass the condition into the stop mechanism of the EVI, then the
@@ -133,6 +168,7 @@ class RunActorWithStop(RunActor):
         if isinstance(self.iterator, EndlessViewIterator):
             self.iterator.stop_callback = stop_function
             self.iterator.stop_callback_args = stop_function_args
+
         try:
             for task in self.iterator:
                 self._run(task)
