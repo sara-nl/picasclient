@@ -53,9 +53,10 @@ class ExampleActor(RunActorWithStop):
         command = "/usr/bin/time -v ./process_task.sh " + "\"" +token['input'] + "\" " + token['_id'] + " 2> logs_" + str(token['_id']) + ".err 1> logs_" + str(token['_id']) + ".out"
 
         out = execute(command, shell=True)
+        self.subprocess = out[0]
 
         ## Get the job exit code in the token
-        token['exit_code'] = out[0]
+        token['exit_code'] = out[1]
         token = self.modifier.close(token)
         #self.client.db[token['_id']] = token # necessary?
 

@@ -28,6 +28,8 @@ class RunActor(object):
         self.db = db
         # current task is needed to reset it when PiCaS is killed
         self.current_task = None
+        # the subprocess running the token code is necessary s.t. the handler can cleanly kill it
+        self.subprocess = None
         self.tasks_processed = 0
         self.token_reset_values = token_reset_values
 
@@ -85,22 +87,40 @@ class RunActor(object):
 
     def handler(self, signum, frame):
         """
-        Signal handler method. It sets the tokens values of 'lock' and 'done' to the values passed to token_reset_values.
-        This method ensures that when PiCaS is killed by the scheduler or user, it automatically resets the token that
-        was being worked on back to some state (default: 'todo' state).
+        Signal handler method. It sets the tokens values of 'lock' and 'done' fields to the values 
+        passed to token_reset_values. This method ensures that when PiCaS is killed by the 
+        scheduler or user, it automatically resets the token that was being worked on back to some
+        state (default: 'todo' state).
 
         @param signum: signal to listen to and act upon
         @param frame: stack frame, defaults to None, see https://docs.python.org/3/library/signal.html#signal.signal
         """
-        log.info(f'PiCaS shutting down: called with signal {signum}')
+        log.info(f'PiCaS shutting down, called with signal {signum}')
+
+        # gracefully kill the process running token code, it needs to stop before we update the token state
+        if self.subprocess and self.subprocess.poll() is None:
+            log.info('Terminating execution of token')
+            self.subprocess.terminate()
+            try:
+                self.subprocess.communicate(timeout=30) # wait 30 seconds for termination, value chosen to allow complex processes to stop
+            except subprocess.TimeoutExpired:
+                log.info('Killing subprocess')
+                self.subprocess.kill()
+                self.subprocess.communicate()
+
+        # update the token state
         if self.current_task:
             self.current_task['lock'] = self.token_reset_values[0]
             self.current_task['exit_code'] = self.token_reset_values[1]
             self.db.save(self.current_task)
+
         self.cleanup_env()
         exit(0)
 
     def setup_handler(self):
+        """
+        Method to set up the handler in the run method with lower redundancy
+        """
         log.info('Setting up signal handlers')
         signal.signal(signal.SIGTERM, self.handler)
         signal.signal(signal.SIGINT, self.handler)
