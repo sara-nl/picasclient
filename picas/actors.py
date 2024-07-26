@@ -108,8 +108,8 @@ class RunActor(object):
                 self.subprocess.kill()
                 self.subprocess.communicate()
 
-        # update the token state
-        if self.current_task:
+        # update the token state, if reset vaue is None, do nothing.
+        if self.current_task and self.token_reset_values is not None:
             self.current_task['lock'] = self.token_reset_values[0]
             self.current_task['exit_code'] = self.token_reset_values[1]
             self.db.save(self.current_task)
