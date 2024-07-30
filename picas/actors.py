@@ -6,6 +6,7 @@
 """
 import logging
 import signal
+import subprocess
 
 from .util import Timer
 from .iterators import TaskViewIterator, EndlessViewIterator
