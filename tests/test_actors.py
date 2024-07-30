@@ -1,8 +1,16 @@
-import unittest
+import pytest
+import os
+import signal
+import subprocess
 import time
+import unittest
 
 from test_mock import MockDB, MockRun, MockRunWithStop
 from nose.tools import assert_true, assert_equals
+from unittest.mock import patch, Mock
+
+from picas import actors
+from picas.documents import Task
 
 
 class TestRun(unittest.TestCase):
@@ -56,3 +64,36 @@ class TestRun(unittest.TestCase):
         runner.run(max_time=self.max_time, avg_time_factor=self.avg_time_fac)
         self.assertEqual(self.count, self.test_number)
 
+    @patch('picas.actors.log')
+    @patch('signal.signal')
+    def test_setup_handler(self, mock_signal, mock_log):
+        actor = actors.RunActor(MockDB())
+        actor.setup_handler()
+
+        mock_signal.assert_any_call(signal.SIGTERM, actor.handler)
+        mock_signal.assert_any_call(signal.SIGINT, actor.handler)
+        mock_log.info.assert_called_once_with('Setting up signal handlers')
+
+
+class TestHandler(unittest.TestCase):
+    def setUp(self):
+        self.lock_code = 2
+        self.exit_code = 2
+        self.actor = actors.RunActor(MockDB(), token_reset_values=[self.lock_code, self.exit_code])
+        self.actor.subprocess = subprocess.Popen(['sleep', '10']) #ensure the actor is busy
+        self.actor.current_task = Task({'_id':'c', 'lock': None, 'exit_code': None})
+
+    def test_signal_handling(self):
+        self.actor.setup_handler()
+
+        # to handle the exit code from the handler, pytest can catch it
+        with pytest.raises(SystemExit) as handler_exit_code:
+            self.actor.handler(signal.SIGTERM, None)
+        self.assertEqual(handler_exit_code.value.code, 0)
+
+        with pytest.raises(SystemExit) as handler_exit_code:
+            self.actor.handler(signal.SIGINT, None)
+        self.assertEqual(handler_exit_code.value.code, 0)
+
+        self.assertEqual(self.actor.current_task['lock'], self.lock_code)
+        self.assertEqual(self.actor.current_task['exit_code'], self.exit_code)

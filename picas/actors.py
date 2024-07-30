@@ -77,7 +77,7 @@ class RunActor(object):
         # token back to 'todo' state (or other state defined through the token_reset_values)
         self.setup_handler()
 
-        time = Timer()
+        self.time = Timer()
         self.prepare_env()
         try:
             for task in self.iterator:
@@ -176,7 +176,7 @@ class RunActorWithStop(RunActor):
         @param stop_function: custom function to stop the execution, mustt return bool
         @param stop_function_args: kwargs to supply to stop_function
         """
-        time = Timer()
+        self.time = Timer()
         self.prepare_env()
 
         # handler needs to be setup in overwritten method
@@ -208,7 +208,7 @@ class RunActorWithStop(RunActor):
                     # for a large number of tokens the avg time will be better (due to statistics)
                     # resulting in a better estimate of whether time.elapsed + avg_time (what will
                     # be added on the next iteration) is larger than the max_time.
-                    will_elapse = (time.elapsed() + avg_time_factor)
+                    will_elapse = (self.time.elapsed() + avg_time_factor)
                     if will_elapse > max_time:
                         break
         finally:
