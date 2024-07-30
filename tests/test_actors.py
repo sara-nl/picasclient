@@ -16,6 +16,9 @@ from picas.documents import Task
 class TestRun(unittest.TestCase):
 
     def _callback(self, task):
+        """
+        _callback is used to process tasks: for mock tasks it just increases the counter.
+        """
         self.assertTrue(task.id in [t['_id'] for t in MockDB.TASKS])
         self.assertTrue(task['lock'] > 0)
         self.count += 1
@@ -33,6 +36,9 @@ class TestRun(unittest.TestCase):
         self.assertEqual(self.count, len(MockDB.TASKS))
 
     def test_stop_max_tasks(self):
+        """
+        Test to stop after 1 task is performed.
+        """
         self.count = 0
         self.test_number = 1
         runner = MockRunWithStop(self._callback)
@@ -43,6 +49,9 @@ class TestRun(unittest.TestCase):
         return run_obj.current_task['_id'] == id
 
     def test_stop_fn(self):
+        """
+        Test to stop when a function is true.
+        """
         self.count = 0
         self.stop_fn_arg = "a"
         runner = MockRunWithStop(self._callback)
@@ -50,12 +59,19 @@ class TestRun(unittest.TestCase):
         self.assertEqual(runner.current_task['_id'], self.stop_fn_arg)
 
     def _callback_timer(self, task):
+        """
+        Callback function for processing tokens that sleeps, s.t. the max time of 
+        processing can expire and stop the processing.
+        """
         self.assertTrue(task.id in [t['_id'] for t in MockDB.TASKS])
         self.assertTrue(task['lock'] > 0)
         self.count += 1
         time.sleep(0.5) # force one token to "take" 0.5 s
 
     def test_max_time(self):
+        """
+        Test to stop running when the max time is about to be reached.
+        """
         self.count = 0
         self.max_time = 0.5 # one token takes 0.5, so it quits after 1 token
         self.avg_time_fac = 0.5
@@ -66,16 +82,20 @@ class TestRun(unittest.TestCase):
 
     @patch('picas.actors.log')
     @patch('signal.signal')
-    def test_setup_handler(self, mock_signal, mock_log):
+    def test_setup_handler(self, sig, log):
+        """
+        Test the setting up of the handler.
+        """
         actor = actors.RunActor(MockDB())
         actor.setup_handler()
 
-        mock_signal.assert_any_call(signal.SIGTERM, actor.handler)
-        mock_signal.assert_any_call(signal.SIGINT, actor.handler)
-        mock_log.info.assert_called_once_with('Setting up signal handlers')
+        sig.assert_any_call(signal.SIGTERM, actor.handler)
+        sig.assert_any_call(signal.SIGINT, actor.handler)
+        log.info.assert_called_once_with('Setting up signal handlers')
 
 
 class TestHandler(unittest.TestCase):
+
     def setUp(self):
         self.lock_code = 2
         self.exit_code = 2
@@ -84,6 +104,9 @@ class TestHandler(unittest.TestCase):
         self.actor.current_task = Task({'_id':'c', 'lock': None, 'exit_code': None})
 
     def test_signal_handling(self):
+        """
+        Test the handler response: proper exiting and updating of task codes.
+        """
         self.actor.setup_handler()
 
         # to handle the exit code from the handler, pytest can catch it
