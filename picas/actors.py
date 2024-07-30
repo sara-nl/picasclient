@@ -12,6 +12,8 @@ from .iterators import TaskViewIterator, EndlessViewIterator
 
 from couchdb.http import ResourceConflict
 
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 class RunActor(object):
     """
