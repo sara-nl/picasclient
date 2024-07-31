@@ -61,6 +61,7 @@ class RunActor(object):
         while True:
             try:
                 self.db.save(task)
+                self.current_task = None # set to None so the handler leaves the token alone when picas is killed
                 break
             except ResourceConflict:
                 # simply overwrite changes - model results are more
