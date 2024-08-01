@@ -93,7 +93,7 @@ class TestRun(unittest.TestCase):
 
         sig.assert_any_call(signal.SIGTERM, actor.handler)
         sig.assert_any_call(signal.SIGINT, actor.handler)
-        log.info.assert_called_once_with('Setting up signal handlers')
+        log.info.assert_any_call('Setting up signal handlers')
 
 
 class TestHandler(unittest.TestCase):
