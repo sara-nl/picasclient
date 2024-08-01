@@ -61,7 +61,6 @@ class RunActor(object):
         while True:
             try:
                 self.db.save(task)
-                self.current_task = None # set to None so the handler leaves the token alone when picas is killed
                 break
             except ResourceConflict:
                 # simply overwrite changes - model results are more
@@ -86,6 +85,7 @@ class RunActor(object):
         try:
             for task in self.iterator:
                 self._run(task)
+                self.current_task = None # set to None so the handler leaves the token alone when picas is killed
         finally:
             self.cleanup_env()
 
@@ -215,5 +215,6 @@ class RunActorWithStop(RunActor):
                     will_elapse = (self.time.elapsed() + avg_time_factor)
                     if will_elapse > max_time:
                         break
+                self.current_task = None # set to None so the handler leaves the token alone when picas is killed
         finally:
             self.cleanup_env()
