@@ -22,6 +22,7 @@ class TestRun(unittest.TestCase):
         self.assertTrue(task.id in [t['_id'] for t in MockDB.TASKS])
         self.assertTrue(task['lock'] > 0)
         self.count += 1
+        task['exit_code'] = 0
 
     def test_run(self):
         """
@@ -67,6 +68,7 @@ class TestRun(unittest.TestCase):
         self.assertTrue(task['lock'] > 0)
         self.count += 1
         time.sleep(0.5) # force one token to "take" 0.5 s
+        task['exit_code'] = 0
 
     def test_max_time(self):
         """
@@ -98,10 +100,10 @@ class TestHandler(unittest.TestCase):
 
     def setUp(self):
         self.lock_code = 2
-        self.exit_code = 2
-        self.actor = actors.RunActor(MockDB(), token_reset_values=[self.lock_code, self.exit_code])
+        self.done_code = 2
+        self.actor = actors.RunActor(MockDB(), token_reset_values=[self.lock_code, self.done_code])
         self.actor.subprocess = subprocess.Popen(['sleep', '10']) #ensure the actor is busy
-        self.actor.current_task = Task({'_id':'c', 'lock': None, 'exit_code': None})
+        self.actor.current_task = Task({'_id':'c', 'lock': None, 'done': None})
 
     def test_signal_handling(self):
         """
@@ -119,4 +121,4 @@ class TestHandler(unittest.TestCase):
         self.assertEqual(handler_exit_code.value.code, 0)
 
         self.assertEqual(self.actor.current_task['lock'], self.lock_code)
-        self.assertEqual(self.actor.current_task['exit_code'], self.exit_code)
+        self.assertEqual(self.actor.current_task['done'], self.done_code)
