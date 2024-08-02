@@ -13,13 +13,12 @@ description:
 
 '''
 
-#python imports
+import logging
 import os
 import time
 import couchdb
 import picasconfig
 
-#picas imports
 from picas.actors import RunActor, RunActorWithStop
 from picas.clients import CouchDB
 from picas.iterators import TaskViewIterator
@@ -27,6 +26,8 @@ from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
 from picas.executers import execute
 from picas.util import Timer
+
+log = logging.getLogger(__name__)
 
 class ExampleActor(RunActorWithStop):
     """
@@ -36,7 +37,7 @@ class ExampleActor(RunActorWithStop):
     def __init__(self, db, modifier, view="todo", **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
-        self.iterator = EndlessViewIterator(self.iterator)#, stop_callback=self.time_elapsed, elapsed=15) # overwrite default iterator from super().init()
+        self.iterator = EndlessViewIterator(self.iterator)
         self.modifier = modifier
         self.client = db
 
@@ -55,10 +56,9 @@ class ExampleActor(RunActorWithStop):
         out = execute(command, shell=True)
         self.subprocess = out[0]
 
-        ## Get the job exit code in the token
+        # Get the job exit code and done in the token
         token['exit_code'] = out[1]
         token = self.modifier.close(token)
-        #self.client.db[token['_id']] = token # necessary?
 
         # Attach logs in token
         curdate = time.strftime("%d/%m/%Y_%H:%M:%S_")
