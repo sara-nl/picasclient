@@ -173,6 +173,7 @@ class Task(Document):
         'hostname': '',
         'scrub_count': 0,
         'input': {},
+        'exit_code': '',
         'output': {},
         'uploads': {},
         'error': [],

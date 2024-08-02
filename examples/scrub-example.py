@@ -1,45 +1,32 @@
-'''
-@helpdesk: SURF helpdesk <helpdesk@surf.nl>
-
-usage: python local-example.py
-description:
-    Connect to PiCaS server
-    Get the next token in todo View
-    Fetch the token parameters, e.g. input value
-    Run main job (process_task.sh) with the input argument
-    When done, return the exit code to the token
-    Attach the logs to the token
-
-
-'''
-
 import logging
 import os
 import time
 import couchdb
 import picasconfig
 
-from picas.actors import RunActor, RunActorWithStop
+from picas.actors import RunActorWithStop
 from picas.clients import CouchDB
-from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
 from picas.executers import execute
 from picas.util import Timer
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("Scrub example")
 
 class ExampleActor(RunActorWithStop):
     """
     The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
-    Feel free to adjust to whatever you need, a template can be found at: example-template.py
+    Example for scrubbing tokens and rerunning them. Scrubbing is done when a token fails to finish
+    properly and the user wants to rerun it.
     """
-    def __init__(self, db, modifier, view="todo", **viewargs):
+    def __init__(self, db, modifier, view="todo", scrub_count=2, **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
         self.iterator = EndlessViewIterator(self.iterator)
         self.modifier = modifier
         self.client = db
+        # scrub limit is the amount of retries
+        self.scrub_limit = scrub_count
 
     def process_task(self, token):
         # Print token information
@@ -60,6 +47,12 @@ class ExampleActor(RunActorWithStop):
         token['exit_code'] = out[1]
         token = self.modifier.close(token)
 
+        # Scrub the token N times if it failed, scrubbing puts it back in 'todo' state
+        if (token['scrub_count'] < self.scrub_limit) and (out[1] != 0):
+            log.info(f"Scrubbing token {token['_id']}")
+            token = self.modifier.unclose(token)
+            token.scrub()
+
         # Attach logs in token
         curdate = time.strftime("%d/%m/%Y_%H:%M:%S_")
         try:
@@ -73,18 +66,6 @@ class ExampleActor(RunActorWithStop):
         except:
             pass
 
-    def time_elapsed(self, elapsed=30.):
-        """
-        This function returns whether the class has been alive for more than `elapsed` seconds. This is needed because currently the maxtime argument in RunActor.run is broken:
-        The run method will break when the iterator is non-empty and then it checks if the maxtime has passed. If the iterator stays empty, it will run until a new token is 
-        processed, and after processing the if statement is true, and run breaks.
-
-        @param elapsed: lifetime of the Actor in seconds
-
-        @returns: bool
-        """
-        return self.timer.elapsed() > elapsed
-
 def main():
     # setup connection to db
     client = CouchDB(url=picasconfig.PICAS_HOST_URL, db=picasconfig.PICAS_DATABASE, username=picasconfig.PICAS_USERNAME, password=picasconfig.PICAS_PASSWORD)
@@ -92,7 +73,7 @@ def main():
     # Create token modifier
     modifier = BasicTokenModifier()
     # Create actor
-    actor = ExampleActor(client, modifier)
+    actor = ExampleActor(client, modifier, scrub_count=2)
     # Start work!
     actor.run()
 
