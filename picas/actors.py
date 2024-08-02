@@ -29,14 +29,20 @@ class RunActor(object):
         if db is None:
             raise ValueError("Database must be initialized")
         self.db = db
+        self.iterator = iterator
+        self.token_reset_values = token_reset_values
+
         # current task is needed to reset it when PiCaS is killed
         self.current_task = None
         # the subprocess running the token code is necessary s.t. the handler can cleanly kill it
         self.subprocess = None
         self.tasks_processed = 0
-        self.token_reset_values = token_reset_values
 
-        self.iterator = iterator
+        # current task is needed to reset it when PiCaS is killed
+        self.current_task = None
+        # the subprocess running the token code is necessary s.t. the handler can cleanly kill it
+        self.subprocess = None
+
         if iterator is None:
             self.iterator = TaskViewIterator(self.db, view, **view_params)
         else:
