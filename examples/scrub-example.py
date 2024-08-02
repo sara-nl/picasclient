@@ -16,7 +16,8 @@ log = logging.getLogger("Scrub example")
 class ExampleActor(RunActorWithStop):
     """
     The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
-    Example for scrubbing tokens and rerunning them.
+    Example for scrubbing tokens and rerunning them. Scrubbing is done when a token fails to finish
+    properly and the user wants to rerun it.
     """
     def __init__(self, db, modifier, view="todo", scrub_count=2, **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
@@ -24,6 +25,7 @@ class ExampleActor(RunActorWithStop):
         self.iterator = EndlessViewIterator(self.iterator)
         self.modifier = modifier
         self.client = db
+        # scrub limit is the amount of retries
         self.scrub_limit = scrub_count
 
     def process_task(self, token):
@@ -45,6 +47,7 @@ class ExampleActor(RunActorWithStop):
         token['exit_code'] = out[1]
         token = self.modifier.close(token)
 
+        # Scrub the token N times if it failed, scrubbing puts it back in 'todo' state
         if (token['scrub_count'] < self.scrub_limit) and (out[1] != 0):
             log.info(f"Scrubbing token {token['_id']}")
             token = self.modifier.unclose(token)
