@@ -46,7 +46,7 @@ class RunActor(object):
                     msg = ("Exception {0} occurred during processing: {1}"
                            .format(type(ex), ex))
                     task.error(msg, exception=ex)
-                    print(msg)
+                    picaslogger.info(msg)
 
                 while True:
                     try:

@@ -119,7 +119,7 @@ class SRMClient(object):
         """
         surl = self.srm_host + loc
         cmd = ['srmls', surl]
-        print(" ".join(cmd))
+        picaslogger.info(" ".join(cmd))
         (returncode, stdout, stderr) = execute(cmd)
         if returncode == 0:
             bn = path.basename(loc)
@@ -151,7 +151,7 @@ class SRMClient(object):
 
         cmd = ['srmcp', '-2', '-server_mode=passive',
                'file:///' + local_file, srm_url]
-        print(cmd)
+        picaslogger.info(cmd)
         (returncode, stdout, stderr) = execute(cmd)
         if returncode == 0:
             pass

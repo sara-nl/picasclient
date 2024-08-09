@@ -156,10 +156,10 @@ class EndlessViewIterator(ViewIterator):
             except StopIteration:
                 self.iterator.reset()
                 time.sleep(self.sleep_sec)
-                print("Iterator is waiting for work...")
+                picaslogger.info("Iterator is waiting for work...")
 
         # no longer continue
         self.iterator.stop()
         self.stop()
-        print("Iterator is finishing.")
+        picaslogger.info("Iterator is finishing.")
         raise StopIteration

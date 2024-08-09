@@ -25,9 +25,9 @@ def download(files, threads=10):
         thread_pool.append(d)
 
     q.join()
-    print("Download work done, joining threads")
+    picaslogger.info("Download work done, joining threads")
     for d in thread_pool:
-        print("Joining: {0!s}".format(str(d.ident)))
+        picaslogger.info("Joining: {0!s}".format(str(d.ident)))
         d.join(1)
 
 
@@ -54,4 +54,4 @@ class Downloader(threading.Thread):
             if (count > 9):
                 raise EnvironmentError("Download failed.")
             self.q.task_done()
-        print("Exiting while loop, thread should close itself...")
+        picaslogger.info("Exiting while loop, thread should close itself...")

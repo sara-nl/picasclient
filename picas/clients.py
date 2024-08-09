@@ -7,12 +7,12 @@
 @author: Joris Borgdorff
 """
 
-from .documents import Document
 import random
 import sys
 
 # Couchdb imports
 import couchdb
+from .documents import Document
 from couchdb.design import ViewDefinition
 from couchdb.http import ResourceConflict
 
@@ -185,13 +185,13 @@ class CouchDB(object):
             try:
                 self.delete(doc)
             except ResourceConflict as ex:
-                print("Could not delete document {0} (rev {1}) "
+                picaslogger.info("Could not delete document {0} (rev {1}) "
                       "due to resource conflict: {2}".
                       format(doc.id, doc.rev, str(ex)),
                       file=sys.stderr)
                 result[i] = False
             except Exception as ex:
-                print("Could not delete document {0!s}: {1!s}".
+                picaslogger.info("Could not delete document {0!s}: {1!s}".
                       format(str(doc), str(ex)), file=sys.stderr)
                 result[i] = False
 

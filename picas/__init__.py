@@ -28,7 +28,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 ch.setFormatter(formatter)
 picaslogger.addHandler(ch)
-picaslogger.setLevel(logging.ERROR)
+picaslogger.setLevel(logging.INFO)
 
 __all__ = [
     'CouchDB',
