@@ -2,7 +2,6 @@ import unittest
 
 from picas.iterators import TaskViewIterator
 from test_mock import MockDB
-#from nose.tools import assert_equals, assert_true
 
 
 class TestTask(unittest.TestCase):

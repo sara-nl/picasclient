@@ -1,7 +1,6 @@
 import unittest
 
 from test_mock import MockDB, MockRun
-from nose.tools import assert_true, assert_equals
 
 
 class TestRun(unittest.TestCase):
