@@ -13,6 +13,7 @@ import queue
 from os import path
 
 from .executers import execute, execute_old
+from .picaslogger import picaslogger
 
 
 def download(remotefile, local_dir):

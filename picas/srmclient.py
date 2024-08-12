@@ -11,6 +11,7 @@ import logging
 import queue
 
 from picas import SRMClient
+from .picaslogger import picaslogger
 
 
 def download(files, threads=10):

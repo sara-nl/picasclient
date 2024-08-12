@@ -10,12 +10,12 @@
 import random
 import sys
 
-# Couchdb imports
 import couchdb
-from .documents import Document
 from couchdb.design import ViewDefinition
 from couchdb.http import ResourceConflict
 
+from .documents import Document
+from .picaslogger import picaslogger
 
 class CouchDB(object):
 

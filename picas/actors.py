@@ -6,6 +6,7 @@
 """
 from .util import Timer
 from .iterators import TaskViewIterator
+from .picaslogger import picaslogger
 
 from couchdb.http import ResourceConflict
 

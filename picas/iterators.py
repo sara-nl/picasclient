@@ -5,9 +5,12 @@
 @Copyright (c) 2016, Jan Bot
 """
 
-from .documents import Task
-from couchdb.http import ResourceConflict
 import time
+
+from couchdb.http import ResourceConflict
+
+from .documents import Task
+from .picaslogger import picaslogger
 
 
 class ViewIterator(object):
