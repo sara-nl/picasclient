@@ -14,7 +14,7 @@ def seconds():
     return int(time.time())
 
 
-class Timer(object):
+class Timer:
 
     def __init__(self):
         self.t = time.time()

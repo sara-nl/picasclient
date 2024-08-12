@@ -9,7 +9,7 @@ from . import batchid
 ''' @author Joris Borgdorff '''
 
 
-class Document(object):
+class Document:
 
     ''' A CouchDB document '''
 

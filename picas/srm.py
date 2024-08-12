@@ -100,7 +100,7 @@ class Downloader(threading.Thread):
                 raise EnvironmentError("Download failed of: " + f)
 
 
-class SRMClient(object):
+class SRMClient:
 
     """Helper class to easily down- and upload files to/from SRM.
     """

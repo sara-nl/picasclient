@@ -6,7 +6,7 @@
 """
 
 
-class TokenGenerator(object):
+class TokenGenerator:
     """Object to generate the standard tokens with.
     """
     def __init__(self):

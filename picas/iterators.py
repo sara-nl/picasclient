@@ -13,7 +13,7 @@ from .documents import Task
 from .picaslogger import picaslogger
 
 
-class ViewIterator(object):
+class ViewIterator:
     """
     Dummy class to show what to implement for a PICaS iterator.
     """

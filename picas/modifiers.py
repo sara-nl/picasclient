@@ -13,7 +13,7 @@ from os import environ
 from . import batchid
 
 
-class TokenModifier(object):
+class TokenModifier:
 
     def __init__(self, timeout=86400):
         self.timeout = timeout

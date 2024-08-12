@@ -17,7 +17,7 @@ from couchdb.http import ResourceConflict
 from .documents import Document
 from .picaslogger import picaslogger
 
-class CouchDB(object):
+class CouchDB:
 
     """Client class to handle communication with the CouchDB back-end.
     """

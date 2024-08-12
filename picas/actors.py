@@ -11,7 +11,7 @@ from .picaslogger import picaslogger
 from couchdb.http import ResourceConflict
 
 
-class RunActor(object):
+class RunActor:
 
     """Executor class to be overwritten in the client implementation.
     """
