@@ -16,12 +16,13 @@ from couchdb.http import ResourceConflict
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
+
 class RunActor(object):
     """
     Executor class to be overwritten in the client implementation.
     """
 
-    def __init__(self, db, iterator=None, view='todo', token_reset_values=[0,0], **view_params):
+    def __init__(self, db, iterator=None, view='todo', token_reset_values=[0, 0], **view_params):
         """
         @param database: the database to get the tasks from.
         @param token_reset_values: values to use in the token when PiCaS is terminated, defaults to values of 'todo' ([0,0])
@@ -82,7 +83,7 @@ class RunActor(object):
         Run method of the actor, executes the application code by iterating
         over the available tasks in CouchDB.
         """
-        # The error handler for when SLURM (or other scheduler / user) kills PiCaS, to reset the 
+        # The error handler for when SLURM (or other scheduler / user) kills PiCaS, to reset the
         # token back to 'todo' state (or other state defined through the token_reset_values)
         self.setup_handler()
 
@@ -91,14 +92,14 @@ class RunActor(object):
         try:
             for task in self.iterator:
                 self._run(task)
-                self.current_task = None # set to None so the handler leaves the token alone when picas is killed
+                self.current_task = None  # set to None so the handler leaves the token alone when picas is killed
         finally:
             self.cleanup_env()
 
     def handler(self, signum, frame):
         """
-        Signal handler method. It sets the tokens values of 'lock' and 'done' fields to the values 
-        passed to token_reset_values. This method ensures that when PiCaS is killed by the 
+        Signal handler method. It sets the tokens values of 'lock' and 'done' fields to the values
+        passed to token_reset_values. This method ensures that when PiCaS is killed by the
         scheduler or user, it automatically resets the token that was being worked on back to some
         state (default: 'todo' state).
 
@@ -112,7 +113,7 @@ class RunActor(object):
             log.info('Terminating execution of token')
             self.subprocess.terminate()
             try:
-                self.subprocess.communicate(timeout=30) # wait 30 seconds for termination, value chosen to allow complex processes to stop
+                self.subprocess.communicate(timeout=30)  # wait 30 seconds for termination, value chosen to allow complex processes to stop
             except subprocess.TimeoutExpired:
                 log.info('Killing subprocess')
                 self.subprocess.kill()
@@ -168,6 +169,7 @@ class RunActor(object):
         """
         pass
 
+
 class RunActorWithStop(RunActor):
     """
     RunActor class with added stopping functionality.
@@ -192,8 +194,8 @@ class RunActorWithStop(RunActor):
         # handler needs to be setup in overwritten method
         self.setup_handler()
 
-        # Special case to break the while loop of the EndlessViewIterator: 
-        # The while loop cant reach the stop condition in the for loop below, 
+        # Special case to break the while loop of the EndlessViewIterator:
+        # The while loop cant reach the stop condition in the for loop below,
         # so pass the condition into the stop mechanism of the EVI, then the
         # iterator is stopped from EVI and not the RunActorWithStop
         if isinstance(self.iterator, EndlessViewIterator):
@@ -206,7 +208,7 @@ class RunActorWithStop(RunActor):
 
                 logging.debug("Tasks executed: ", self.tasks_processed)
 
-                if (stop_function is not None and 
+                if (stop_function is not None and
                     stop_function(**stop_function_args)):
                     break
 
@@ -221,6 +223,6 @@ class RunActorWithStop(RunActor):
                     will_elapse = (self.time.elapsed() + avg_time_factor)
                     if will_elapse > max_time:
                         break
-                self.current_task = None # set to None so the handler leaves the token alone when picas is killed
+                self.current_task = None  # set to None so the handler leaves the token alone when picas is killed
         finally:
             self.cleanup_env()

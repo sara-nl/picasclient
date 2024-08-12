@@ -136,7 +136,7 @@ class CouchDB(object):
         updated = self.db.update([doc.value for doc in docs])
 
         result = [False] * len(docs)
-        for i in enumerate(docs):
+        for i, doc in enumerate(docs):
             is_added, _id, _rev = updated[i]
             if is_added:
                 docs[i]['_id'] = _id
