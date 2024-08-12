@@ -9,8 +9,6 @@ description:
     Run main job (process_task.sh) with the input argument
     When done, return the exit code to the token
     Attach the logs to the token
-
-
 '''
 
 import logging
@@ -21,10 +19,10 @@ import picasconfig
 
 from picas.actors import RunActor, RunActorWithStop
 from picas.clients import CouchDB
+from picas.executers import execute
 from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
-from picas.executers import execute
 from picas.util import Timer
 
 log = logging.getLogger(__name__)
