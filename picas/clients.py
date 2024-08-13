@@ -17,6 +17,7 @@ from couchdb.http import ResourceConflict
 from .documents import Document
 from .picaslogger import picaslogger
 
+
 class CouchDB(object):
 
     """Client class to handle communication with the CouchDB back-end.
@@ -185,14 +186,15 @@ class CouchDB(object):
             try:
                 self.delete(doc)
             except ResourceConflict as ex:
-                picaslogger.info("Could not delete document {0} (rev {1}) "
-                      "due to resource conflict: {2}".
-                      format(doc.id, doc.rev, str(ex)),
-                      file=sys.stderr)
+                picaslogger.info(
+                    "Could not delete document {0} (rev {1}) "
+                    "due to resource conflict: {2}".
+                    format(doc.id, doc.rev, str(ex)),
+                    file=sys.stderr)
                 result[i] = False
             except Exception as ex:
                 picaslogger.info("Could not delete document {0!s}: {1!s}".
-                      format(str(doc), str(ex)), file=sys.stderr)
+                                 format(str(doc), str(ex)), file=sys.stderr)
                 result[i] = False
 
         return result

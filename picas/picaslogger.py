@@ -15,4 +15,3 @@ ch.setLevel(logging.DEBUG)
 ch.setFormatter(formatter)
 picaslogger.addHandler(ch)
 picaslogger.setLevel(logging.INFO)
-

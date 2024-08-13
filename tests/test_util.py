@@ -32,7 +32,6 @@ class TestMerge(unittest.TestCase):
     def test_empty_empty_merge(self):
         self.assertEqual(merge_dicts({}, {}), {})
 
-
     def test_timer(self):
         timer = Timer()
         time.sleep(0.2)
