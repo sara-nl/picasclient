@@ -190,16 +190,13 @@ class CouchDB:
             try:
                 self.delete(doc)
             except ResourceConflict as ex:
-                picaslogger.info("Could not delete document {0} (rev {1}) "
-                      "due to resource conflict: {2}".
-                      format(doc.id, doc.rev, str(ex)),
+                picaslogger.info(f"Could not delete document {doc.id} (rev {doc.rev}) "
+                      "due to resource conflict: {str(ex)}",
                       file=sys.stderr)
                 result[i] = False
             except Exception as ex:
-                picaslogger.info("Could not delete document {0!s}: {1!s}".
-                      format(str(doc), str(ex)), file=sys.stderr)
+                picaslogger.info(f"Could not delete document {str(doc)}: {str(ex)}", file=sys.stderr)
                 result[i] = False
-
         return result
 
     def delete_from_view(self, view, design_doc="Monitor"):

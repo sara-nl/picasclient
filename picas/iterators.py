@@ -83,7 +83,7 @@ class TaskViewIterator(ViewIterator):
         @param view_params: parameters which need to be passed on to the view
         (optional).
         """
-        super(TaskViewIterator, self).__init__()
+        super().__init__()
         self.database = database
         self.view = view
         self.view_params = view_params
@@ -109,7 +109,7 @@ class PrioritizedViewIterator(ViewIterator):
         @param view_params: parameters which need to be passed on to the view
         (optional).
         """
-        super(PrioritizedViewIterator, self).__init__()
+        super().__init__()
         self.database = database
         self.high_priority_view = high_priority_view
         self.low_priority_view = low_priority_view
@@ -141,7 +141,7 @@ class EndlessViewIterator(ViewIterator):
                               iterator should stop feeding tasks
         @param stop_callback_args: arguments to the stop_callback function.
         """
-        super(EndlessViewIterator, self).__init__()
+        super().__init__()
         self.iterator = view_iterator
         self.sleep_sec = sleep_sec
         self.stop_callback = stop_callback

@@ -174,7 +174,7 @@ class User(Document):
             roles = []
         if data is None:
             data = {}
-        super(User, self).__init__(
+        super().__init__(
             data=data,
             base={
                 '_id': 'org.couchdb.user:{0}'.format(username),
@@ -205,7 +205,7 @@ class Task(Document):
     def __init__(self, task=None):
         if task is None:
             task = {}
-        super(Task, self).__init__(task, Task.__BASE)
+        super().__init__(task, Task.__BASE)
         if '_id' not in self.doc:
             self.doc['_id'] = 'task_' + uuid4().hex
 
@@ -329,7 +329,7 @@ class Job(Document):
     }
 
     def __init__(self, job):
-        super(Job, self).__init__(job, Job.__BASE)
+        super().__init__(job, Job.__BASE)
         if '_id' not in self.doc:
             raise ValueError('Job ID must be set')
 
