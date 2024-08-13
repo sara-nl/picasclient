@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-
 @licence: The MIT License (MIT)
 @Copyright (c) 2016, Jan Bot
 @author: Jan Bot
@@ -19,8 +18,7 @@ from .picaslogger import picaslogger
 
 class CouchDB:
 
-    """Client class to handle communication with the CouchDB back-end.
-    """
+    """Client class to handle communication with the CouchDB back-end."""
 
     def __init__(self, url="http://localhost:5984", db="test",
                  username=None, password="", ssl_verification=True,
@@ -44,9 +42,7 @@ class CouchDB:
             self.db = server[db]
 
     def copy(self):
-        """
-        Copy the DB connection.
-        """
+        """Copy the DB connection."""
         resource = self.db.resource
         try:
             username, password = resource.credentials
@@ -212,9 +208,7 @@ class CouchDB:
 
     def set_users(self, admins=None, members=None, admin_roles=None,
                   member_roles=None):
-        """
-        Set permissions for users.
-        """
+        """Set permissions for users."""
         security = self.db.resource.get_json("_security")[2]
 
         def try_set(value, d, key, subkey):

@@ -13,9 +13,7 @@ from .util import merge_dicts, seconds
 
 
 class Document:
-    """
-    A CouchDB document
-    """
+    """A CouchDB document."""
 
     def __init__(self, data=None, base=None):
         if data is None:
@@ -54,9 +52,7 @@ class Document:
 
     @property
     def id(self):
-        """
-        id getter
-        """
+        """id getter"""
         try:
             return self.doc['_id']
         except KeyError:
@@ -64,9 +60,7 @@ class Document:
 
     @property
     def rev(self):
-        """
-        revision getter
-        """
+        """revision getter"""
         try:
             return self.doc['_rev']
         except KeyError:
@@ -75,22 +69,16 @@ class Document:
 
     @id.setter
     def id(self, new_id):
-        """
-        id setter
-        """
+        """id setter"""
         self.doc['_id'] = new_id
 
     @property
     def value(self):
-        """
-        doc getter
-        """
+        """doc getter"""
         return self.doc
 
     def update(self, values):
-        """
-        Add the output of the RunActor to the task.
-        """
+        """Add the output of the RunActor to the task."""
         self.doc.update(values)
 
     def put_attachment(self, name, data, mimetype=None):
@@ -157,10 +145,12 @@ class Document:
         return attachment
 
     def remove_attachment(self, name):
+        """Remove attachment from document"""
         del self.doc['_attachments'][name]
         return self
 
     def _update_hostname(self):
+        """Set hostname in document"""
         self.doc['hostname'] = socket.gethostname()
         return self
 
@@ -210,9 +200,7 @@ class Task(Document):
             self.doc['_id'] = 'task_' + uuid4().hex
 
     def lock(self):
-        """
-        Function which modifies the task such that it is locked.
-        """
+        """Function which modifies the task such that it is locked."""
         self.doc['lock'] = seconds()
         batchid.add_batch_management_id(self.doc)
         return self._update_hostname()
@@ -227,44 +215,32 @@ class Task(Document):
 
     @property
     def input(self):
-        """
-        Get input
-        """
+        """Get input"""
         return self.doc['input']
 
     @input.setter
     def input(self, value):
-        """
-        Set input
-        """
+        """Set input"""
         self.doc['input'] = value
 
     @property
     def output(self):
-        """
-        Get the output from the RunActor.
-        """
+        """Get the output from the RunActor."""
         return self.doc['output']
 
     @output.setter
     def output(self, output):
-        """
-        Add the output of the RunActor to the task.
-        """
+        """Add the output of the RunActor to the task."""
         self.doc['output'] = output
 
     @property
     def uploads(self):
-        """
-        Uploads getter
-        """
+        """Uploads getter"""
         return self.doc['uploads']
 
     @uploads.setter
     def uploads(self, uploads):
-        """
-        Uploads setter
-        """
+        """Uploads setter"""
         self.doc['uploads'] = uploads
 
     def scrub(self):
@@ -296,24 +272,18 @@ class Task(Document):
         return self
 
     def has_error(self):
-        """
-        Bool: check if document has an error
-        """
+        """Bool: check if document has an error"""
         return self.doc['lock'] == -1
 
     def get_errors(self):
-        """
-        Get document error
-        """
+        """Get document error"""
         try:
             return self.doc['error']
         except KeyError():
             return []
 
     def is_done(self):
-        """
-        Bool: is document done
-        """
+        """Bool: is document done"""
         return self.doc['done'] != 0
 
 
@@ -334,9 +304,7 @@ class Job(Document):
             raise ValueError('Job ID must be set')
 
     def queue(self, method, host=None):
-        """
-        Set queue time
-        """
+        """Set queue time"""
         self.doc['method'] = method
         if host is not None:
             self.doc['hostname'] = host
@@ -344,25 +312,19 @@ class Job(Document):
         return self
 
     def start(self):
-        """
-        Set start time
-        """
+        """Set start time"""
         self.doc['start'] = seconds()
         self.doc['done'] = 0
         self.doc['archive'] = 0
         return self._update_hostname()
 
     def finish(self):
-        """
-        Set end time
-        """
+        """Set end time"""
         self.doc['done'] = seconds()
         return self
 
     def archive(self):
-        """
-        Set archive time
-        """
+        """Set archive time"""
         if self.doc['done'] <= 0:
             self.doc['done'] = seconds()
         self.doc['archive'] = seconds()
@@ -371,7 +333,5 @@ class Job(Document):
         return self
 
     def is_done(self):
-        """
-        Bool: is done
-        """
+        """Bool: is done"""
         return self.doc['done'] != 0

@@ -26,15 +26,19 @@ class ViewIterator:
         return self
 
     def reset(self):
+        """Reset the iterator."""
         self._stop = False
 
     def stop(self):
+        """Stop the iterator."""
         self._stop = True
 
     def is_stopped(self):
+        """Bool: iterator stopped."""
         return self._stop
 
     def next(self):
+        """Iterator next."""
         return self.__next__()
 
     def __next__(self):
@@ -54,9 +58,7 @@ class ViewIterator:
             raise StopIteration
 
     def claim_task(self):
-        """
-        Get the first available task from a view.
-        """
+        """Get the first available task from a view."""
         raise NotImplementedError("claim_task function not implemented.")
 
 
@@ -74,8 +76,7 @@ def _claim_task(database, view, allowed_failures=10, **view_params):
 
 class TaskViewIterator(ViewIterator):
 
-    """Iterator object to fetch tasks while available.
-    """
+    """Iterator object to fetch tasks while available."""
     def __init__(self, database, view, **view_params):
         """
         @param database: CouchDB database to get tasks from.
@@ -148,6 +149,7 @@ class EndlessViewIterator(ViewIterator):
         self.stop_callback_args = stop_callback_args
 
     def is_cancelled(self):
+        """Bool to check if the while should be stopped"""
         return (self.is_stopped() or
                 (self.stop_callback is not None and
                  self.stop_callback(**self.stop_callback_args)))
