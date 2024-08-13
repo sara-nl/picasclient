@@ -4,11 +4,12 @@
 @Copyright (c) 2016, Jan Bot
 @author: Jan Bot, Joris Borgdorff
 """
+
+from couchdb.http import ResourceConflict
+
 from .util import Timer
 from .iterators import TaskViewIterator
 from .picaslogger import picaslogger
-
-from couchdb.http import ResourceConflict
 
 
 class RunActor:
@@ -44,8 +45,7 @@ class RunActor:
                 try:
                     self.process_task(task)
                 except Exception as ex:
-                    msg = ("Exception {0} occurred during processing: {1}"
-                           .format(type(ex), ex))
+                    msg = f"Exception {type(ex)} occurred during processing: {ex}"
                     task.error(msg, exception=ex)
                     picaslogger.info(msg)
 

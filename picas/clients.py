@@ -25,7 +25,8 @@ class CouchDB:
     def __init__(self, url="http://localhost:5984", db="test",
                  username=None, password="", ssl_verification=True,
                  create=False):
-        """Create a CouchClient object.
+        """
+        Create a CouchClient object.
         :param url: the location where the CouchDB instance is located,
                     including the port at which it's listening.
                     Default: http://localhost:5984
@@ -43,6 +44,9 @@ class CouchDB:
             self.db = server[db]
 
     def copy(self):
+        """
+        Copy the DB connection.
+        """
         resource = self.db.resource
         try:
             username, password = resource.credentials
@@ -122,7 +126,8 @@ class CouchDB:
         return doc
 
     def save_documents(self, docs):
-        """Save a sequence of Documents to the database.
+        """
+        Save a sequence of Documents to the database.
 
         - If the document was newly created and the _id is already is in the
           database the document will not be added.
@@ -145,9 +150,9 @@ class CouchDB:
 
         return result
 
-    def add_view(self, view, map_fun, reduce_fun=None, design_doc="Monitor",
-                 *args, **kwargs):
-        """ Add a view to the database
+    def add_view(self, view, map_fun, *args, reduce_fun=None, design_doc="Monitor", **kwargs):
+        """
+        Add a view to the database
         All extra parameters are passed to couchdb.design.ViewDefinition
         :param view: name of the view
         :param map_fun: string of the javascript map function
@@ -210,6 +215,9 @@ class CouchDB:
 
     def set_users(self, admins=None, members=None, admin_roles=None,
                   member_roles=None):
+        """
+        Set permissions for users.
+        """
         security = self.db.resource.get_json("_security")[2]
 
         def try_set(value, d, key, subkey):
