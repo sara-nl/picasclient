@@ -74,13 +74,11 @@ class RunActor:
         """Method to be called to prepare the environment to run the
         application.
         """
-        pass
 
     def prepare_run(self, *args, **kwargs):
         """Code to run before a task gets processed. Used e.g. for fetching
         inputs.
         """
-        pass
 
     def process_task(self, task):
         """The function to override, which processes the tasks themselves.
@@ -91,9 +89,7 @@ class RunActor:
     def cleanup_run(self, *args, **kwargs):
         """Code to run after a task has been processed.
         """
-        pass
 
     def cleanup_env(self, *args, **kwargs):
         """Method which gets called after the run method has completed.
         """
-        pass

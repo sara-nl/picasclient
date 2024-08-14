@@ -7,13 +7,15 @@
 
 
 class TokenGenerator:
-    """Object to generate the standard tokens with.
+    """
+    Object to generate the standard tokens with.
     """
     def __init__(self):
         pass
 
     @staticmethod
     def get_empty_token():
+        """Generate empty token"""
         token = {
                 'lock': 0,
                 'done': 0,

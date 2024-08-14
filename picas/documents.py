@@ -55,17 +55,17 @@ class Document:
         """id getter"""
         try:
             return self.doc['_id']
-        except KeyError:
-            raise AttributeError("_id for document is not set")
+        except KeyError as ex:
+            raise AttributeError("_id for document is not set") from ex
 
     @property
     def rev(self):
         """revision getter"""
         try:
             return self.doc['_rev']
-        except KeyError:
+        except KeyError as ex:
             raise AttributeError("_rev is not available: document is not "
-                                 "retrieved from database")
+                                 "retrieved from database") from ex
 
     @id.setter
     def id(self, new_id):
@@ -95,7 +95,7 @@ class Document:
             self.doc['_attachments'] = {}
 
         if mimetype is None:
-            mimetype, encoding = mimetypes.guess_type(name)
+            mimetype, _ = mimetypes.guess_type(name)
             if mimetype is None:
                 mimetype = 'text/plain'
 
@@ -167,7 +167,7 @@ class User(Document):
         super().__init__(
             data=data,
             base={
-                '_id': 'org.couchdb.user:{0}'.format(username),
+                '_id': f'org.couchdb.user:{username}',
                 'name': username,
                 'type': 'user',
                 'password': password,
@@ -176,6 +176,9 @@ class User(Document):
 
 
 class Task(Document):
+    """
+    Class to manage task modifications with.
+    """
     __BASE = {
         'type': 'task',
         'lock': 0,
@@ -188,9 +191,6 @@ class Task(Document):
         'error': [],
     }
 
-    """
-    Class to manage task modifications with.
-    """
 
     def __init__(self, task=None):
         if task is None:
@@ -257,6 +257,7 @@ class Task(Document):
         return self._update_hostname()
 
     def error(self, msg=None, exception=None):
+        """Set error message in the document"""
         error = {'time': seconds()}
         if msg is not None:
             error['message'] = str(msg)
@@ -288,6 +289,9 @@ class Task(Document):
 
 
 class Job(Document):
+    """
+    Job class is more explicit in the timing and archives the work.
+    """
     __BASE = {
         'type': 'job',
         'hostname': '',

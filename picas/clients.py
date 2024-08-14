@@ -187,8 +187,7 @@ class CouchDB:
                 self.delete(doc)
             except ResourceConflict as ex:
                 picaslogger.info(f"Could not delete document {doc.id} (rev {doc.rev}) "
-                      "due to resource conflict: {str(ex)}",
-                      file=sys.stderr)
+                      "due to resource conflict: {str(ex)}", file=sys.stderr)
                 result[i] = False
             except Exception as ex:
                 picaslogger.info(f"Could not delete document {str(doc)}: {str(ex)}", file=sys.stderr)

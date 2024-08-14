@@ -53,9 +53,9 @@ class ViewIterator:
 
         try:
             return self.claim_task()
-        except IndexError:
+        except IndexError as ex:
             self.stop()
-            raise StopIteration
+            raise StopIteration from ex
 
     def claim_task(self):
         """Get the first available task from a view."""
