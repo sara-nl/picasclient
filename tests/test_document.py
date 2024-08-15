@@ -1,14 +1,16 @@
+"""
+@author Joris Borgdorff
+"""
+
 import base64
 import unittest
 
 from picas.documents import Document, Task
 from picas.util import seconds
 
-''' @author Joris Borgdorff '''
 
 test_id = 'mydoc'
 test_other_id = 'myotherdoc'
-
 
 
 class TestTask(unittest.TestCase):
