@@ -37,10 +37,6 @@ class ViewIterator:
         """Bool: iterator stopped."""
         return self._stop
 
-    def next(self):
-        """Iterator next."""
-        return self.__next__()
-
     def __next__(self):
         """
         Get the next task.
