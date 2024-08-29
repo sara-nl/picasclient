@@ -1,6 +1,6 @@
 import unittest
 
-from picas.executors import execute
+from picas.executers import execute
 
 class TestExecutors(unittest.TestCase):
 
