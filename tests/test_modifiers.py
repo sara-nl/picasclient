@@ -3,6 +3,7 @@ import unittest
 from picas.documents import Task
 from picas.modifiers import BasicTokenModifier
 
+
 class TestModifier(unittest.TestCase):
 
     def setUp(self):

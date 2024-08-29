@@ -17,7 +17,7 @@ class TestTask(unittest.TestCase):
         self.assertEqual(len(self.db.saved), 1)
 
     def stop_function(self, stop_value=2):
-        self.stop_value=stop_value
+        self.stop_value = stop_value
         return len(self.db.saved) == stop_value
 
     def test_endlessviewiterator(self):

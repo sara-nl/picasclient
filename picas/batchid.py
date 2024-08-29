@@ -5,6 +5,7 @@
 
 from os import environ
 
+
 def add_batch_management_id(doc):
     """
     Add job number id of the batch system to a token/document

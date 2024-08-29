@@ -2,6 +2,7 @@ import unittest
 
 from picas.executers import execute
 
+
 class TestExecutors(unittest.TestCase):
 
     def test_run_command(self):

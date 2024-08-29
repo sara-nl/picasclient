@@ -2,6 +2,7 @@ import unittest
 
 from picas.generators import TokenGenerator
 
+
 class TestGenerators(unittest.TestCase):
 
     def setUp(self):
