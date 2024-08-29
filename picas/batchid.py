@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+@author Maarten Kooyman
+"""
+
 from os import environ
-
-''' @author Maarten Kooyman '''
-
 
 def add_batch_management_id(doc):
     """

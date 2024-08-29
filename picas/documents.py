@@ -1,17 +1,19 @@
+"""
+@author Joris Borgdorff
+"""
+
 import socket
-from .util import merge_dicts, seconds
 import mimetypes
 import base64
 import traceback
 from uuid import uuid4
+
 from . import batchid
+from .util import merge_dicts, seconds
 
-''' @author Joris Borgdorff '''
 
-
-class Document(object):
-
-    ''' A CouchDB document '''
+class Document:
+    """A CouchDB document."""
 
     def __init__(self, data=None, base=None):
         if data is None:
@@ -50,34 +52,37 @@ class Document(object):
 
     @property
     def id(self):
+        """id getter"""
         try:
             return self.doc['_id']
-        except KeyError:
-            raise AttributeError("_id for document is not set")
+        except KeyError as ex:
+            raise AttributeError("_id for document is not set") from ex
 
     @property
     def rev(self):
+        """revision getter"""
         try:
             return self.doc['_rev']
-        except KeyError:
+        except KeyError as ex:
             raise AttributeError("_rev is not available: document is not "
-                                 "retrieved from database")
+                                 "retrieved from database") from ex
 
     @id.setter
     def id(self, new_id):
+        """id setter"""
         self.doc['_id'] = new_id
 
     @property
     def value(self):
+        """doc getter"""
         return self.doc
 
     def update(self, values):
-        """Add the output of the RunActor to the task.
-        """
+        """Add the output of the RunActor to the task."""
         self.doc.update(values)
 
     def put_attachment(self, name, data, mimetype=None):
-        '''
+        """
         Put an attachment in the document.
 
         The attachment data must be provided as str in Python 2 and bytes in
@@ -85,12 +90,12 @@ class Document(object):
 
         The mimetype, if not provided, is guessed from the filename and
         defaults to text/plain.
-        '''
+        """
         if '_attachments' not in self.doc:
             self.doc['_attachments'] = {}
 
         if mimetype is None:
-            mimetype, encoding = mimetypes.guess_type(name)
+            mimetype, _ = mimetypes.guess_type(name)
             if mimetype is None:
                 mimetype = 'text/plain'
 
@@ -105,7 +110,8 @@ class Document(object):
             'content_type': mimetype, 'data': b64data.decode()}
 
     def get_attachment(self, name, retrieve_from_database=None):
-        ''' Gets an attachment dict from the document.
+        """
+        Gets an attachment dict from the document.
         Attachment data may not have been copied over from the
         database, in that case it will have an md5 checksum.
         A CouchDB database may be set in retrieve_from_database to retrieve
@@ -115,7 +121,7 @@ class Document(object):
         Python 3.
 
         Raises KeyError if attachment does not exist.
-        '''
+        """
         # Copy all attributes except data, it may be very large
         attachment = {}
         for key in self.doc['_attachments'][name]:
@@ -139,25 +145,29 @@ class Document(object):
         return attachment
 
     def remove_attachment(self, name):
+        """Remove attachment from document"""
         del self.doc['_attachments'][name]
         return self
 
     def _update_hostname(self):
+        """Set hostname in document"""
         self.doc['hostname'] = socket.gethostname()
         return self
 
 
 class User(Document):
-    ''' CouchDB user '''
+    """
+    CouchDB user
+    """
     def __init__(self, username, password, roles=None, data=None):
         if roles is None:
             roles = []
         if data is None:
             data = {}
-        super(User, self).__init__(
+        super().__init__(
             data=data,
             base={
-                '_id': 'org.couchdb.user:{0}'.format(username),
+                '_id': f'org.couchdb.user:{username}',
                 'name': username,
                 'type': 'user',
                 'password': password,
@@ -166,6 +176,9 @@ class User(Document):
 
 
 class Task(Document):
+    """
+    Class to manage task modifications with.
+    """
     __BASE = {
         'type': 'task',
         'lock': 0,
@@ -178,25 +191,23 @@ class Task(Document):
         'error': [],
     }
 
-    """Class to manage task modifications with.
-    """
 
     def __init__(self, task=None):
         if task is None:
             task = {}
-        super(Task, self).__init__(task, Task.__BASE)
+        super().__init__(task, Task.__BASE)
         if '_id' not in self.doc:
             self.doc['_id'] = 'task_' + uuid4().hex
 
     def lock(self):
-        """Function which modifies the task such that it is locked.
-        """
+        """Function which modifies the task such that it is locked."""
         self.doc['lock'] = seconds()
         batchid.add_batch_management_id(self.doc)
         return self._update_hostname()
 
     def done(self):
-        """Function which modifies the task such that it is closed for ever
+        """
+        Function which modifies the task such that it is closed for ever
         to the view that has supplied it.
         """
         self.doc['done'] = seconds()
@@ -204,12 +215,12 @@ class Task(Document):
 
     @property
     def input(self):
-        """ Get input """
+        """Get input"""
         return self.doc['input']
 
     @input.setter
     def input(self, value):
-        """ Set input """
+        """Set input"""
         self.doc['input'] = value
 
     @property
@@ -219,16 +230,17 @@ class Task(Document):
 
     @output.setter
     def output(self, output):
-        """Add the output of the RunActor to the task.
-        """
+        """Add the output of the RunActor to the task."""
         self.doc['output'] = output
 
     @property
     def uploads(self):
+        """Uploads getter"""
         return self.doc['uploads']
 
     @uploads.setter
     def uploads(self, uploads):
+        """Uploads setter"""
         self.doc['uploads'] = uploads
 
     def scrub(self):
@@ -245,6 +257,7 @@ class Task(Document):
         return self._update_hostname()
 
     def error(self, msg=None, exception=None):
+        """Set error message in the document"""
         error = {'time': seconds()}
         if msg is not None:
             error['message'] = str(msg)
@@ -260,19 +273,25 @@ class Task(Document):
         return self
 
     def has_error(self):
+        """Bool: check if document has an error"""
         return self.doc['lock'] == -1
 
     def get_errors(self):
+        """Get document error"""
         try:
             return self.doc['error']
         except KeyError():
             return []
 
     def is_done(self):
+        """Bool: is document done"""
         return self.doc['done'] != 0
 
 
 class Job(Document):
+    """
+    Job class is more explicit in the timing and archives the work.
+    """
     __BASE = {
         'type': 'job',
         'hostname': '',
@@ -284,11 +303,12 @@ class Job(Document):
     }
 
     def __init__(self, job):
-        super(Job, self).__init__(job, Job.__BASE)
+        super().__init__(job, Job.__BASE)
         if '_id' not in self.doc:
             raise ValueError('Job ID must be set')
 
     def queue(self, method, host=None):
+        """Set queue time"""
         self.doc['method'] = method
         if host is not None:
             self.doc['hostname'] = host
@@ -296,16 +316,19 @@ class Job(Document):
         return self
 
     def start(self):
+        """Set start time"""
         self.doc['start'] = seconds()
         self.doc['done'] = 0
         self.doc['archive'] = 0
         return self._update_hostname()
 
     def finish(self):
+        """Set end time"""
         self.doc['done'] = seconds()
         return self
 
     def archive(self):
+        """Set archive time"""
         if self.doc['done'] <= 0:
             self.doc['done'] = seconds()
         self.doc['archive'] = seconds()
@@ -314,4 +337,5 @@ class Job(Document):
         return self
 
     def is_done(self):
+        """Bool: is done"""
         return self.doc['done'] != 0

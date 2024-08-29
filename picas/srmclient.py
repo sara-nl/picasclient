@@ -10,17 +10,18 @@ import threading
 import logging
 import queue
 
-from picas import SRMClient
+from picas.srm import SRMClient
 from .picaslogger import picaslogger
 
 
 def download(files, threads=10):
+    """Download wrapper"""
     q = queue.Queue()
-    for k, v in files.items():
+    for _, v in files.items():
         q.put(v)
 
     thread_pool = []
-    for i in range(threads):
+    for _ in range(threads):
         d = Downloader(q)
         d.start()
         thread_pool.append(d)
@@ -28,15 +29,16 @@ def download(files, threads=10):
     q.join()
     picaslogger.info("Download work done, joining threads")
     for d in thread_pool:
-        picaslogger.info("Joining: {0!s}".format(str(d.ident)))
+        picaslogger.info(f"Joining: {d.ident}")
         d.join(1)
 
 
 class Downloader(threading.Thread):
+    """Download class using SRM"""
 
-    def __init__(self, queue):
+    def __init__(self, q):
         threading.Thread.__init__(self)
-        self.q = queue
+        self.q = q
         self.logger = logging.getLogger('Pindel')
         self.srm = SRMClient(self.logger)
         self.daemon = False
@@ -52,7 +54,7 @@ class Downloader(threading.Thread):
                     done = True
                 except Exception():
                     count += 1
-            if (count > 9):
+            if count > 9:
                 raise EnvironmentError("Download failed.")
             self.q.task_done()
         picaslogger.info("Exiting while loop, thread should close itself...")

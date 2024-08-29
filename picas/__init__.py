@@ -18,7 +18,7 @@ from .iterators import (ViewIterator, TaskViewIterator, EndlessViewIterator,
 from .actors import RunActor
 
 
-version = "0.3.0"
+VERSION = "0.3.0"
 
 __all__ = [
     'CouchDB',

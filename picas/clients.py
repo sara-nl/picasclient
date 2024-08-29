@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-
 @licence: The MIT License (MIT)
 @Copyright (c) 2016, Jan Bot
 @author: Jan Bot
@@ -17,16 +16,15 @@ from couchdb.http import ResourceConflict
 from .documents import Document
 from .picaslogger import picaslogger
 
+class CouchDB:
 
-class CouchDB(object):
-
-    """Client class to handle communication with the CouchDB back-end.
-    """
+    """Client class to handle communication with the CouchDB back-end."""
 
     def __init__(self, url="http://localhost:5984", db="test",
                  username=None, password="", ssl_verification=True,
                  create=False):
-        """Create a CouchClient object.
+        """
+        Create a CouchClient object.
         :param url: the location where the CouchDB instance is located,
                     including the port at which it's listening.
                     Default: http://localhost:5984
@@ -44,6 +42,7 @@ class CouchDB(object):
             self.db = server[db]
 
     def copy(self):
+        """Copy the DB connection."""
         resource = self.db.resource
         try:
             username, password = resource.credentials
@@ -123,7 +122,8 @@ class CouchDB(object):
         return doc
 
     def save_documents(self, docs):
-        """Save a sequence of Documents to the database.
+        """
+        Save a sequence of Documents to the database.
 
         - If the document was newly created and the _id is already is in the
           database the document will not be added.
@@ -146,9 +146,9 @@ class CouchDB(object):
 
         return result
 
-    def add_view(self, view, map_fun, reduce_fun=None, design_doc="Monitor",
-                 *args, **kwargs):
-        """ Add a view to the database
+    def add_view(self, view, map_fun, *args, reduce_fun=None, design_doc="Monitor", **kwargs):
+        """
+        Add a view to the database
         All extra parameters are passed to couchdb.design.ViewDefinition
         :param view: name of the view
         :param map_fun: string of the javascript map function
@@ -186,17 +186,12 @@ class CouchDB(object):
             try:
                 self.delete(doc)
             except ResourceConflict as ex:
-                picaslogger.info(
-                    "Could not delete document {0} (rev {1}) "
-                    "due to resource conflict: {2}".
-                    format(doc.id, doc.rev, str(ex)),
-                    file=sys.stderr)
+                picaslogger.info(f"Could not delete document {doc.id} (rev {doc.rev}) "
+                      "due to resource conflict: {str(ex)}", file=sys.stderr)
                 result[i] = False
             except Exception as ex:
-                picaslogger.info("Could not delete document {0!s}: {1!s}".
-                                 format(str(doc), str(ex)), file=sys.stderr)
+                picaslogger.info(f"Could not delete document {str(doc)}: {str(ex)}", file=sys.stderr)
                 result[i] = False
-
         return result
 
     def delete_from_view(self, view, design_doc="Monitor"):
@@ -212,6 +207,7 @@ class CouchDB(object):
 
     def set_users(self, admins=None, members=None, admin_roles=None,
                   member_roles=None):
+        """Set permissions for users."""
         security = self.db.resource.get_json("_security")[2]
 
         def try_set(value, d, key, subkey):
