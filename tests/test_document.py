@@ -28,8 +28,11 @@ class TestTask(unittest.TestCase):
 
     def test_no_id(self):
         doc = Document({'someattr': 1})
-        self.assertRaises(AttributeError, getattr(doc), 'id')
-        self.assertRaises(AttributeError, getattr(doc), 'rev')
+        with self.assertRaises(AttributeError):
+            getattr(doc, 'id')
+
+        with self.assertRaises(AttributeError):
+            getattr(doc, 'rev')
 
     def test_empty(self):
         Document({})
