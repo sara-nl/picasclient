@@ -4,6 +4,7 @@
 @Copyright (c) 2016, Jan Bot
 @author: Jan Bot, Joris Borgdorff
 """
+
 import logging
 import signal
 import subprocess
@@ -141,14 +142,12 @@ class RunActor(object):
         Method to be called to prepare the environment to run the
         application.
         """
-        pass
 
     def prepare_run(self, *args, **kwargs):
         """
         Code to run before a task gets processed. Used e.g. for fetching
         inputs.
         """
-        pass
 
     def process_task(self, task):
         """
@@ -161,15 +160,13 @@ class RunActor(object):
         """
         Code to run after a task has been processed.
         """
-        pass
 
     def cleanup_env(self, *args, **kwargs):
         """
         Method which gets called after the run method has completed.
         """
-        pass
 
-
+        
 class RunActorWithStop(RunActor):
     """
     RunActor class with added stopping functionality.

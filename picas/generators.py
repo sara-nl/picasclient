@@ -6,14 +6,16 @@
 """
 
 
-class TokenGenerator(object):
-    """Object to generate the standard tokens with.
+class TokenGenerator:
+    """
+    Object to generate the standard tokens with.
     """
     def __init__(self):
         pass
 
     @staticmethod
     def get_empty_token():
+        """Generate empty token"""
         token = {
                 'lock': 0,
                 'done': 0,

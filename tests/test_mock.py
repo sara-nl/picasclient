@@ -4,7 +4,7 @@ from picas.documents import Document
 
 
 class MockDB(object):
-    TASKS = [{'_id': 'a', 'lock': 0}, {'_id': 'b', 'lock': 0}]
+    TASKS = [{'_id': 'a', 'lock': 0}, {'_id': 'b', 'lock': 0}, {'_id': 'c', 'lock': 0}]
     JOBS = [{'_id': 'myjob'}]
 
     def __init__(self):

@@ -11,7 +11,6 @@ infrastructure. Relies on a CouchDB server to keep track of the work itself.
 
 """
 
-import logging
 from .documents import Document, Task, Job, User
 from .clients import CouchDB
 from .iterators import (ViewIterator, TaskViewIterator, EndlessViewIterator,
@@ -19,16 +18,7 @@ from .iterators import (ViewIterator, TaskViewIterator, EndlessViewIterator,
 from .actors import RunActor
 
 
-version = "0.3.0"
-
-picaslogger = logging.getLogger("PiCaS")
-formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-ch.setFormatter(formatter)
-picaslogger.addHandler(ch)
-picaslogger.setLevel(logging.ERROR)
+VERSION = "0.3.0"
 
 __all__ = [
     'CouchDB',

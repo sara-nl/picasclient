@@ -13,30 +13,39 @@ from os import environ
 from . import batchid
 
 
-class TokenModifier(object):
+class TokenModifier:
+    """(semi)Abstract class for token modifiers
+    """
 
     def __init__(self, timeout=86400):
         self.timeout = timeout
 
     def lock(self, *args, **kwargs):
+        """Set the token to locked state"""
         raise NotImplementedError("Lock function not implemented.")
 
     def unlock(self, *args, **kwargs):
+        """Set the token to unlocked state"""
         raise NotImplementedError("Unlock functin not implemented.")
 
     def close(self, *args, **kwargs):
+        """Set the token to closed state"""
         raise NotImplementedError("Close function not implemented.")
 
     def unclose(self, *args, **kwargs):
+        """Set the token to not closed state"""
         raise NotImplementedError("Unclose function not implemented.")
 
     def add_output(self, *args, **kwargs):
+        """Add output to the token"""
         raise NotImplementedError("Add_output function not implemented.")
 
     def scrub(self, *args, **kwargs):
+        """Scrub the token"""
         raise NotImplementedError("Scrub function not implemented.")
 
     def set_error(self, *args, **kwargs):
+        """Set the token to error state"""
         raise NotImplementedError("set_error function not implemented.")
 
 
@@ -138,6 +147,8 @@ class BasicTokenModifier(TokenModifier):
 
 
 class NestedTokenModifier(TokenModifier):
+    """Nested token modifier class
+    """
 
     def __init__(self, timeout=86400):
         self.timeout = timeout
@@ -153,17 +164,17 @@ class NestedTokenModifier(TokenModifier):
         return record[ref]
 
     def _get_token(self, ref, record):
-        if (isinstance(ref, list)):
+        if isinstance(ref, list):
             return self._get_token_from_list(ref, record)
-        else:
-            return self._get_token_from_value(ref, record)
+        return self._get_token_from_value(ref, record)
 
     def get_token(self, ref, record):
+        """Get a nested token with a reference"""
         return self._get_token(ref, record)
 
     def _update_record(self, ref, record, token):
         r = record
-        if (isinstance(ref, list)):
+        if isinstance(ref, list):
             for k in ref[1:-1]:
                 r = r[k]
             r[ref[-1]] = token

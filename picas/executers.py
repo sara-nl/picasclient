@@ -21,6 +21,7 @@ def execute(args, shell=False):
     return (proc, proc.returncode, stdout, stderr)
 
 
+
 def execute_old(cmd):
     """Helper function to execute an external application.
     @param cmd: the command to be executed.
