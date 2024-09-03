@@ -26,10 +26,10 @@ class TestTask(unittest.TestCase):
         self.assertEqual(doc.id, test_other_id)
         self.assertEqual(doc.value, {'_id': test_other_id})
 
-    # def test_no_id(self):
-    #     doc = Document({'someattr': 1})
-    #     self.assertRaises(AttributeError, getattr(doc), 'id')
-    #     self.assertRaises(AttributeError, getattr(doc), 'rev')
+    def test_no_id(self):
+        doc = Document({'someattr': 1})
+        self.assertRaises(AttributeError, getattr(doc), 'id')
+        self.assertRaises(AttributeError, getattr(doc), 'rev')
 
     def test_empty(self):
         Document({})
@@ -57,7 +57,7 @@ class TestTask(unittest.TestCase):
         self.assertEqual(self.task.value['_id'], test_id)
         self.assertEqual(self.task['_id'], test_id)
 
-    def test_no_id(self):
+    def test_id_len(self):
         t = Task()
         self.assertTrue(len(t.id) > 10)
 
