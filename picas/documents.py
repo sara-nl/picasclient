@@ -191,7 +191,6 @@ class Task(Document):
         'error': [],
     }
 
-
     def __init__(self, task=None):
         if task is None:
             task = {}
