@@ -40,11 +40,6 @@ class RunActor(object):
         self.subprocess = None
         self.tasks_processed = 0
 
-        # current task is needed to reset it when PiCaS is killed
-        self.current_task = None
-        # the subprocess running the token code is necessary s.t. the handler can cleanly kill it
-        self.subprocess = None
-
         if iterator is None:
             self.iterator = TaskViewIterator(self.db, view, **view_params)
         else:
