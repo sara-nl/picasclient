@@ -174,9 +174,10 @@ class RunActorWithStop(RunActor):
         logic is also extended into the EndlessViewIterator to break it when
         the condition is met, otherwise it never stops.
 
-        @param max_time:
-        @param avg_time_factor:
-        @param max_tasks:
+        @param max_time: maximum time to run picas before stopping
+        @param avg_time_factor: used for estimating when to stop with `max_time`,
+                                value is average time per token to run
+        @param max_tasks: number of tasks that are performed before stopping
         @param stop_function: custom function to stop the execution, mustt return bool
         @param stop_function_args: kwargs to supply to stop_function
         """
