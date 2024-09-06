@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 
-class RunActor(object):
+class AbstractRunActor(object):
     """
     Executor class to be overwritten in the client implementation.
     """
@@ -162,7 +162,7 @@ class RunActor(object):
         """
 
         
-class RunActorWithStop(RunActor):
+class RunActor(AbstractRunActor):
     """
     RunActor class with added stopping functionality.
     """
