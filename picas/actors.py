@@ -178,7 +178,7 @@ class RunActor(AbstractRunActor):
         @param avg_time_factor: used for estimating when to stop with `max_time`,
                                 value is average time per token to run
         @param max_tasks: number of tasks that are performed before stopping
-        @param stop_function: custom function to stop the execution, mustt return bool
+        @param stop_function: custom function to stop the execution, must return bool
         @param stop_function_args: kwargs to supply to stop_function
         """
         self.time = Timer()
