@@ -17,7 +17,7 @@ import time
 import couchdb
 import picasconfig
 
-from picas.actors import RunActor, RunActorWithStop
+from picas.actors import RunActor
 from picas.clients import CouchDB
 from picas.executers import execute
 from picas.iterators import TaskViewIterator
