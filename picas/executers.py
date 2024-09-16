@@ -18,7 +18,7 @@ def execute(args, shell=False):
     """
     with Popen(args, stdout=PIPE, stderr=PIPE, shell=shell) as proc:
         (stdout, stderr) = proc.communicate()
-    return (proc.returncode, stdout, stderr)
+    return (proc, proc.returncode, stdout, stderr)
 
 
 
