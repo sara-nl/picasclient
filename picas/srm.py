@@ -120,7 +120,8 @@ class SRMClient:
         surl = self.srm_host + loc
         cmd = ['srmls', surl]
         picaslogger.info(" ".join(cmd))
-        (returncode, stdout, _) = execute(cmd)
+        (proc, returncode, stdout, _) = execute(cmd)
+
         if returncode == 0:
             bn = path.basename(loc)
             lines = stdout.split("\n")
@@ -150,7 +151,7 @@ class SRMClient:
         cmd = ['srmcp', '-2', '-server_mode=passive',
                'file:///' + local_file, srm_url]
         picaslogger.info(cmd)
-        (returncode, _, _) = execute(cmd)
+        (proc, returncode, _, _) = execute(cmd)
         if returncode == 0:
             pass
         else:

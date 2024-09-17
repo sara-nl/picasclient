@@ -9,24 +9,23 @@ description:
     Run main job (process_task.sh) with the input argument
     When done, return the exit code to the token
     Attach the logs to the token
-
-
 '''
 
-#python imports
+import logging
 import os
 import time
 import couchdb
 import picasconfig
 
-#picas imports
 from picas.actors import RunActor
 from picas.clients import CouchDB
+from picas.executers import execute
 from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
-from picas.executers import execute
 from picas.util import Timer
+
+log = logging.getLogger(__name__)
 
 class ExampleActor(RunActor):
     """
@@ -36,7 +35,7 @@ class ExampleActor(RunActor):
     def __init__(self, db, modifier, view="todo", **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
-        self.iterator = EndlessViewIterator(self.iterator, stop_callback=self.time_elapsed) # overwrite default iterator from super().init()
+        self.iterator = EndlessViewIterator(self.iterator)
         self.modifier = modifier
         self.client = db
 
@@ -52,12 +51,12 @@ class ExampleActor(RunActor):
         # /usr/bin/time -v ./process_task.sh [input] [tokenid] 2> logs_[token_id].err 1> logs_[token_id].out
         command = "/usr/bin/time -v ./process_task.sh " + "\"" +token['input'] + "\" " + token['_id'] + " 2> logs_" + str(token['_id']) + ".err 1> logs_" + str(token['_id']) + ".out"
 
-        out = execute(command,shell=True)
+        out = execute(command, shell=True)
+        self.subprocess = out[0]
 
-        ## Get the job exit code in the token
-        token['exit_code'] = out[0]
+        # Get the job exit code and done in the token
+        token['exit_code'] = out[1]
         token = self.modifier.close(token)
-        #self.client.db[token['_id']] = token # necessary?
 
         # Attach logs in token
         curdate = time.strftime("%d/%m/%Y_%H:%M:%S_")
@@ -93,7 +92,7 @@ def main():
     # Create actor
     actor = ExampleActor(client, modifier)
     # Start work!
-    actor.run()
+    actor.run(max_tasks=2, stop_function=actor.time_elapsed, elapsed=11)
 
 if __name__ == '__main__':
     main()

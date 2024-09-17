@@ -1,5 +1,5 @@
 import random
-from picas.actors import RunActor
+from picas.actors import AbstractRunActor, RunActor
 from picas.documents import Document
 
 
@@ -40,11 +40,23 @@ class MockDB(object):
         return doc
 
 
-class MockRun(RunActor):
+class MockRun(AbstractRunActor):
 
     def __init__(self, callback):
         db = MockDB()
         super(MockRun, self).__init__(db)
+
+        self.callback = callback
+
+    def process_task(self, task):
+        self.callback(task)
+
+
+class MockRunWithStop(RunActor):
+
+    def __init__(self, callback):
+        db = MockDB()
+        super(MockRunWithStop, self).__init__(db)
 
         self.callback = callback
 

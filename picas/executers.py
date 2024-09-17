@@ -18,11 +18,12 @@ def execute(args, shell=False):
     """
     with Popen(args, stdout=PIPE, stderr=PIPE, shell=shell) as proc:
         (stdout, stderr) = proc.communicate()
-    return (proc.returncode, stdout, stderr)
+    return (proc, proc.returncode, stdout, stderr)
+
 
 
 def execute_old(cmd):
-    """Helper functino to execute an external application.
+    """Helper function to execute an external application.
     @param cmd: the command to be executed.
     @return the exit code of the executed program.
     """
