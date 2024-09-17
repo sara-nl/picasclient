@@ -14,10 +14,17 @@ def add_batch_management_id(doc):
     A glite wms system makes underneath use of a cream system which makes use
      of PBS. I such a case only the glite wms id instead of all of them.
     """
+    dirac_jobid = environ.get("DIRACJOBID")
+    slurm_jobid = environ.get("SLURM_JOB_ID")
     wms_jobid = environ.get("GLITE_WMS_JOBID")
     cream_jobid = environ.get("CREAM_JOBID")
     pbs_jobid = environ.get("PBS_JOBID")
-    if wms_jobid is not None:
+
+    if slurm_jobid is not None:
+        doc["slurm_job_id"] = slurm_jobid
+    if dirac_jobid is not None:
+        doc["dirac_job_id"] = dirac_jobid           
+    elif wms_jobid is not None:
         if not wms_jobid.startswith("http"):
             wms_jobid = None
         doc["wms_job_id"] = wms_jobid
@@ -31,6 +38,10 @@ def remove_batch_management_id(doc):
     """
     removes all batch id from doc/token
     """
+    if "slurm_job_id" in doc:
+        del doc["slurm_job_id"]
+    if "dirac_job_id" in doc:
+        del doc["dirac_job_id"]    
     if "wms_job_id" in doc:
         del doc["wms_job_id"]
     if "cream_job_id" in doc:

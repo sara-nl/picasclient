@@ -64,14 +64,12 @@ class BasicTokenModifier(TokenModifier):
         @return: modified token.
         """
 
-        dirac_jobid = environ.get("DIRACJOBID")
         lock_content = {
             'hostname': socket.gethostname(),
             'lock': int(time.time()),
-            'dirac_jobid': dirac_jobid
         }
 
-        # try to include glite wms job id if present
+        # try to include job id if present
         batchid.add_batch_management_id(token)
 
         token.update(lock_content)
