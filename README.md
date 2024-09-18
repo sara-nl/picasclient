@@ -15,6 +15,11 @@ cd picasclient
 pip install -U .
 ```
 
+If you come across error messages related to python, you can execute pip module for a specific python version using the corresponding python:
+```
+python3.9 -m  pip install -U .
+```
+
 Testing
 =======
 
@@ -33,28 +38,61 @@ Examples
 
 ## Setting up the examples
 
-The examples directory contains examples to use the picasclient. There are examples for running locally (laptop, cluster login), slurm and the Grid (https://www.egi.eu/), and in principle the jobs can be sent to any machine that can run this client.
+The examples directory contains examples to use the picasclient. There are examples for running locally (laptop, cluster login), to a slurm job scheduler and the Grid (https://www.egi.eu/), and in principle the jobs can be sent to any machine that can run this client.
 
-To run the examples, first you need to have a CouchDB instance running that functions as the token broker that stores the tokens which the worker machines can approach to get work execute. To set up this CouchDB instance, see the [SURF documentation](https://doc.grid.surfsara.nl/en/latest/Pages/Practices/picas/picas_overview.html#picas-server-1), these examples assume you have an instance running and access to a DB on this instance.
+To run the examples, first you need to have a CouchDB instance running that functions as the token broker that stores the tokens which the worker machines can approach to get work execute. To set up this CouchDB instance, see the [SURF documentation](https://doc.grid.surfsara.nl/en/latest/Pages/Practices/picas/picas_overview.html#picas-server-1), these examples assume you have an instance running and access to a DB on this instance. If you are following a workshop organized by SURF, this has already been arranged for you.
 
 Once this server is running, you can run the PiCaS examples:
  - Local
  - Slurm
  - Grid
 
-To approach the DB, you have to fill in the `examples/picasconfig.py` with the information to log in to your CouchDB instance and the database you want use for storing the work tokens.
 
+## Prepare the tokens
+
+
+To approach the DB, you have to fill in the `examples/picasconfig.py` with the information to log in to your CouchDB instance and the database you want use for storing the work tokens. Specifically, the information needed are:
+```
+PICAS_HOST_URL="https://picas.surfsara.nl:6984"
+PICAS_DATABASE=""
+PICAS_USERNAME=""
+PICAS_PASSWORD=""
+```
+### Create views
 Once you can approach the server, you have to define "view" logic, so that you can easily view large numbers of tokens and filter on new, running and finished tokens. To create these views, run:
 
 ```
 python createViews.py
 ```
 
-Next you have to send some tokens containing work to the CouchDB instance. You can send two types of work in this example. For very fast running jobs, send the `quickExample.txt` file with:
+### Create tokens
+This example includes a bash script `(./createTokens)` that generates a sensible parameter file, with each line representing a set of parameters that the fractals program can be called with. Without arguments it creates a fairly sensible set of 24 lines of parameters. You can generate different sets of parameters by calling the program with a combination of `-q`, `-d` and `-m` arguments, but at the moment no documentation exists on these. We recommend not to use them for the moment.
+```
+./createTokens
+```
+After you ran the `createTokens` script you’ll see output similar to the following:
+```
+/tmp/tmp.fZ33Kd8wXK
+cat /tmp/tmp.fZ33Kd8wXK
+```
 
+### Upload tokens to the PiCaS server
+
+
+Next you have to send some tokens containing work to the CouchDB instance. You can send two types of work in this example. For very fast running jobs, send the `quickExample.txt` file with:
 ```
 python pushTokens.py quickExample.txt
 ```
+
+For longer jobs with a set of 24 lines of parameters. send the file generated in the create tokens step:
+```
+python pushTokens.py /tmp/tmp.fZ33Kd8wXK
+```
+
+### Reset tokens 
+
+### Delete tokens
+
 
 Now we are ready to run the examples!
 
