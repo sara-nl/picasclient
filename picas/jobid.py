@@ -12,7 +12,7 @@ def add_job_id(doc):
     adds information of the highest level of batch system,
     since job submision systems may be layered e.g:
     A glite wms system makes underneath use of a cream system which makes use
-    of PBS. I such a case only the glite wms id instead of all of them.
+    of PBS. In such a case only the glite wms id instead of all of them.
     """
     dirac_jobid = environ.get("DIRACJOBID")
     slurm_jobid = environ.get("SLURM_JOB_ID")

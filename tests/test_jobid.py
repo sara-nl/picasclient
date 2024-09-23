@@ -24,14 +24,13 @@ class TestJobid(unittest.TestCase):
             add_job_id(self.doc)
             self.assertTrue(self.doc[self.env_vars[test]] == "http/jobid")
             environ.pop(test)
-
         environ["GLITE_WMS_JOBID"] = "jobid"
         add_job_id(self.doc)
         self.assertTrue(self.doc["wms_job_id"] is None)
 
     def test_remove_job_id(self):
         """ Test if job_id is removed from token"""
-        for test in self.env_vars:
-            self.doc[self.env_vars[test]] = "jobid"
+        for test in self.env_vars.values():
+            self.doc[test] = "jobid"
             remove_job_id(self.doc)
-            self.assertRaises(KeyError, self.doc.__getitem__, self.env_vars[test])
+            self.assertRaises(KeyError, self.doc.__getitem__, test)
