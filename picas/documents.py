@@ -8,7 +8,7 @@ import base64
 import traceback
 from uuid import uuid4
 
-from . import batchid
+from . import jobid
 from .util import merge_dicts, seconds
 
 
@@ -202,7 +202,7 @@ class Task(Document):
     def lock(self):
         """Function which modifies the task such that it is locked."""
         self.doc['lock'] = seconds()
-        batchid.add_batch_management_id(self.doc)
+        jobid.add_job_id(self.doc)
         return self._update_hostname()
 
     def done(self):
@@ -253,7 +253,7 @@ class Task(Document):
         self.doc['scrub_count'] += 1
         self.doc['done'] = 0
         self.doc['lock'] = 0
-        batchid.remove_batch_management_id(self.doc)
+        jobid.remove_job_id(self.doc)
         return self._update_hostname()
 
     def error(self, msg=None, exception=None):

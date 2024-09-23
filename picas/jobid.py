@@ -6,13 +6,13 @@
 from os import environ
 
 
-def add_batch_management_id(doc):
+def add_job_id(doc):
     """
-    Add job number id of the batch system to a token/document
-    Adds information of the highest level of batch system,
+    Add job number id to a token/document. For batch jobs,
+    adds information of the highest level of batch system,
     since job submision systems may be layered e.g:
     A glite wms system makes underneath use of a cream system which makes use
-     of PBS. I such a case only the glite wms id instead of all of them.
+    of PBS. I such a case only the glite wms id instead of all of them.
     """
     dirac_jobid = environ.get("DIRACJOBID")
     slurm_jobid = environ.get("SLURM_JOB_ID")
@@ -23,7 +23,7 @@ def add_batch_management_id(doc):
     if slurm_jobid is not None:
         doc["slurm_job_id"] = slurm_jobid
     if dirac_jobid is not None:
-        doc["dirac_job_id"] = dirac_jobid           
+        doc["dirac_job_id"] = dirac_jobid
     elif wms_jobid is not None:
         if not wms_jobid.startswith("http"):
             wms_jobid = None
@@ -34,14 +34,14 @@ def add_batch_management_id(doc):
         doc["pbs_job_id"] = pbs_jobid
 
 
-def remove_batch_management_id(doc):
+def remove_job_id(doc):
     """
-    removes all batch id from doc/token
+    removes all job id from doc/token
     """
     if "slurm_job_id" in doc:
         del doc["slurm_job_id"]
     if "dirac_job_id" in doc:
-        del doc["dirac_job_id"]    
+        del doc["dirac_job_id"]
     if "wms_job_id" in doc:
         del doc["wms_job_id"]
     if "cream_job_id" in doc:
