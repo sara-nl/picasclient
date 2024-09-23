@@ -1,13 +1,11 @@
 import pytest
-import os
 import signal
 import subprocess
 import time
 import unittest
 
 from test_mock import MockDB, MockRun, MockRunWithStop
-from nose.tools import assert_true, assert_equals
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 from picas import actors
 from picas.documents import Task
@@ -61,13 +59,13 @@ class TestRun(unittest.TestCase):
 
     def _callback_timer(self, task):
         """
-        Callback function for processing tokens that sleeps, s.t. the max time of 
+        Callback function for processing tokens that sleeps, s.t. the max time of
         processing can expire and stop the processing.
         """
         self.assertTrue(task.id in [t['_id'] for t in MockDB.TASKS])
         self.assertTrue(task['lock'] > 0)
         self.count += 1
-        time.sleep(0.5) # force one token to "take" 0.5 s
+        time.sleep(0.5)  # force one token to "take" 0.5 s
         task['exit_code'] = 0
 
     def test_max_time(self):
@@ -75,7 +73,7 @@ class TestRun(unittest.TestCase):
         Test to stop running when the max time is about to be reached.
         """
         self.count = 0
-        self.max_time = 0.5 # one token takes 0.5, so it quits after 1 token
+        self.max_time = 0.5  # one token takes 0.5, so it quits after 1 token
         self.avg_time_fac = 0.5
         self.test_number = 1
         runner = MockRunWithStop(self._callback_timer)
@@ -102,8 +100,8 @@ class TestHandler(unittest.TestCase):
         self.lock_code = 2
         self.done_code = 2
         self.actor = actors.RunActor(MockDB(), token_reset_values=[self.lock_code, self.done_code])
-        self.actor.subprocess = subprocess.Popen(['sleep', '10']) #ensure the actor is busy
-        self.actor.current_task = Task({'_id':'c', 'lock': None, 'done': None})
+        self.actor.subprocess = subprocess.Popen(['sleep', '10'])  # ensure the actor is busy
+        self.actor.current_task = Task({'_id': 'c', 'lock': None, 'done': None})
 
     def test_signal_handling(self):
         """

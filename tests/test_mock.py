@@ -1,10 +1,10 @@
 import random
-from picas.actors import RunActor, RunActorWithStop
+from picas.actors import AbstractRunActor, RunActor
 from picas.documents import Document
 
 
 class MockDB(object):
-    TASKS = [{'_id': 'a', 'lock': 0}, {'_id': 'b', 'lock': 0}]
+    TASKS = [{'_id': 'a', 'lock': 0}, {'_id': 'b', 'lock': 0}, {'_id': 'c', 'lock': 0}]
     JOBS = [{'_id': 'myjob'}]
 
     def __init__(self):
@@ -40,7 +40,7 @@ class MockDB(object):
         return doc
 
 
-class MockRun(RunActor):
+class MockRun(AbstractRunActor):
 
     def __init__(self, callback):
         db = MockDB()
@@ -52,7 +52,7 @@ class MockRun(RunActor):
         self.callback(task)
 
 
-class MockRunWithStop(RunActorWithStop):
+class MockRunWithStop(RunActor):
 
     def __init__(self, callback):
         db = MockDB()

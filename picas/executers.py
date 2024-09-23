@@ -16,9 +16,10 @@ def execute(args, shell=False):
     @param args: the arguments as they need to be specified for Popen.
     @return: a tuple containing the exitcode, stdout & stderr
     """
-    proc = Popen(args, stdout=PIPE, stderr=PIPE, shell=shell)
-    (stdout, stderr) = proc.communicate()
+    with Popen(args, stdout=PIPE, stderr=PIPE, shell=shell) as proc:
+        (stdout, stderr) = proc.communicate()
     return (proc, proc.returncode, stdout, stderr)
+
 
 
 def execute_old(cmd):

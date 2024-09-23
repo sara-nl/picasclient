@@ -4,6 +4,7 @@
 @Copyright (c) 2016, Jan Bot
 @author: Jan Bot, Joris Borgdorff
 """
+
 import logging
 import signal
 import subprocess
@@ -16,12 +17,13 @@ from couchdb.http import ResourceConflict
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
-class RunActor(object):
+
+class AbstractRunActor(object):
     """
     Executor class to be overwritten in the client implementation.
     """
 
-    def __init__(self, db, iterator=None, view='todo', token_reset_values=[0,0], **view_params):
+    def __init__(self, db, iterator=None, view='todo', token_reset_values=[0, 0], **view_params):
         """
         @param database: the database to get the tasks from.
         @param token_reset_values: values to use in the token when PiCaS is terminated, defaults to values of 'todo' ([0,0])
@@ -29,14 +31,15 @@ class RunActor(object):
         if db is None:
             raise ValueError("Database must be initialized")
         self.db = db
+        self.iterator = iterator
+        self.token_reset_values = token_reset_values
+
         # current task is needed to reset it when PiCaS is killed
         self.current_task = None
         # the subprocess running the token code is necessary s.t. the handler can cleanly kill it
         self.subprocess = None
         self.tasks_processed = 0
-        self.token_reset_values = token_reset_values
 
-        self.iterator = iterator
         if iterator is None:
             self.iterator = TaskViewIterator(self.db, view, **view_params)
         else:
@@ -76,7 +79,7 @@ class RunActor(object):
         Run method of the actor, executes the application code by iterating
         over the available tasks in CouchDB.
         """
-        # The error handler for when SLURM (or other scheduler / user) kills PiCaS, to reset the 
+        # The error handler for when SLURM (or other scheduler / user) kills PiCaS, to reset the
         # token back to 'todo' state (or other state defined through the token_reset_values)
         self.setup_handler()
 
@@ -85,14 +88,14 @@ class RunActor(object):
         try:
             for task in self.iterator:
                 self._run(task)
-                self.current_task = None # set to None so the handler leaves the token alone when picas is killed
+                self.current_task = None  # set to None so the handler leaves the token alone when picas is killed
         finally:
             self.cleanup_env()
 
     def handler(self, signum, frame):
         """
-        Signal handler method. It sets the tokens values of 'lock' and 'done' fields to the values 
-        passed to token_reset_values. This method ensures that when PiCaS is killed by the 
+        Signal handler method. It sets the tokens values of 'lock' and 'done' fields to the values
+        passed to token_reset_values. This method ensures that when PiCaS is killed by the
         scheduler or user, it automatically resets the token that was being worked on back to some
         state (default: 'todo' state).
 
@@ -106,7 +109,7 @@ class RunActor(object):
             log.info('Terminating execution of token')
             self.subprocess.terminate()
             try:
-                self.subprocess.communicate(timeout=30) # wait 30 seconds for termination, value chosen to allow complex processes to stop
+                self.subprocess.communicate(timeout=30)  # wait 30 seconds for termination, value chosen to allow complex processes to stop
             except subprocess.TimeoutExpired:
                 log.info('Killing subprocess')
                 self.subprocess.kill()
@@ -134,14 +137,12 @@ class RunActor(object):
         Method to be called to prepare the environment to run the
         application.
         """
-        pass
 
     def prepare_run(self, *args, **kwargs):
         """
         Code to run before a task gets processed. Used e.g. for fetching
         inputs.
         """
-        pass
 
     def process_task(self, task):
         """
@@ -154,15 +155,14 @@ class RunActor(object):
         """
         Code to run after a task has been processed.
         """
-        pass
 
     def cleanup_env(self, *args, **kwargs):
         """
         Method which gets called after the run method has completed.
         """
-        pass
 
-class RunActorWithStop(RunActor):
+        
+class RunActor(AbstractRunActor):
     """
     RunActor class with added stopping functionality.
     """
@@ -174,10 +174,11 @@ class RunActorWithStop(RunActor):
         logic is also extended into the EndlessViewIterator to break it when
         the condition is met, otherwise it never stops.
 
-        @param max_time:
-        @param avg_time_factor:
-        @param max_tasks:
-        @param stop_function: custom function to stop the execution, mustt return bool
+        @param max_time: maximum time to run picas before stopping
+        @param avg_time_factor: used for estimating when to stop with `max_time`,
+                                value is average time per token to run
+        @param max_tasks: number of tasks that are performed before stopping
+        @param stop_function: custom function to stop the execution, must return bool
         @param stop_function_args: kwargs to supply to stop_function
         """
         self.time = Timer()
@@ -186,8 +187,8 @@ class RunActorWithStop(RunActor):
         # handler needs to be setup in overwritten method
         self.setup_handler()
 
-        # Special case to break the while loop of the EndlessViewIterator: 
-        # The while loop cant reach the stop condition in the for loop below, 
+        # Special case to break the while loop of the EndlessViewIterator:
+        # The while loop cant reach the stop condition in the for loop below,
         # so pass the condition into the stop mechanism of the EVI, then the
         # iterator is stopped from EVI and not the RunActorWithStop
         if isinstance(self.iterator, EndlessViewIterator):
@@ -200,7 +201,7 @@ class RunActorWithStop(RunActor):
 
                 logging.debug("Tasks executed: ", self.tasks_processed)
 
-                if (stop_function is not None and 
+                if (stop_function is not None and
                     stop_function(**stop_function_args)):
                     break
 
@@ -215,6 +216,6 @@ class RunActorWithStop(RunActor):
                     will_elapse = (self.time.elapsed() + avg_time_factor)
                     if will_elapse > max_time:
                         break
-                self.current_task = None # set to None so the handler leaves the token alone when picas is killed
+                self.current_task = None  # set to None so the handler leaves the token alone when picas is killed
         finally:
             self.cleanup_env()

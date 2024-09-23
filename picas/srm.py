@@ -13,18 +13,19 @@ import queue
 from os import path
 
 from .executers import execute, execute_old
+from .picaslogger import picaslogger
 
 
-def download(remotefile, local_dir):
-    logging.debug("Downloading: " + remotefile)
-    raise NotImplementedError(
-        "Download function not implemented yet. Use SRMClient class.")
+def download(remotefile):
+    """Download file"""
+    logging.debug(f"Downloading: {remotefile}")
+    raise NotImplementedError("Download function not implemented yet. Use SRMClient class.")
 
 
-def upload(localfile, srm_dir):
-    logging.debug("Uploading: " + localfile)
-    raise NotImplementedError(
-        "Upload function not implemented yet. Use SRMClient class.")
+def upload(localfile):
+    """Upload file"""
+    logging.debug(f"Uploading: {localfile}")
+    raise NotImplementedError("Upload function not implemented yet. Use SRMClient class.")
 
 
 def download_many(files, poolsize=10, logger=None):
@@ -39,7 +40,7 @@ def download_many(files, poolsize=10, logger=None):
         q.put(v)
 
     thread_pool = []
-    for i in range(poolsize):
+    for _ in range(poolsize):
         d = Downloader(q, logger)
         d.start()
         thread_pool.append(d)
@@ -50,8 +51,8 @@ def download_many(files, poolsize=10, logger=None):
 
 
 def upload_many(files, poolsize=10):
-    raise NotImplementedError(
-        "upload_many function not implemented. Use SRMClient class.")
+    """Upload multiple files"""
+    raise NotImplementedError("upload_many function not implemented. Use SRMClient class.")
 
 
 class Downloader(threading.Thread):
@@ -61,14 +62,14 @@ class Downloader(threading.Thread):
     SRM with too many request.
     """
 
-    def __init__(self, queue, logger=None):
+    def __init__(self, q, logger=None):
         """Initialization.
-        @param queue: Python queue object containing all the files that need
+        @param q: Python queue object containing all the files that need
         to be downloaded.
         @param logger: Python logger object.
         """
         threading.Thread.__init__(self)
-        self.q = queue
+        self.q = q
         if logger is None:
             self.logger = logging.getLogger('SRM')
         else:
@@ -93,13 +94,12 @@ class Downloader(threading.Thread):
 
             self.q.task_done()
 
-            if (count > 24):
-                self.logger.error("Download of " + f +
-                                  " failed after multiple tries.")
+            if count > 24:
+                self.logger.error(f"Download of {f} failed after multiple tries.")
                 raise EnvironmentError("Download failed of: " + f)
 
 
-class SRMClient(object):
+class SRMClient:
 
     """Helper class to easily down- and upload files to/from SRM.
     """
@@ -119,17 +119,16 @@ class SRMClient(object):
         """
         surl = self.srm_host + loc
         cmd = ['srmls', surl]
-        print(" ".join(cmd))
-        (proc, returncode, stdout, stderr) = execute(cmd)
+        picaslogger.info(" ".join(cmd))
+        (proc, returncode, stdout, _) = execute(cmd)
+
         if returncode == 0:
             bn = path.basename(loc)
             lines = stdout.split("\n")
             for line in lines:
                 if bn in line:
                     return True
-            return False
-        else:
-            return False
+        return False
 
     def upload(self, local_file, srm_dir, check=False):
         """Upload local file to the SRM.
@@ -151,8 +150,8 @@ class SRMClient(object):
 
         cmd = ['srmcp', '-2', '-server_mode=passive',
                'file:///' + local_file, srm_url]
-        print(cmd)
-        (proc, returncode, stdout, stderr) = execute(cmd)
+        picaslogger.info(cmd)
+        (proc, returncode, _, _) = execute(cmd)
         if returncode == 0:
             pass
         else:

@@ -5,12 +5,15 @@
 @Copyright (c) 2016, Jan Bot
 """
 
-from .documents import Task
-from couchdb.http import ResourceConflict
 import time
 
+from couchdb.http import ResourceConflict
 
-class ViewIterator(object):
+from .documents import Task
+from .picaslogger import picaslogger
+
+
+class ViewIterator:
     """
     Dummy class to show what to implement for a PICaS iterator.
     """
@@ -23,16 +26,16 @@ class ViewIterator(object):
         return self
 
     def reset(self):
+        """Reset the iterator."""
         self._stop = False
 
     def stop(self):
+        """Stop the iterator."""
         self._stop = True
 
     def is_stopped(self):
+        """Bool: iterator stopped."""
         return self._stop
-
-    def next(self):
-        return self.__next__()
 
     def __next__(self):
         """
@@ -46,14 +49,12 @@ class ViewIterator(object):
 
         try:
             return self.claim_task()
-        except IndexError:
+        except IndexError as ex:
             self.stop()
-            raise StopIteration
+            raise StopIteration from ex
 
     def claim_task(self):
-        """
-        Get the first available task from a view.
-        """
+        """Get the first available task from a view."""
         raise NotImplementedError("claim_task function not implemented.")
 
 
@@ -71,8 +72,7 @@ def _claim_task(database, view, allowed_failures=10, **view_params):
 
 class TaskViewIterator(ViewIterator):
 
-    """Iterator object to fetch tasks while available.
-    """
+    """Iterator object to fetch tasks while available."""
     def __init__(self, database, view, **view_params):
         """
         @param database: CouchDB database to get tasks from.
@@ -80,7 +80,7 @@ class TaskViewIterator(ViewIterator):
         @param view_params: parameters which need to be passed on to the view
         (optional).
         """
-        super(TaskViewIterator, self).__init__()
+        super().__init__()
         self.database = database
         self.view = view
         self.view_params = view_params
@@ -106,7 +106,7 @@ class PrioritizedViewIterator(ViewIterator):
         @param view_params: parameters which need to be passed on to the view
         (optional).
         """
-        super(PrioritizedViewIterator, self).__init__()
+        super().__init__()
         self.database = database
         self.high_priority_view = high_priority_view
         self.low_priority_view = low_priority_view
@@ -138,13 +138,14 @@ class EndlessViewIterator(ViewIterator):
                               iterator should stop feeding tasks
         @param stop_callback_args: arguments to the stop_callback function.
         """
-        super(EndlessViewIterator, self).__init__()
+        super().__init__()
         self.iterator = view_iterator
         self.sleep_sec = sleep_sec
         self.stop_callback = stop_callback
         self.stop_callback_args = stop_callback_args
 
     def is_cancelled(self):
+        """Bool to check if the while should be stopped"""
         return (self.is_stopped() or
                 (self.stop_callback is not None and
                  self.stop_callback(**self.stop_callback_args)))
@@ -156,10 +157,10 @@ class EndlessViewIterator(ViewIterator):
             except StopIteration:
                 self.iterator.reset()
                 time.sleep(self.sleep_sec)
-                print("Iterator is waiting for work...")
+                picaslogger.info("Iterator is waiting for work...")
 
         # no longer continue
         self.iterator.stop()
         self.stop()
-        print("Iterator is finishing.")
+        picaslogger.info("Iterator is finishing.")
         raise StopIteration

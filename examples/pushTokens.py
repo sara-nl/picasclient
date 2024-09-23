@@ -42,7 +42,7 @@ def loadTokens(db):
             'exit_code': ''
         }
         tokens.append(token)
-        i = i +1
+        i = i + 1
     db.update(tokens)
 
 def get_db():

@@ -9,8 +9,6 @@ description:
     Run main job (process_task.sh) with the input argument
     When done, return the exit code to the token
     Attach the logs to the token
-
-
 '''
 
 import logging
@@ -19,17 +17,17 @@ import time
 import couchdb
 import picasconfig
 
-from picas.actors import RunActor, RunActorWithStop
+from picas.actors import RunActor
 from picas.clients import CouchDB
+from picas.executers import execute
 from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
-from picas.executers import execute
 from picas.util import Timer
 
 log = logging.getLogger(__name__)
 
-class ExampleActor(RunActorWithStop):
+class ExampleActor(RunActor):
     """
     The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
     Feel free to adjust to whatever you need, a template can be found at: example-template.py
