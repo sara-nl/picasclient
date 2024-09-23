@@ -93,6 +93,12 @@ python pushTokens.py /tmp/tmp.fZ33Kd8wXK
 
 ### Delete tokens
 
+To delete all the Tokens in a certain view, you can use the `deteleTokens.py` under the `examples` directory. For example to delete all the tokens in todo view, run
+```
+python /path-to-script/deleteTokens.py Monitor/todo
+```
+
+
 
 Now we are ready to run the examples! You can start with running a quick example on different systems. Or you can jump to "Running the long jobs" section for a more complex example.
 
