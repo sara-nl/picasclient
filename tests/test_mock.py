@@ -1,6 +1,7 @@
 import random
 from picas.actors import AbstractRunActor, RunActor
 from picas.documents import Document
+from stopit import threading_timeoutable as timeoutable
 
 
 class MockDB(object):
@@ -48,6 +49,7 @@ class MockRun(AbstractRunActor):
 
         self.callback = callback
 
+    @timeoutable(default=None)
     def process_task(self, task):
         self.callback(task)
 
@@ -60,5 +62,6 @@ class MockRunWithStop(RunActor):
 
         self.callback = callback
 
+    @timeoutable(default=None)
     def process_task(self, task):
         self.callback(task)
