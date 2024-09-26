@@ -147,7 +147,7 @@ class AbstractRunActor(object):
         inputs.
         """
 
-    @timeoutable()
+    @timeoutable(default=None)
     def process_task(self, task):
         """
         The function to override, which processes the tasks themselves.
