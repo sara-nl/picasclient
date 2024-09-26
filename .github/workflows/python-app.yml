@@ -34,7 +34,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -U .
         pip install -U ".[test]"
-        pip install flake8 pytest nose stopit
+        pip install flake8 pytest nose stopit setuptools
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
