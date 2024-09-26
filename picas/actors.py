@@ -118,6 +118,8 @@ class AbstractRunActor(object):
 
         # update the token state, if reset vaue is None, do nothing.
         if self.current_task and self.token_reset_values is not None:
+            # scrub goes first, as it reset lock and done to defaults, which could be overwritten below
+            self.current_task.scrub()
             self.current_task['lock'] = self.token_reset_values[0]
             self.current_task['done'] = self.token_reset_values[1]
             self.db.save(self.current_task)
