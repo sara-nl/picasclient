@@ -177,7 +177,8 @@ class RunActor(AbstractRunActor):
     RunActor class with added stopping functionality.
     """
 
-    def run(self, max_token_time=None, max_time=None, avg_time_factor=0.0, max_tasks=0, stop_function=None, **stop_function_args):
+    def run(self, max_token_time=None, max_time=None, avg_time_factor=0.0, max_tasks=0,
+            max_scrub=0, stop_function=None, **stop_function_args):
         """
         Run method of the actor, executes the application code by iterating
         over the available tasks in CouchDB, including stop logic. The stop
@@ -189,6 +190,7 @@ class RunActor(AbstractRunActor):
         @param avg_time_factor: used for estimating when to stop with `max_time`,
                                 value is average time per token to run
         @param max_tasks: number of tasks that are performed before stopping
+        @param max_scrub: number of times a token can be reset ('scrubbed') after failing
         @param stop_function: custom function to stop the execution, must return bool
         @param stop_function_args: kwargs to supply to stop_function
         """
@@ -211,6 +213,12 @@ class RunActor(AbstractRunActor):
                 self._run(task, timeout=max_token_time)
 
                 logging.debug("Tasks executed: ", self.tasks_processed)
+
+                # Scrub the token if it failed, scrubbing puts it back in 'todo' state
+                if (task['scrub_count'] < max_scrub) and (task['exit_code'] != 0):
+                    log.info(f"Scrubbing token {task['_id']}")
+                    task.scrub()
+                    self.db.save(task)
 
                 if (stop_function is not None and stop_function(**stop_function_args)):
                     break
