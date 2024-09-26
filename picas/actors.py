@@ -13,10 +13,12 @@ from .util import Timer
 from .iterators import TaskViewIterator, EndlessViewIterator
 
 from couchdb.http import ResourceConflict
-from stopit import threading_timeoutable as timeoutable
+from stopit import ThreadingTimeout
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
+stopit_logger = logging.getLogger('stopit')
+stopit_logger.setLevel(logging.ERROR)
 
 
 class AbstractRunActor(object):
@@ -55,11 +57,16 @@ class AbstractRunActor(object):
         self.current_task = task
 
         try:
-            self.process_task(task, timeout=timeout)
+            with ThreadingTimeout(timeout, swallow_exc=False) as context_manager:
+                self.process_task(task)
         except Exception as ex:
             msg = ("Exception {0} occurred during processing: {1}"
                    .format(type(ex), ex))
             task.error(msg, exception=ex)
+            log.info(msg)
+
+        if context_manager.state == context_manager.TIMED_OUT:
+            msg = ("Token execution exceeded timeout limit of {0} seconds".format(timeout))
             log.info(msg)
 
         while True:
@@ -147,7 +154,6 @@ class AbstractRunActor(object):
         inputs.
         """
 
-    @timeoutable(default=None)
     def process_task(self, task):
         """
         The function to override, which processes the tasks themselves.
@@ -165,7 +171,7 @@ class AbstractRunActor(object):
         Method which gets called after the run method has completed.
         """
 
-        
+
 class RunActor(AbstractRunActor):
     """
     RunActor class with added stopping functionality.
@@ -206,8 +212,7 @@ class RunActor(AbstractRunActor):
 
                 logging.debug("Tasks executed: ", self.tasks_processed)
 
-                if (stop_function is not None and
-                    stop_function(**stop_function_args)):
+                if (stop_function is not None and stop_function(**stop_function_args)):
                     break
 
                 # break if number of tasks processed is max set
