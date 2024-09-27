@@ -177,7 +177,8 @@ class RunActor(AbstractRunActor):
     RunActor class with added stopping functionality.
     """
 
-    def run(self, max_token_time=None, max_total_time=None, max_tasks=None, max_scrub=0):
+    def run(self, max_token_time=None, max_total_time=None, max_tasks=None, max_scrub=0,
+            stop_function=None, **stop_function_args):
         """
         Run method of the actor, executes the application code by iterating
         over the available tasks in CouchDB, including stop logic. The stop
@@ -188,6 +189,8 @@ class RunActor(AbstractRunActor):
         @param max_total_time: maximum time to run picas before stopping
         @param max_tasks: number of tasks that are performed before stopping
         @param max_scrub: number of times a token can be reset ('scrubbed') after failing
+        @param stop_function: custom function to stop the execution, must return bool
+        @param stop_function_args: kwargs to supply to stop_function
         """
         timer = Timer()
         self.prepare_env()
@@ -195,14 +198,10 @@ class RunActor(AbstractRunActor):
         # handler needs to be setup in overwritten method
         self.setup_handler()
 
+        # Break the while loop of the Iterator if max_total_time is exceeded
         if max_total_time is not None:
-            stop_function = time_elapsed
-            stop_function_args = {"timer": timer, "max": max_total_time}
-
-        # Stop function to break the while loop of the EndlessViewIterator
-        if isinstance(self.iterator, EndlessViewIterator):
-            self.iterator.stop_callback = stop_function
-            self.iterator.stop_callback_args = stop_function_args
+            self.iterator.stop_callback = time_elapsed
+            self.iterator.stop_callback_args = {"timer": timer, "max": max_total_time}
 
         try:
             for task in self.iterator:
@@ -215,6 +214,9 @@ class RunActor(AbstractRunActor):
                     log.info(f"Scrubbing token {task['_id']}")
                     task.scrub()
                     self.db.save(task)
+
+                if (stop_function is not None and stop_function(**stop_function_args)):
+                    break
 
                 # break if number of tasks processed is max set
                 if max_tasks and self.tasks_processed == max_tasks:

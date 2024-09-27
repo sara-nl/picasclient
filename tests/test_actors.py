@@ -68,17 +68,18 @@ class TestRun(unittest.TestCase):
         time.sleep(0.5)  # force one token to "take" 0.5 s
         task['exit_code'] = 0
 
-    def test_max_time(self):
+    def test_max_total_time(self):
         """
         Test to stop running when the max time is about to be reached.
         """
         self.count = 0
-        self.max_time = 0.5  # one token takes 0.5, so it quits after 1 token
-        self.avg_time_fac = 0.5
-        self.test_number = 1
+        max_time = 1.
         runner = MockRunWithStop(self._callback_timer)
-        runner.run(max_time=self.max_time, avg_time_factor=self.avg_time_fac)
-        self.assertEqual(self.count, self.test_number)
+        start = time.time()
+        runner.run(max_total_time=max_time)
+        end = time.time()
+        exec_time = end-start
+        self.assertAlmostEqual(max_time, exec_time, 1)
 
     @patch('picas.actors.log')
     @patch('signal.signal')
