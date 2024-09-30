@@ -4,7 +4,7 @@ import subprocess
 import time
 import unittest
 
-from test_mock import MockDB, MockRun, MockRunWithStop
+from test_mock import MockDB, MockRun, MockRunWithStop, MockRunEmpty
 from unittest.mock import patch
 
 from picas import actors
@@ -80,6 +80,43 @@ class TestRun(unittest.TestCase):
         end = time.time()
         exec_time = end-start
         self.assertAlmostEqual(max_time, exec_time, 1)
+
+    def test_max_total_time_empty(self):
+
+        self.count = 0
+        max_time = 1.
+        runner = MockRunEmpty(self._callback_timer)
+        start = time.time()
+        runner.run(max_total_time=max_time)
+        end = time.time()
+        exec_time = end-start
+        self.assertAlmostEqual(max_time, exec_time, 1)
+
+    def _callback_error(self, task):
+        """
+        Callback function that simulates an error.
+        """
+        self.assertTrue(task.id in [t['_id'] for t in MockDB.TASKS])
+        self.assertTrue(task['lock'] > 0)
+        self.count += 1
+        task['exit_code'] = 1
+
+    def test_scrub(self):
+        """
+        Test how many times a token is scrubbed. We can only test max_scrub
+        0 or 1 because of the limitations of MockDB.
+        """
+        self.count = 0
+        max_scrub = 0
+        runner = MockRunWithStop(self._callback_error)
+        runner.run(max_scrub=max_scrub)
+        for t in runner.db.saved:
+            self.assertEqual(runner.db.saved[t]["scrub_count"], max_scrub)
+        max_scrub = 1
+        runner = MockRunWithStop(self._callback_error)
+        runner.run(max_scrub=max_scrub)
+        for t in runner.db.saved:
+            self.assertEqual(runner.db.saved[t]["scrub_count"], max_scrub)
 
     @patch('picas.actors.log')
     @patch('signal.signal')
