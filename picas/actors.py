@@ -198,8 +198,8 @@ class RunActor(AbstractRunActor):
         # handler needs to be setup in overwritten method
         self.setup_handler()
 
-        # Break the while loop of the Iterator if max_total_time is exceeded
-        if max_total_time is not None:
+        # Break the while loop of the EndlessViewIterator if max_total_time is exceeded
+        if max_total_time is not None and isinstance(self.iterator, EndlessViewIterator):
             self.iterator.stop_callback = time_elapsed
             self.iterator.stop_callback_args = {"timer": timer, "max": max_total_time}
 
@@ -220,6 +220,10 @@ class RunActor(AbstractRunActor):
 
                 # break if number of tasks processed is max set
                 if max_tasks and self.tasks_processed == max_tasks:
+                    break
+
+                # break if max_total_time is exceeded (needed because only EndlessViewIterator has stop callback)
+                if max_total_time is not None and timer.elapsed() > max_total_time:
                     break
 
                 self.current_task = None  # set to None so the handler leaves the token alone when picas is killed

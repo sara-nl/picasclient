@@ -1,7 +1,6 @@
 import random
 from picas.actors import AbstractRunActor, RunActor
 from picas.documents import Document
-from picas.iterators import EndlessViewIterator
 
 
 class MockDB(object):
@@ -58,7 +57,6 @@ class MockRunWithStop(RunActor):
         db = MockDB()
         super(MockRunWithStop, self).__init__(db)
         self.callback = callback
-        self.iterator = EndlessViewIterator(self.iterator)
 
     def process_task(self, task):
         self.callback(task)
