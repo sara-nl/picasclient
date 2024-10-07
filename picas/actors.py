@@ -9,14 +9,16 @@ import logging
 import signal
 import subprocess
 
-from .util import Timer
+from .util import Timer, time_elapsed
 from .iterators import TaskViewIterator, EndlessViewIterator
 
 from couchdb.http import ResourceConflict
-from stopit import threading_timeoutable as timeoutable
+from stopit import ThreadingTimeout
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
+stopit_logger = logging.getLogger('stopit')
+stopit_logger.setLevel(logging.ERROR)
 
 
 class AbstractRunActor(object):
@@ -55,11 +57,16 @@ class AbstractRunActor(object):
         self.current_task = task
 
         try:
-            self.process_task(task, timeout=timeout)
+            with ThreadingTimeout(timeout, swallow_exc=False) as context_manager:
+                self.process_task(task)
         except Exception as ex:
             msg = ("Exception {0} occurred during processing: {1}"
                    .format(type(ex), ex))
             task.error(msg, exception=ex)
+            log.info(msg)
+
+        if context_manager.state == context_manager.TIMED_OUT:
+            msg = ("Token execution exceeded timeout limit of {0} seconds".format(timeout))
             log.info(msg)
 
         while True:
@@ -147,7 +154,6 @@ class AbstractRunActor(object):
         inputs.
         """
 
-    @timeoutable(default=None)
     def process_task(self, task):
         """
         The function to override, which processes the tasks themselves.
@@ -165,13 +171,14 @@ class AbstractRunActor(object):
         Method which gets called after the run method has completed.
         """
 
-        
+
 class RunActor(AbstractRunActor):
     """
     RunActor class with added stopping functionality.
     """
 
-    def run(self, max_token_time=None, max_time=None, avg_time_factor=0.0, max_tasks=0, stop_function=None, **stop_function_args):
+    def run(self, max_token_time=None, max_total_time=None, max_tasks=None, max_scrub=0,
+            stop_function=None, **stop_function_args):
         """
         Run method of the actor, executes the application code by iterating
         over the available tasks in CouchDB, including stop logic. The stop
@@ -179,26 +186,22 @@ class RunActor(AbstractRunActor):
         the condition is met, otherwise it never stops.
 
         @param max_token_time: maximum time to run a single token before stopping
-        @param max_time: maximum time to run picas before stopping
-        @param avg_time_factor: used for estimating when to stop with `max_time`,
-                                value is average time per token to run
+        @param max_total_time: maximum time to run picas before stopping
         @param max_tasks: number of tasks that are performed before stopping
+        @param max_scrub: number of times a token can be reset ('scrubbed') after failing
         @param stop_function: custom function to stop the execution, must return bool
         @param stop_function_args: kwargs to supply to stop_function
         """
-        self.time = Timer()
+        timer = Timer()
         self.prepare_env()
 
         # handler needs to be setup in overwritten method
         self.setup_handler()
 
-        # Special case to break the while loop of the EndlessViewIterator:
-        # The while loop cant reach the stop condition in the for loop below,
-        # so pass the condition into the stop mechanism of the EVI, then the
-        # iterator is stopped from EVI and not the RunActorWithStop
-        if isinstance(self.iterator, EndlessViewIterator):
-            self.iterator.stop_callback = stop_function
-            self.iterator.stop_callback_args = stop_function_args
+        # Break the while loop of the EndlessViewIterator if max_total_time is exceeded
+        if max_total_time is not None and isinstance(self.iterator, EndlessViewIterator):
+            self.iterator.stop_callback = time_elapsed
+            self.iterator.stop_callback_args = {"timer": timer, "max": max_total_time}
 
         try:
             for task in self.iterator:
@@ -206,21 +209,23 @@ class RunActor(AbstractRunActor):
 
                 logging.debug("Tasks executed: ", self.tasks_processed)
 
-                if (stop_function is not None and
-                    stop_function(**stop_function_args)):
+                # Scrub the token if it failed, scrubbing puts it back in 'todo' state
+                if (task['scrub_count'] < max_scrub) and (task['exit_code'] != 0):
+                    log.info(f"Scrubbing token {task['_id']}")
+                    task.scrub()
+                    self.db.save(task)
+
+                if (stop_function is not None and stop_function(**stop_function_args)):
                     break
 
                 # break if number of tasks processed is max set
                 if max_tasks and self.tasks_processed == max_tasks:
                     break
 
-                if max_time is not None:
-                    # for a large number of tokens the avg time will be better (due to statistics)
-                    # resulting in a better estimate of whether time.elapsed + avg_time (what will
-                    # be added on the next iteration) is larger than the max_time.
-                    will_elapse = (self.time.elapsed() + avg_time_factor)
-                    if will_elapse > max_time:
-                        break
+                # break if max_total_time is exceeded (needed because only EndlessViewIterator has stop callback)
+                if max_total_time is not None and timer.elapsed() > max_total_time:
+                    break
+
                 self.current_task = None  # set to None so the handler leaves the token alone when picas is killed
         finally:
             self.cleanup_env()
