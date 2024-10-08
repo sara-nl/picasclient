@@ -161,7 +161,7 @@ class AbstractRunActor(object):
         Method which gets called after the run method has completed.
         """
 
-        
+
 class RunActor(AbstractRunActor):
     """
     RunActor class with added stopping functionality.
@@ -201,8 +201,7 @@ class RunActor(AbstractRunActor):
 
                 logging.debug("Tasks executed: ", self.tasks_processed)
 
-                if (stop_function is not None and
-                    stop_function(**stop_function_args)):
+                if (stop_function is not None and stop_function(**stop_function_args)):
                     break
 
                 # break if number of tasks processed is max set

@@ -9,8 +9,7 @@
 import socket
 import time
 
-from os import environ
-from . import batchid
+from . import jobid
 
 
 class TokenModifier:
@@ -64,15 +63,13 @@ class BasicTokenModifier(TokenModifier):
         @return: modified token.
         """
 
-        dirac_jobid = environ.get("DIRACJOBID")
         lock_content = {
             'hostname': socket.gethostname(),
             'lock': int(time.time()),
-            'dirac_jobid': dirac_jobid
         }
 
-        # try to include glite wms job id if present
-        batchid.add_batch_management_id(token)
+        # try to include job id if present
+        jobid.add_job_id(token)
 
         token.update(lock_content)
         return token
@@ -87,7 +84,7 @@ class BasicTokenModifier(TokenModifier):
             'hostname': socket.gethostname(),
             'lock': 0
         }
-        batchid.remove_batch_management_id(token)
+        jobid.remove_job_id(token)
 
         token.update(lock_content)
         return token
@@ -115,7 +112,7 @@ class BasicTokenModifier(TokenModifier):
             'done': 0
         }
         token.update(done_content)
-        batchid.remove_batch_management_id(token)
+        jobid.remove_job_id(token)
         return token
 
     def add_output(self, token, output):

@@ -14,7 +14,6 @@ class TestModifier(unittest.TestCase):
         self.modifier.lock(self.token)
         self.assertTrue(self.token['hostname'] != "")
         self.assertTrue(self.token['lock'] > 0)
-        self.assertTrue(self.token['dirac_jobid'] is None)
 
     def test_unlock(self):
         self.modifier.unlock(self.token)
