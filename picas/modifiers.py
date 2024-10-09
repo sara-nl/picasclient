@@ -138,8 +138,8 @@ class BasicTokenModifier(TokenModifier):
         return token
 
     def set_error(self, token):
-        token['lock'] = -1
-        token['done'] = -1
+        token['lock'] = 99
+        token['done'] = 99
         return token
 
 
