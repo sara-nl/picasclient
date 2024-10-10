@@ -13,7 +13,7 @@ setup(name='picas',
       url='https://github.com/sara-nl/picasclient',
       download_url='https://github.com/sara-nl/picasclient/tarball/0.3.0',
       packages=['picas'],
-      install_requires=['couchdb'],
+      install_requires=['couchdb', 'stopit'],
       license="MIT",
       extras_require={
           'test': ['flake8', 'pytest'],

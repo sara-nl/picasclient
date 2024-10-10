@@ -6,6 +6,17 @@ import time
 from copy import deepcopy
 
 
+def time_elapsed(timer, max=30.):
+    """
+    This function returns True whether the elapsed time is more than `max` seconds.
+    @param timer: Timer
+    @param max: maximum allowed time
+
+    @returns: bool
+    """
+    return timer.elapsed() > max
+
+
 def merge_dicts(dict1, dict2):
     """merge two dicts"""
     merge = deepcopy(dict1)

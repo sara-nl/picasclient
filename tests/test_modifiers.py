@@ -37,8 +37,8 @@ class TestModifier(unittest.TestCase):
 
     def test_seterror(self):
         self.modifier.set_error(self.token)
-        self.assertTrue(self.token['lock'] == -1)
-        self.assertTrue(self.token['done'] == -1)
+        self.assertTrue(self.token['lock'] == 99)
+        self.assertTrue(self.token['done'] == 99)
 
     def test_addoutput(self):
         self.modifier.add_output(self.token, {"output": "test"})
