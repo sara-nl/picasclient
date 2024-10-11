@@ -88,8 +88,8 @@ class TestTask(unittest.TestCase):
 
     def test_error(self):
         self.task.error("some message")
-        self.assertEqual(self.task['lock'], -1)
-        self.assertEqual(self.task['done'], -1)
+        self.assertEqual(self.task['lock'], 99)
+        self.assertEqual(self.task['done'], 99)
         self.task.scrub()
         self.assertEqual(self.task['lock'], 0)
         self.assertEqual(self.task['done'], 0)

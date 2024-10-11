@@ -71,17 +71,6 @@ class ExampleActor(RunActor):
         except:
             pass
 
-    def time_elapsed(self, elapsed=30.):
-        """
-        This function returns whether the class has been alive for more than `elapsed` seconds. This is needed because currently the maxtime argument in RunActor.run is broken:
-        The run method will break when the iterator is non-empty and then it checks if the maxtime has passed. If the iterator stays empty, it will run until a new token is 
-        processed, and after processing the if statement is true, and run breaks.
-
-        @param elapsed: lifetime of the Actor in seconds
-
-        @returns: bool
-        """
-        return self.timer.elapsed() > elapsed
 
 def main():
     # setup connection to db
@@ -92,7 +81,7 @@ def main():
     # Create actor
     actor = ExampleActor(client, modifier)
     # Start work!
-    actor.run(max_tasks=2, stop_function=actor.time_elapsed, elapsed=11)
+    actor.run(max_token_time=10, max_total_time=100, max_tasks=10, max_scrub=2)
 
 if __name__ == '__main__':
     main()

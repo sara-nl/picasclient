@@ -265,8 +265,8 @@ class Task(Document):
         if exception is not None:
             error['exception'] = traceback.format_exc()
 
-        self.doc['lock'] = -1
-        self.doc['done'] = -1
+        self.doc['lock'] = 99
+        self.doc['done'] = 99
         if 'error' not in self.doc:
             self.doc['error'] = []
         self.doc['error'].append(error)
@@ -274,7 +274,7 @@ class Task(Document):
 
     def has_error(self):
         """Bool: check if document has an error"""
-        return self.doc['lock'] == -1
+        return self.doc['lock'] == 99
 
     def get_errors(self):
         """Get document error"""

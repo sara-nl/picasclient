@@ -1,10 +1,13 @@
 import random
 from picas.actors import AbstractRunActor, RunActor
 from picas.documents import Document
+from picas.iterators import EndlessViewIterator
 
 
 class MockDB(object):
-    TASKS = [{'_id': 'a', 'lock': 0}, {'_id': 'b', 'lock': 0}, {'_id': 'c', 'lock': 0}]
+    TASKS = [{'_id': 'a', 'lock': 0, 'scrub_count': 0},
+             {'_id': 'b', 'lock': 0, 'scrub_count': 0},
+             {'_id': 'c', 'lock': 0, 'scrub_count': 0}]
     JOBS = [{'_id': 'myjob'}]
 
     def __init__(self):
@@ -40,12 +43,16 @@ class MockDB(object):
         return doc
 
 
+class EmptyMockDB(MockDB):
+    TASKS = []
+    JOBS = []
+
+
 class MockRun(AbstractRunActor):
 
     def __init__(self, callback):
         db = MockDB()
         super(MockRun, self).__init__(db)
-
         self.callback = callback
 
     def process_task(self, task):
@@ -57,8 +64,20 @@ class MockRunWithStop(RunActor):
     def __init__(self, callback):
         db = MockDB()
         super(MockRunWithStop, self).__init__(db)
-
         self.callback = callback
+        # self.iterator = EndlessViewIterator(self.iterator)
+
+    def process_task(self, task):
+        self.callback(task)
+
+
+class MockRunEmpty(RunActor):
+
+    def __init__(self, callback):
+        db = EmptyMockDB()
+        super(MockRunEmpty, self).__init__(db)
+        self.callback = callback
+        self.iterator = EndlessViewIterator(self.iterator)
 
     def process_task(self, task):
         self.callback(task)
