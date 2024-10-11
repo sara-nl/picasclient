@@ -22,7 +22,7 @@ echo $TOKENID
 echo $OUTPUT
 
 #Start processing
-eval $INPUT
+bash -c "$INPUT"
 if [[ "$?" != "0" ]]; then
     echo "Program interrupted. Exit now..."
     exit 1
