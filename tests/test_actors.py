@@ -4,11 +4,36 @@ import subprocess
 import time
 import unittest
 
-from test_mock import MockDB, MockRun, MockRunWithStop, MockRunEmpty
+from test_mock import MockDB, MockEmptyDB
 from unittest.mock import patch
 
 from picas import actors
 from picas.documents import Task
+from picas.actors import RunActor
+from picas.iterators import EndlessViewIterator
+
+
+class ExampleRun(RunActor):
+
+    def __init__(self, callback):
+        db = MockDB()
+        super(ExampleRun, self).__init__(db)
+        self.callback = callback
+
+    def process_task(self, task):
+        self.callback(task)
+
+
+class EmptyRun(RunActor):
+
+    def __init__(self, callback):
+        db = MockEmptyDB()
+        super(EmptyRun, self).__init__(db)
+        self.callback = callback
+        self.iterator = EndlessViewIterator(self.iterator)
+
+    def process_task(self, task):
+        self.callback(task)
 
 
 class TestRun(unittest.TestCase):
@@ -26,11 +51,11 @@ class TestRun(unittest.TestCase):
         """
         Test the run function, which iterates over the iterator class, where __next__ calls
         the claim_task method which calls _claim_task that locks the token.
-        The callback function is applied through MockRun.process_task.
+        The callback function is applied through ExampleRun.process_task.
         This locking is the test here.
         """
         self.count = 0
-        runner = MockRun(self._callback)
+        runner = ExampleRun(self._callback)
         runner.run()
         self.assertEqual(self.count, len(MockDB.TASKS))
 
@@ -40,7 +65,7 @@ class TestRun(unittest.TestCase):
         """
         self.count = 0
         self.test_number = 1
-        runner = MockRunWithStop(self._callback)
+        runner = ExampleRun(self._callback)
         runner.run(max_tasks=self.test_number)
         self.assertEqual(self.count, self.test_number)
 
@@ -53,7 +78,7 @@ class TestRun(unittest.TestCase):
         """
         self.count = 0
         self.stop_fn_arg = "a"
-        runner = MockRunWithStop(self._callback)
+        runner = ExampleRun(self._callback)
         runner.run(stop_function=self.stop_fn, run_obj=runner, id=self.stop_fn_arg)
         self.assertEqual(runner.current_task['_id'], self.stop_fn_arg)
 
@@ -74,12 +99,12 @@ class TestRun(unittest.TestCase):
         """
         self.count = 0
         max_time = 1.
-        runner = MockRunWithStop(self._callback_timer)
+        runner = ExampleRun(self._callback_timer)
         start = time.time()
         runner.run(max_total_time=max_time)
         end = time.time()
         exec_time = end-start
-        self.assertLess(exec_time, max_time + 1.)  # Take into account extra time needed
+        self.assertAlmostEqual(max_time, exec_time, 1)
 
     def test_max_total_time_empty(self):
         """
@@ -87,7 +112,7 @@ class TestRun(unittest.TestCase):
         """
         self.count = 0
         max_time = 1.
-        runner = MockRunEmpty(self._callback_timer)
+        runner = EmptyRun(self._callback_timer)
         start = time.time()
         runner.run(max_total_time=max_time)
         end = time.time()
@@ -110,12 +135,12 @@ class TestRun(unittest.TestCase):
         """
         self.count = 0
         max_scrub = 0
-        runner = MockRunWithStop(self._callback_error)
+        runner = ExampleRun(self._callback_error)
         runner.run(max_scrub=max_scrub)
         for t in runner.db.saved:
             self.assertEqual(runner.db.saved[t]["scrub_count"], max_scrub)
         max_scrub = 1
-        runner = MockRunWithStop(self._callback_error)
+        runner = ExampleRun(self._callback_error)
         runner.run(max_scrub=max_scrub)
         for t in runner.db.saved:
             self.assertEqual(runner.db.saved[t]["scrub_count"], max_scrub)
