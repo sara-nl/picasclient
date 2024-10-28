@@ -47,6 +47,12 @@ class EmptyMockDB(MockDB):
     TASKS = []
     JOBS = []
 
+    def __init__(self):
+        self.tasks = dict((t['_id'], t.copy())
+                          for t in EmptyMockDB.TASKS)  # deep copy
+        self.jobs = dict((t['_id'], t.copy()) for t in EmptyMockDB.JOBS)
+        self.saved = {}
+
 
 class MockRun(AbstractRunActor):
 
@@ -65,7 +71,6 @@ class MockRunWithStop(RunActor):
         db = MockDB()
         super(MockRunWithStop, self).__init__(db)
         self.callback = callback
-        # self.iterator = EndlessViewIterator(self.iterator)
 
     def process_task(self, task):
         self.callback(task)
