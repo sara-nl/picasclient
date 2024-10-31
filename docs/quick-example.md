@@ -41,7 +41,12 @@ To create these views, run:
 ```
 python createViews.py
 ```
-Once it is finished, you should be able to see the views in the [CouchDB web interface](https://picas.surfsara.nl:6984/_utils/#/database/database-name/). The link needs to be adjusted with your database name
+After a few moments, you should be able to find the generated views in [CouchDB web interface](https://picas.surfsara.nl:6984/_utils/#login). Click on your database and you will see the views on the left under `Monitor/Views`.
+
+![picas views](./docs/picas-views.png)
+
+
+
 
 ## Prepare and upload tokens
 
