@@ -17,7 +17,7 @@ git clone git@github.com:sara-nl/picasclient.git
 cd picasclient
 poetry install --with test
 ```
-Note that poetry will create a virtual environment if it is not running withing an activiated virtual environment already.
+Note that poetry will create a virtual environment if it is not running withing an activated virtual environment already. In that case, you will need to run `poetry run` before your commands to execute them within the poetry virtual environment.
 
 To test, run
 ```
