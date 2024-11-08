@@ -18,4 +18,4 @@ cd $PWD
 # You need to load your environment here
 # mamba activate MAMBA-ENV
 # source /PATH/TO/VENV/bin/activate
-python local-example.py
+python local_example.py

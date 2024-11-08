@@ -1,7 +1,7 @@
 '''
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
-usage: python local-example.py
+usage: python local_example.py
 description:
     Connect to PiCaS server
     Get the next token in todo View
