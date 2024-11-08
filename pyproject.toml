@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "picas"
+version = "0.3.1"
+description = "Python client using CouchDB as a token pool server."
+authors = ["Jan Bot, Joris Borgdorff, Lodewijk Nauta, Haili Hu"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.10.12"
+couchdb = "^1.2"
+stopit = "^1.1.2"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.3"
+flake8 = "^7.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
