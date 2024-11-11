@@ -16,3 +16,8 @@ This can be achieved by adjusting:
  3. The job scripts (.sh) that end up in slurm / your scheduler
  4. The pilot jobs that scan the views containing the work
  5. Finally, The tokens need to be available in your database
+
+Running autopilot
+=================
+To run the scanner on a schedule, one can start it using (in slurm) scrontab, as described in https://doc.spider.surfsara.nl/en/latest/Pages/workflows.html#recurring-jobs and https://slurm.schedmd.com/scrontab.html
+
