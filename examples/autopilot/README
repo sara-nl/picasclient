@@ -1,0 +1,18 @@
+Autopiloting
+============
+
+This example shows how to automatically start a picas client (or pilot) to process tokens from the database.
+While this example explicitly shows the case of two types of tokens, that is single-core and multi-core work, you can adjust the code to:
+ - Run for a single view, such as your default tokens.
+ - Add more than the 2 views, to process as many types of tokens as you want (where type could also be GPU, high-memory, or other properties of a job).
+ - Add properties to the tokens in your "pushTokens" code, such as 
+    - "gpu: 1" and start a GPU-based job
+    - "time: 72:00:00" and then start a job with a 3-day walltime
+    - "cores: 8" and start a high-memory job
+
+This can be achieved by adjusting:
+ 1. The view code to create all the necessary views
+ 2. The scanner code to scan these views and submit the necessary jobs
+ 3. The job scripts (.sh) that end up in slurm / your scheduler
+ 4. The pilot jobs that scan the views containing the work
+ 5. Finally, The tokens need to be available in your database
