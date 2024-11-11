@@ -11,9 +11,9 @@ import sys
 
 import couchdb
 from couchdb.design import ViewDefinition
-from couchdb.http import ResourceConflict
+from couchdb.http import ResourceConflict, ResourceNotFound
 
-from .documents import Document
+from .documents import Document, Task
 from .picaslogger import picaslogger
 
 
@@ -225,3 +225,25 @@ class CouchDB:
         try_set(member_roles, security, 'members', 'roles')
 
         self.db.resource.put("_security", security)
+
+    def is_view_nonempty(self, view, **view_params):
+        """
+        Database view scanner
+        Useful for starting pilot jobs automatically. When a view is non-empty, returns true: a pilot can be started.
+
+        :param view: database view to scan for tokens
+        :return: bool
+        """
+        try:
+            doc = self.get_single_from_view(view, **view_params)
+            task = Task(doc)
+            picaslogger.debug(doc)
+            picaslogger.debug(task['input'])
+            picaslogger.info(f"Database view {view} is non-empty.")
+            return True
+        except IndexError as e:
+            picaslogger.info(f"Database view {view} is empty: {e}")
+            return False
+        except ResourceNotFound as e:
+            picaslogger.info(f"Non-existing database view passed: {view}")
+            return False

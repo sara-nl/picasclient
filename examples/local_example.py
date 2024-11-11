@@ -15,7 +15,6 @@ import logging
 import os
 import time
 import couchdb
-import picasconfig
 
 from picas.actors import RunActor
 from picas.clients import CouchDB
@@ -24,6 +23,7 @@ from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
 from picas.util import Timer
+from . import picasconfig
 
 log = logging.getLogger(__name__)
 
