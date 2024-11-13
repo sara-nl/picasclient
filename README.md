@@ -10,7 +10,7 @@ Installation
 
 To install, first clone the repository and then use pip to install:
 ```
-git clone git@github.com:sara-nl/picasclient.git
+git clone https://github.com/sara-nl/picasclient.git
 cd picasclient
 pip install -U .
 ```
