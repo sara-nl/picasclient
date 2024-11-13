@@ -114,6 +114,13 @@ If you are interested, you can look into scripts `examples/local-example.py` and
 ### Running on Grid
 
 On the grid, in our screnario, you need to supply the entire environment through the sandbox (a more grid-native CVMFS example is available in the [picas-profile](https://github.com/sara-nl/picas-profile) repository). The binaries and python code need to be in this sandbox.
+
+The steps will be:
+* First we define and generate the application tokens with all the necessary parameters.
+* Then we define and create a shell script to process one task (*process_task.sh*) that will be sent with the job using the input sandbox. This contains some boiler plate code to e.g. setup the environment, download software or data from the Grid storage, run the application etc. This doesn’t have to be a shell script, however, setting up environment variables is easiest when using a shell script, and this way setup scripts are separated from the application code.
+* We also define and create a Python script to handle all the communication with the token pool server, call the process_task,sh script, catch errors and do the reporting.
+* Finally we define the :abbr:`JDL (Job Description Language)` on the User Interface machine to specify some general properties of our jobs. This is required to submit a batch of pilot jobs to the Grid that will in turn initiate the Python script as defined in the previous step.
+
 First we need to create a tar of the picas code, so that it can be sent to the Grid:
 
 ```
