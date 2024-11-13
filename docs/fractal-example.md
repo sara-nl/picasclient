@@ -1,8 +1,8 @@
-PiCaS fractal example in Grid
+PiCaS fractal example 
 ============
 
 
-
+## Running in Grid
 In this fractal example we will implement the following pilot job workflow:
 
 * First we define and generate the application tokens with all the necessary parameters.
@@ -123,3 +123,50 @@ For the tokens that are processed on Grid, you can send the output to the :ref:`
 
 As we have seen, through PiCaS you have a single interface that can store tokens with work to be done (the CouchDB instance). Then on any machine where you can deploy the PiCaS client, one can perform the tasks hand.
 
+## Running locally and in Slurm
+
+To get an idea on longer running jobs there is also a "fractal" example. 
+The work in this example takes from 10 seconds up to 30 minutes per token. To add these tokens to your DB, do:
+
+```
+./createTokens
+>>> /tmp/tmp.abc123
+```
+
+And pass the output file to the push tokens code:
+
+```
+python pushTokens.py /tmp/tmp.abc123
+```
+
+Now the tokens are available in the database. Next, the binary for the fractal calculation needs to be built:
+
+```
+mkdir bin
+cc src/fractals.c -o bin/fractals -lm
+```
+
+And finally, the `process_task.sh` code needs to call a different command. Replace
+
+```
+eval $INPUT
+```
+
+with:
+
+```
+cd bin
+./fractals -o $OUTPUT $INPUT
+```
+
+to ensure the fractal code is called.
+
+Now, you can run your jobs whichever way you want (locally, slurm, grid) and start submitting job!
+
+## Check the results
+It will recursively generate an image based on parameters received from PiCas. Once the jobs are run successfully, you can find the output in the bin directory. 
+Convert the output file to .png format and display the picture: 
+```
+convert output_token_6 output_token_6.png # replace with your output filename
+display output_token_6.png
+```
