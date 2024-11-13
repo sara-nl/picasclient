@@ -1,147 +1,125 @@
-PiCaS fractal example
+PiCaS fractal example in Grid
 ============
 
-To get an idea on longer running jobs there is also a "fractal" example. The work in this example takes from 10 seconds up to 30 minutes per token.
-
-The fractal example including four main steps: 
-  1. connect to Picas server
-  2. prepare and upload tokens to Picas server
-  3. run Picas example pilot job
-  4. check the tokens and results
-
-## Prerequisite
-
-Before running the example, please read the README.md in [Picas Client](https://github.com/sara-nl/picasclient/). The prerequisites are:
-  * you have installed and tested the Picas client
-  * you have a Picas account and a Picas database
-  * there is a Picas token pool server running on CouchDB.
-
-If you are following a workshop organized by SURF, the last two requirements have already been arranged for you.
-
-## Connect to Picas server
-
-To connect to the Picas server CouchDB, you need to fill in the `examples/picasconfig.py` with the information to log in to your Picas server and the database you want use for storing the work tokens. Specifically, the information needed are:
-```
-PICAS_HOST_URL="https://picas.surfsara.nl:6984"
-PICAS_DATABASE=""
-PICAS_USERNAME=""
-PICAS_PASSWORD=""
-```
-
-Save and exit. Next don't forget to change the permissions of `examples/picasconfig.py`. Run:
-```
-cd examples
-chmod 600 picasconfig.py
-```
-
-For the first time using Picas, you need to define "view" logic and create views. CouchDB views are the basic query mechanism in CouchDB and allow you to extract, transform and combine data from different documents stored in the same database.
-
-To create these views, run:
-
-```
-python createViews.py
-```
-After a few moments, you should be able to find the generated views in [CouchDB web interface](https://picas.surfsara.nl:6984/_utils/#login). Click on your database and you will see the views on the left under `Monitor/Views`.
-
-![picas views](./docs/picas-views.png)
 
 
-## Prepare and upload tokens
+In this fractal example we will implement the following pilot job workflow:
 
-Next you need to send some tokens containing work to the Picas server.
-To add these tokens to your DB, do:
-
-```
-./createTokens
->>> /tmp/tmp.abc123
-```
-
-And pass the output file to the push tokens code:
-
-```
-python pushTokens.py /tmp/tmp.abc123
-```
-
-## Run Picas example
-
-Now the tokens are available in the database. First, the binary for the fractal calculation needs to be built:
-
-```
-cc src/fractals.c -o bin/fractals -lm
-```
-
-And finally, the `process_task.sh` code needs to call a different command. Replace
-
-```
-eval $INPUT
-```
-
-with:
-
-```
-./fractals -o $OUTPUT $INPUT
-```
-
-to ensure the fractal code is called.
-
-In principle, the pilot jobs can be sent to any machine that can run Picas client. For this Picas fractal example, we provide instructions on running locally (laptop, cluster login), to a slurm job scheduler and the [Grid](https://www.egi.eu/).
-
-### Running locally
-
-To run the example locally, run from the `examples` directory:
-
-```
-python local-example.py
-```
-
-The token in the database will have attachments with the regular and error output of the terminal. 
-
-Once the script is running, it will start polling the Picas server for work. Once the work is complete, the script will finish.
-
-Tokens have status, which will go from "todo" to "done" once the work has been completed (or "failed" if the work fails). To do more work, you will have to add new tokens that are not in a "done" state yet, otherwise the example script will just stop after finding no more work to do.
-
-### Running on a cluster with Slurm
-
-To start the slurm job which runs the PiCaS client, run the `slurm-example.sh` from the `examples` directory:
-
-```
-sbatch slurm-example.sh
-```
-
-Now in a slurm job array the work will be performed (you can set the number of array jobs in the script at `--array`) and each job will start polling the CouchDB instance for work. Once the work is complete, the slurm job will finish.
-If you are interested, you can look into scripts `examples/local-example.py` and `examples/process_task.sh` to check what the actual work is. 
-
-### Running on Grid
-
-On the grid, in our screnario, you need to supply the entire environment through the sandbox (a more grid-native CVMFS example is available in the [picas-profile](https://github.com/sara-nl/picas-profile) repository). The binaries and python code need to be in this sandbox.
-
-The steps will be:
 * First we define and generate the application tokens with all the necessary parameters.
 * Then we define and create a shell script to process one task (*process_task.sh*) that will be sent with the job using the input sandbox. This contains some boiler plate code to e.g. setup the environment, download software or data from the Grid storage, run the application etc. This doesn’t have to be a shell script, however, setting up environment variables is easiest when using a shell script, and this way setup scripts are separated from the application code.
 * We also define and create a Python script to handle all the communication with the token pool server, call the process_task,sh script, catch errors and do the reporting.
 * Finally we define the :abbr:`JDL (Job Description Language)` on the User Interface machine to specify some general properties of our jobs. This is required to submit a batch of pilot jobs to the Grid that will in turn initiate the Python script as defined in the previous step.
 
-First we need to create a tar of the picas code, so that it can be sent to the Grid:
+
+### Prerequisites
+
+To be able to run the example you must have:
+
+* All the three Grid :ref:`prerequisites` (User Interface machine, Grid certificate, VO membership)
+* An account on PiCaS server (send your request to <helpdesk@surfsara.nl>)
+
+
+
+### Picas sample example
+
+
+* Log in to the :abbr:`UI (User Interface)` and download the :download:`pilot_picas_fractals.tgz </Scripts/picas-python3/pilot_picas_fractals.tgz>` example, the couchdb package for Python :download:`couchdb.tgz </Scripts/couchdb.tgz>` and the fractals source code :download:`fractals.c </Scripts/fractals.c>`.
+
+* Untar ``pilot_picas_fractals.tgz`` and inspect the content:
 
 ```
-tar cfv grid-sandbox/picas.tar ../picas/
+tar -xvf pilot_picas_fractals.tgz
+cd pilot_picas_fractals/
+ls -l
+-rwxrwxr-x 1 homer homer 1247 Jan 28 15:40 createTokens
+-rw-rw-r-- 1 homer homer 1202 Jan 28 15:40 createTokens.py
+-rw-rw-r-- 1 homer homer 2827 Jan 28 15:40 createViews.py
+-rw-rw-r-- 1 homer homer  462 Jan 28 15:40 fractals.jdl
+drwxrwxr-x 2 homer homer  116 Jan 28 15:40 sandbox
 ```
 
-Secondly, the CouchDB python API needs to be available too, so download and extract it:
+Detailed information regarding the operations performed in each of the scripts below is embedded to the comments inside each of the scripts individually.
+
+* Also download the current PiCaS version :download:`picas.tar </Scripts/picas-python3/picas.tar>` and put both PiCaS and the couchdb.tgz file in the ``sandbox`` directory:
 
 ```
-wget https://files.pythonhosted.org/packages/7c/c8/f94a107eca0c178e5d74c705dad1a5205c0f580840bd1b155cd8a258cb7c/CouchDB-1.2.tar.gz
+cd sandbox
+mv ../../couchdb.tgz ./
+mv ../../picas.tar ./
 ```
 
-Now you can start the example from a grid login node with (in this case DIRAC is used for job submission):
+* And finally compile the fractals program (and put it in the sandbox directory) and move one directory up again:
+```
+cc ../../fractals.c -o fractals -lm
+cd ..
+```
+
+The sandbox directory now holds everything we need to send to the Grid worker nodes.
+
+Create the Tokens
+
+This example includes a bash script (``./createTokens``) that generates a sensible parameter file, with each line representing a set of parameters that the fractals program can be called with. Without arguments it creates a fairly sensible set of 24 lines of parameters. You can generate different sets of parameters by calling the program with a combination of ``-q``, ``-d`` and ``-m`` arguments, but at the moment no documentation exists on these. We recommend not to use them for the moment.
+
+* After you ran the ``createTokens`` script you'll see output similar to the following:
+```
+./createTokens
+/tmp/tmp.fZ33Kd8wXK
+cat /tmp/tmp.fZ33Kd8wXK
+```
+Now we will start using PiCaS. For this we need the downloaded CouchDB and PiCaS packages for Python and set the hostname, database name and our credentials for the CouchDB server:
+
+* Edit ``sandbox/picasconfig.py`` and set the PiCaS host URL, database name, username and password.
 
 ```
-dirac-wms-job-submit grid-example.jdl
+ln -s sandbox/picasconfig.py
 ```
 
-And the status and output can be retrieved with DIRAC commands, while in the token you see the status of the token and the tokens' attachments contain the log files. Once all tokens have been processed (this can be seen in the CouchDB instance) the grid job will finish.
+* Make the CouchDB package locally available:
+```
+tar -xvf sandbox/couchdb.tgz
+```
+
+* Upload the tokens:
+
+```
+$python createTokens.py /tmp/tmp.fZ33Kd8wXK
+```
+
+* Check your database in this link:
+```
+https://picas.surfsara.nl:6984/_utils/#/database/homerdb/_all_docs (replace homerdb with your Picas database name)
+```
+
+* Create the Views (pools) - independent to the tokens (should be created only once):
+
+```
+python createViews.py
+```
+To make use of the dirac tool, first source the dirac env
+
+```
+source /etc/diracosrc
+```
+
+* Create a proxy:
+```
+dirac-proxy-init -b 2048 -g lsgrid_user -M lsgrid --valid 168:00 # replace lsgrid with your VO
+```
+
+* Submit the pilot jobs:
+```
+dirac-wms-job-submit fractals.jdl -f jobIDs
+```
+
+
+It will recursively generate an image based on parameters received from PiCas. At this point, some of your tokens are processed on the Grid worker nodes and some of the tokens are already processed on the :abbr:`UI (User Interface)`. Note that the :abbr:`UI (User Interface)` is not meant for production runs, but only for testing few runs before submitting the pilot jobs to the Grid.
+
+* Convert the :abbr:`UI (User Interface)` output file to .png format and display the picture:
+```
+convert output_token_6 output_token_6.png # replace with your output filename
+```
+
+For the tokens that are processed on Grid, you can send the output to the :ref:`Grid Storage <grid-storage>` or some other remote location.
 
 As we have seen, through PiCaS you have a single interface that can store tokens with work to be done (the CouchDB instance). Then on any machine where you can deploy the PiCaS client, one can perform the tasks hand.
-
-
 
