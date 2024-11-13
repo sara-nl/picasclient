@@ -43,7 +43,6 @@ For longer jobs example with a set of 24 lines of parameters. send the file gene
 python pushTokens.py /tmp/tmp.fZ33Kd8wXK
 ```
 
-### Reset tokens 
 
 ### Delete tokens
 
