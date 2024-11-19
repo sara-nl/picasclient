@@ -69,18 +69,16 @@ class AbstractRunActor(object):
             msg = ("Token execution exceeded timeout limit of {0} seconds".format(timeout))
             log.info(msg)
 
-        while True:
-            try:
-                self.db.save(task)
-                break
-            except Exception as ex:
-                # simply overwrite changes - model results are more
-                # important
-                msg = ("Exception {0} occurred while saving task to database: {1}"
-                    .format(type(ex), ex))
-                log.info(msg)
-                new_task = self.db.get(task.id)
-                task['_rev'] = new_task.rev
+        try:
+            self.db.save(task)
+        except Exception as ex:
+            # simply overwrite changes - model results are more
+            # important
+            msg = ("Exception {0} occurred while saving task to database: {1}"
+                .format(type(ex), ex))
+            log.info(msg)
+            new_task = self.db.get(task.id)
+            task['_rev'] = new_task.rev
 
         self.cleanup_run()
         self.tasks_processed += 1
