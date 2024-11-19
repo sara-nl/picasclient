@@ -73,9 +73,12 @@ class AbstractRunActor(object):
             try:
                 self.db.save(task)
                 break
-            except ResourceConflict:
+            except Exception as ex:
                 # simply overwrite changes - model results are more
                 # important
+                msg = ("Exception {0} occurred while saving task to database: {1}"
+                    .format(type(ex), ex))
+                log.info(msg)
                 new_task = self.db.get(task.id)
                 task['_rev'] = new_task.rev
 

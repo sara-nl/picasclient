@@ -17,7 +17,13 @@ git clone git@github.com:sara-nl/picasclient.git
 cd picasclient
 poetry install --with test
 ```
-Note that poetry will create a virtual environment if it is not running withing an activated virtual environment already. In that case, you will need to run `poetry run` before your commands to execute them within the poetry virtual environment.
+Note that poetry will create a virtual environment if it is not running within an activated virtual environment already. In that case, you will need to run `poetry run` before your commands to execute them within the poetry virtual environment.
+
+If you prefer not to use `poetry`, then you can install with (in a virtual environment):
+```
+pip install -U .
+pip install flake8 pytest
+```
 
 To test, run
 ```
