@@ -11,6 +11,7 @@ from picas import actors
 from picas.documents import Task
 from picas.actors import RunActor
 from picas.iterators import EndlessViewIterator
+from couchdb.http import ResourceConflict
 
 
 class ExampleRun(RunActor):
@@ -58,6 +59,28 @@ class TestRun(unittest.TestCase):
         runner = ExampleRun(self._callback)
         runner.run()
         self.assertEqual(self.count, len(MockDB.TASKS))
+
+    @patch('test_mock.MockDB.save')
+    def test_run_resourceconflict(self, mock_save):
+        """
+        Test the _run function, in case the DB throws a ResourceConflict
+        (when document exists with different revision or was deleted)
+        the _run function should continue
+        """
+        mock_save.side_effect = ResourceConflict
+        runner = ExampleRun(self._callback)
+        runner._run(task=Task({'_id': 'c', 'lock': None, 'done': None}), timeout=None)
+        self.assertEqual(runner.tasks_processed, 1)
+
+    @patch('test_mock.MockDB.save')
+    def test_run_exception(self, mock_save):
+        """
+        Test the _run function, in case the DB throws a an unexpected Exception
+        """
+        with pytest.raises(ValueError):
+            mock_save.side_effect = ValueError
+            runner = ExampleRun(self._callback)
+            runner._run(task=Task({'_id': 'c', 'lock': None, 'done': None}), timeout=None)
 
     def test_stop_max_tasks(self):
         """
