@@ -60,28 +60,26 @@ class AbstractRunActor(object):
             with ThreadingTimeout(timeout, swallow_exc=False) as context_manager:
                 self.process_task(task)
         except Exception as ex:
-            msg = ("Exception {0} occurred during processing: {1}"
-                   .format(type(ex), ex))
+            msg = f"Exception {type(ex)} occurred during processing: {ex}"
             task.error(msg, exception=ex)
             log.info(msg)
 
         if context_manager.state == context_manager.TIMED_OUT:
-            msg = ("Token execution exceeded timeout limit of {0} seconds".format(timeout))
+            msg = f"Token execution exceeded timeout limit of {timeout} seconds"
             log.info(msg)
 
         try:
             self.db.save(task)
         except ResourceConflict as ex:
             # simply overwrite changes - model results are more important
-            msg = ("Warning: {0} occurred while saving task to database: \n"
-                   "Document exists with different revision or was deleted".format(type(ex)))
+            msg = f"Warning: {type(ex)} occurred while saving task to database: " + \
+                "Document exists with different revision or was deleted"
             log.info(msg)
             new_task = self.db.get(task.id)
             task['_rev'] = new_task.rev
         except Exception as ex:
             # re-raise Exception
-            msg = ("Error: {0} occurred while saving task to database: {1}"
-                   .format(type(ex), ex))
+            msg = f"Error: {type(ex)} occurred while saving task to database: {ex}"
             log.info(msg)
             raise
 
