@@ -14,8 +14,8 @@
 #    Attach the logs to the token
 
 
-cd $PWD
-# You need to load your environment here
-# mamba activate MAMBA-ENV
-# source /PATH/TO/VENV/bin/activate
-python local_example.py
+
+# You may set environmental variables needed in the SLURM job
+# For example, when using the LUMI container wrapper:
+# export PATH="/path/to/install_dir/bin:$PATH"
+python local-example.py
