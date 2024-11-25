@@ -20,4 +20,4 @@ chmod u+x ${JOBDIR}/process_task.sh
 chmod u+x ${JOBDIR}/fractals
 ls -l ${JOBDIR}
 
-python ${JOBDIR}/local-example.py
+python ${JOBDIR}/local_example.py

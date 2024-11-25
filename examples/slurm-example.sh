@@ -14,6 +14,7 @@
 #    Attach the logs to the token
 
 
+
 # You may set environmental variables needed in the SLURM job
 # For example, when using the LUMI container wrapper:
 # export PATH="/path/to/install_dir/bin:$PATH"

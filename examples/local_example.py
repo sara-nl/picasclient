@@ -1,7 +1,7 @@
 '''
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
-usage: python local-example.py
+usage: python local_example.py
 description:
     Connect to PiCaS server
     Get the next token in todo View
@@ -15,7 +15,6 @@ import logging
 import os
 import time
 import couchdb
-import picasconfig
 
 from picas.actors import RunActor
 from picas.clients import CouchDB
@@ -24,6 +23,7 @@ from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
 from picas.util import Timer
+from . import picasconfig
 
 log = logging.getLogger(__name__)
 
