@@ -1,10 +1,12 @@
 import random
-from picas.actors import AbstractRunActor, RunActor
+
 from picas.documents import Document
 
 
 class MockDB(object):
-    TASKS = [{'_id': 'a', 'lock': 0}, {'_id': 'b', 'lock': 0}, {'_id': 'c', 'lock': 0}]
+    TASKS = [{'_id': 'a', '_rev': '1', 'lock': 0, 'scrub_count': 0},
+             {'_id': 'b', '_rev': '1', 'lock': 0, 'scrub_count': 0},
+             {'_id': 'c', '_rev': '1', 'lock': 0, 'scrub_count': 0}]
     JOBS = [{'_id': 'myjob'}]
 
     def __init__(self):
@@ -19,11 +21,11 @@ class MockDB(object):
 
     def get(self, idx):
         if idx in self.saved:
-            return self.saved[idx]
+            return Document(self.saved[idx])
         elif idx in self.tasks:
-            return self.tasks[idx]
+            return Document(self.tasks[idx])
         elif idx in self.jobs:
-            return self.jobs[idx]
+            return Document(self.jobs[idx])
         else:
             raise KeyError
 
@@ -40,25 +42,12 @@ class MockDB(object):
         return doc
 
 
-class MockRun(AbstractRunActor):
+class MockEmptyDB(MockDB):
+    TASKS = []
+    JOBS = []
 
-    def __init__(self, callback):
-        db = MockDB()
-        super(MockRun, self).__init__(db)
-
-        self.callback = callback
-
-    def process_task(self, task):
-        self.callback(task)
-
-
-class MockRunWithStop(RunActor):
-
-    def __init__(self, callback):
-        db = MockDB()
-        super(MockRunWithStop, self).__init__(db)
-
-        self.callback = callback
-
-    def process_task(self, task):
-        self.callback(task)
+    def __init__(self):
+        self.tasks = dict((t['_id'], t.copy())
+                          for t in MockEmptyDB.TASKS)  # deep copy
+        self.jobs = dict((t['_id'], t.copy()) for t in MockEmptyDB.JOBS)
+        self.saved = {}

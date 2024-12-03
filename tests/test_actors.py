@@ -4,11 +4,37 @@ import subprocess
 import time
 import unittest
 
-from test_mock import MockDB, MockRun, MockRunWithStop
+from test_mock import MockDB, MockEmptyDB
 from unittest.mock import patch
 
 from picas import actors
 from picas.documents import Task
+from picas.actors import RunActor
+from picas.iterators import EndlessViewIterator
+from couchdb.http import ResourceConflict
+
+
+class ExampleRun(RunActor):
+
+    def __init__(self, callback):
+        db = MockDB()
+        super(ExampleRun, self).__init__(db)
+        self.callback = callback
+
+    def process_task(self, task):
+        self.callback(task)
+
+
+class EmptyRun(RunActor):
+
+    def __init__(self, callback):
+        db = MockEmptyDB()
+        super(EmptyRun, self).__init__(db)
+        self.callback = callback
+        self.iterator = EndlessViewIterator(self.iterator)
+
+    def process_task(self, task):
+        self.callback(task)
 
 
 class TestRun(unittest.TestCase):
@@ -26,13 +52,35 @@ class TestRun(unittest.TestCase):
         """
         Test the run function, which iterates over the iterator class, where __next__ calls
         the claim_task method which calls _claim_task that locks the token.
-        The callback function is applied through MockRun.process_task.
+        The callback function is applied through ExampleRun.process_task.
         This locking is the test here.
         """
         self.count = 0
-        runner = MockRun(self._callback)
+        runner = ExampleRun(self._callback)
         runner.run()
         self.assertEqual(self.count, len(MockDB.TASKS))
+
+    @patch('test_mock.MockDB.save')
+    def test_run_resourceconflict(self, mock_save):
+        """
+        Test the _run function, in case the DB throws a ResourceConflict
+        (when document exists with different revision or was deleted)
+        the _run function should continue
+        """
+        mock_save.side_effect = ResourceConflict
+        runner = ExampleRun(self._callback)
+        runner._run(task=Task({'_id': 'c', 'lock': None, 'done': None}), timeout=None)
+        self.assertEqual(runner.tasks_processed, 1)
+
+    @patch('test_mock.MockDB.save')
+    def test_run_exception(self, mock_save):
+        """
+        Test the _run function, in case the DB throws a an unexpected Exception
+        """
+        with pytest.raises(ValueError):
+            mock_save.side_effect = ValueError
+            runner = ExampleRun(self._callback)
+            runner._run(task=Task({'_id': 'c', 'lock': None, 'done': None}), timeout=None)
 
     def test_stop_max_tasks(self):
         """
@@ -40,7 +88,7 @@ class TestRun(unittest.TestCase):
         """
         self.count = 0
         self.test_number = 1
-        runner = MockRunWithStop(self._callback)
+        runner = ExampleRun(self._callback)
         runner.run(max_tasks=self.test_number)
         self.assertEqual(self.count, self.test_number)
 
@@ -53,7 +101,7 @@ class TestRun(unittest.TestCase):
         """
         self.count = 0
         self.stop_fn_arg = "a"
-        runner = MockRunWithStop(self._callback)
+        runner = ExampleRun(self._callback)
         runner.run(stop_function=self.stop_fn, run_obj=runner, id=self.stop_fn_arg)
         self.assertEqual(runner.current_task['_id'], self.stop_fn_arg)
 
@@ -68,17 +116,57 @@ class TestRun(unittest.TestCase):
         time.sleep(0.5)  # force one token to "take" 0.5 s
         task['exit_code'] = 0
 
-    def test_max_time(self):
+    def test_max_total_time(self):
         """
         Test to stop running when the max time is about to be reached.
         """
         self.count = 0
-        self.max_time = 0.5  # one token takes 0.5, so it quits after 1 token
-        self.avg_time_fac = 0.5
-        self.test_number = 1
-        runner = MockRunWithStop(self._callback_timer)
-        runner.run(max_time=self.max_time, avg_time_factor=self.avg_time_fac)
-        self.assertEqual(self.count, self.test_number)
+        max_time = 1.
+        runner = ExampleRun(self._callback_timer)
+        start = time.time()
+        runner.run(max_total_time=max_time)
+        end = time.time()
+        exec_time = end-start
+        self.assertAlmostEqual(max_time, exec_time, 1)
+
+    def test_max_total_time_empty(self):
+        """
+        Test to stop running when the max time is about to be reached for en empty iterator.
+        """
+        self.count = 0
+        max_time = 1.
+        runner = EmptyRun(self._callback_timer)
+        start = time.time()
+        runner.run(max_total_time=max_time)
+        end = time.time()
+        exec_time = end-start
+        self.assertLess(exec_time, max_time + 10.)  # Take into account extra time needed
+
+    def _callback_error(self, task):
+        """
+        Callback function that simulates an error.
+        """
+        self.assertTrue(task.id in [t['_id'] for t in MockDB.TASKS])
+        self.assertTrue(task['lock'] > 0)
+        self.count += 1
+        task['exit_code'] = 1
+
+    def test_scrub(self):
+        """
+        Test how many times a token is scrubbed. We can only test max_scrub
+        0 or 1 because of the limitations of MockDB.
+        """
+        self.count = 0
+        max_scrub = 0
+        runner = ExampleRun(self._callback_error)
+        runner.run(max_scrub=max_scrub)
+        for t in runner.db.saved:
+            self.assertEqual(runner.db.saved[t]["scrub_count"], max_scrub)
+        max_scrub = 1
+        runner = ExampleRun(self._callback_error)
+        runner.run(max_scrub=max_scrub)
+        for t in runner.db.saved:
+            self.assertEqual(runner.db.saved[t]["scrub_count"], max_scrub)
 
     @patch('picas.actors.log')
     @patch('signal.signal')

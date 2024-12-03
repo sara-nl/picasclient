@@ -14,7 +14,6 @@ class TestModifier(unittest.TestCase):
         self.modifier.lock(self.token)
         self.assertTrue(self.token['hostname'] != "")
         self.assertTrue(self.token['lock'] > 0)
-        self.assertTrue(self.token['dirac_jobid'] is None)
 
     def test_unlock(self):
         self.modifier.unlock(self.token)
@@ -38,8 +37,8 @@ class TestModifier(unittest.TestCase):
 
     def test_seterror(self):
         self.modifier.set_error(self.token)
-        self.assertTrue(self.token['lock'] == -1)
-        self.assertTrue(self.token['done'] == -1)
+        self.assertTrue(self.token['lock'] == 99)
+        self.assertTrue(self.token['done'] == 99)
 
     def test_addoutput(self):
         self.modifier.add_output(self.token, {"output": "test"})
