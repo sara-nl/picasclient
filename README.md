@@ -54,7 +54,7 @@ Prerequisites
 <summary>Get a PiCaS account</summary>
 <br>
 
-To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>
+To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>.
 </details>
 
 
@@ -70,6 +70,7 @@ PICAS_DATABASE=""
 PICAS_USERNAME=""
 PICAS_PASSWORD=""
 ```
+Note that `PICAS_HOST_URL` can be different if your project has its own CouchDB instance.
 </details>
 
 
@@ -77,7 +78,7 @@ PICAS_PASSWORD=""
 <summary>Create DB Views</summary>
 <br>
 
-When you you use the DB for the first time, you need to define "view" logic and create views. <a href="https://docs.couchdb.org/en/stable/ddocs/views/index.html">CouchDB Views</a> are the primary tool used for querying and reporting on CouchDB documents. For example, you can create views to filter on new, running, finished, and failed job tokens. Some pre-defined views can be created with:
+When you you use the DB for the first time, you need to define "view" logic and create views. <a href="https://docs.couchdb.org/en/stable/ddocs/views/index.html">CouchDB views</a> are the primary tool used for querying and reporting on CouchDB documents. For example, you can create views to filter on new, running, finished, and failed job tokens. Some pre-defined views can be created with:
 
 ```
 cd examples
@@ -85,7 +86,7 @@ python createViews.py
 ```
 This will create the following views:
  * `Monitor/todo`: tasks that still need to be done
- *` Monitor/locked`: tasks that are currently running
+ * ` Monitor/locked`: tasks that are currently running
  * `Monitor/error`: tasks that encountered errors 
  * `Monitor/done`: tasks that are finished 
  * `Monitor/overview_total`: all tasks and their states
@@ -123,7 +124,7 @@ To run the example locally (e.g. on your laptop) with:
 python local-example.py
 ```
 
-If all goes well you should see output like:
+If all goes well, you should see output like:
 
 ```
 -----------------------
@@ -152,7 +153,7 @@ this is token A
 Tue 31 Dec 2024 00:00:00  CET
 ```
 
-Once the script is running, it will start polling the Picas server for work. Once the work is complete, the script will finish.
+Once the script is running, it will start polling the PiCaS server for work. Once the work is complete, the script will finish.
 
 Tokens have a status, which will go from "todo" to "done" once the work has been completed (or "failed" if the work fails). To do more work, you will have to add new tokens that in the "todo" state yet, otherwise the example script will just stop after finding no more work to do. If you are interested, you can look into the scripts `examples/local-example.py` and `examples/process_task.sh` to check what the actual work is.
 </details>
@@ -167,7 +168,7 @@ You can run this example on a login node of a SLURM cluster, e.g. Spider at SURF
 sbatch slurm-example.sh
 ```
 
-Now in a SLURM job array the work will be performed (you can set the number of array jobs in the script at `--array`) and each job will start polling the CouchDB instance for work. Once the work is complete, the SLURM job will finish.
+Now the work will be performed in parallel by a SLURM job array, and each job will start polling the CouchDB instance for work. Once the work is complete, the SLURM job will finish. You can set the number of array jobs in the script with `--array`. For more information on SLURM, see the [SLURM documentation](https://slurm.schedmd.com/).
 </details>
 
 
@@ -288,6 +289,9 @@ display output_token_6.png
 PiCaS overview
 ==============
 
-Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. The scripts `slurm-example.sh` and `grid-example.jdl` are for scheduling jobs on a SLURM cluster and the Grid, respectively. For the Grid, there is an extra script `startpilot.sh` needed to start the job on the GRID Computing Environment. Finally, a job is run with `local-example.py` in the same way when tokens are processed locally.
+Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. 
+* The scripts `slurm-example.sh` and `grid-example.jdl` are for scheduling jobs on a SLURM cluster and the Grid, respectively. 
+* For the Grid, there is an extra script `startpilot.sh` needed to start the job on the Grid Computing Environment.
+* Finally, a job is run with `local-example.py` in the same way when tokens are processed locally.
 
 ![picas layers](./docs/picas-layers.png)
