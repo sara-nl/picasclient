@@ -205,11 +205,11 @@ And the status and output can be retrieved with DIRAC commands, while in the tok
 
 While your pilot jobs process tasks, you can keep track of their progress through the CouchDB web interface and the views we created earlier. 
 
-When all your pilot jobs are finished, ideally you'd want all tasks to be 'done'. However, often you will find that not all jobs finished successfully and some are still in a 'locked' or 'error' state. If this happens, you should investigate what went wrong with these jobs. Incidentally, this might be due to errors with the middleware, network or storage. In those cases, you can remove the locks and submitting some new pilot jobs to try again. 
+When all pilot jobs are finished, ideally, you want all tasks to be "done". However, often you will find that not all jobs finished successfully and some are still in a "locked" or "error" state. If this happens, you should investigate what went wrong with these jobs. Incidentally, this might be due to errors with the middleware, network or storage. In those cases, you can remove the locks and submit new pilot jobs to try again. 
 
 In other cases, there could be errors with your task: maybe you've sent the wrong parameters or forgot to download all necessary input files. Reviewing these failed tasks gives you the possibility to correct them and improve your submission scripts. After that, you could run those tasks again, either by removing their locks or delete older tokens and creating new tokens. After that, you can submit new pilot jobs.
 
-To delete all the Tokens in a certain view, you can use the script `deteleTokens.py`. For example to delete all the tokens in `error` view, run:
+To delete all the tokens in a certain view, you can use the script `deteleTokens.py`. For example to delete all the tokens in "error" view, run:
 
 ```
 python deleteTokens.py Monitor/error
@@ -287,6 +287,6 @@ display output_token_6.png
 PiCaS overview
 ==============
 
-Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. The scripts `slurm-example.sh` and `grid-example.jdl` are for scheduling jobs on a SLURM cluster and the Grid, respectively. For the Grid, there is an extra script `startpilot.sh` needed to start the job on the GRID Computing Environment (CE).
+Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. The scripts `slurm-example.sh` and `grid-example.jdl` are for scheduling jobs on a SLURM cluster and the Grid, respectively. For the Grid, there is an extra script `startpilot.sh` needed to start the job on the GRID Computing Environment. Finally, a job is run with `local-example.py` in the same way when tokens are processed locally.
 
 ![picas layers](./docs/picas-layers.png)
