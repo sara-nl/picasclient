@@ -3,7 +3,7 @@ picasclient
 
 ![CICD](https://github.com/sara-nl/picasclient/actions/workflows/python-app.yml/badge.svg) [![License - MIT](https://img.shields.io/github/license/sara-nl/picasclient)](https://github.com/sara-nl/picasclient/blob/main/LICENSE)
 
-Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as a token pool server.
+Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as a token pool server (PiCaS).
 
 
 Installation
@@ -12,21 +12,21 @@ Installation
 Development & Testing
 ---------------------
 
-To install `picas` source code for development, first clone the repository and then use [`poetry`](https://python-poetry.org/docs/) to install. `poetry` is a tool for dependency managing and packaging in Python. If you don't have `poetry`, install it first with `pipx install poetry`.
+To install the PiCaS source code for development, first clone this repository and then use [`poetry`](https://python-poetry.org/docs/) to install. Poetry is a tool for dependency managing and packaging in Python. If you don't have Poetry, install it first with `pipx install poetry`.
 ```
 git clone https://github.com/sara-nl/picasclient.git
 cd picasclient
 poetry install --with test
 ```
-Note that poetry will create a virtual environment if it is not running within an activated virtual environment already. In that case, you will need to run `poetry run` before your commands to execute them within the poetry virtual environment.
+Note that Poetry will create a virtual environment if it is not running within an activated virtual environment already. In that case, you will need to run `poetry run` before your commands to execute them within the Poetry virtual environment.
 
-If you prefer not to use `poetry`, then you can install with (in a virtual environment):
+If you prefer not to use Poetry, then you can install PiCaS with:
 ```
 pip install -U .
 pip install flake8 pytest
 ```
 
-To test, run
+To test, run:
 ```
 flake8 picas tests
 pytest tests
@@ -35,28 +35,33 @@ pytest tests
 
 Installing package
 ------------------
-The latest release of `picas` can be installed as a package from PyPI with:
+Alternatively, the latest release of PiCaS can be installed as a package from PyPI with:
 ```
 pip install picas
 ```
-You can then write your custom Python program to use `picas` based on the examples below. 
+You can then write your custom Python program to use PiCaS as a library based on the examples below. 
 
 
 Examples
 ========
+
 The `examples` directory contains two examples how to use the PiCaS client: a short example and a long example. These also include scripts for running locally, on [Spider](https://doc.spider.surfsara.nl/en/latest/Pages/about.html) (SLURM cluster) and the [Grid](https://doc.grid.surfsara.nl/en/latest/). The examples will show how PiCaS provides a single interface that can store tokens (on the CouchDB instance) with work to be done. Then jobs can be sent to any machine where the PiCaS client can be deployed.
 
 Prerequisites
 -------------
+
 <details closed>
 <summary>Get a PiCaS account</summary>
 <br>
+
 To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>
 </details>
+
 
 <details closed>
 <summary>Connect to the PiCaS server</summary>
 <br>
+
 To connect to the PiCaS server, fill `examples/picasconfig.py` with the information needed to log in to your PiCaS account and the database you want to use for storing the work tokens. Specifically, the information needed are:
   
 ```
@@ -67,9 +72,11 @@ PICAS_PASSWORD=""
 ```
 </details>
 
+
 <details closed>
 <summary>Create DB Views</summary>
 <br>
+
 When you you use the DB for the first time, you need to define "view" logic and create views. <a href="https://docs.couchdb.org/en/stable/ddocs/views/index.html">CouchDB Views</a> are the primary tool used for querying and reporting on CouchDB documents. For example, you can create views to filter on new, running, finished, and failed job tokens. Some pre-defined views can be created with:
 
 ```
@@ -77,11 +84,11 @@ cd examples
 python createViews.py
 ```
 This will create the following views:
- * Monitor/todo: tasks that still need to be done
- * Monitor/locked: tasks that are currently running
- * Monitor/error: tasks that encountered errors 
- * Monitor/done: tasks that are finished 
- * Monitor/overview_total: all tasks and their states
+ * `Monitor/todo`: tasks that still need to be done
+ *` Monitor/locked`: tasks that are currently running
+ * `Monitor/error`: tasks that encountered errors 
+ * `Monitor/done`: tasks that are finished 
+ * `Monitor/overview_total`: all tasks and their states
    
 After a few moments, you should be able to find the generated views in the <a href="https://picas.surfsara.nl:6984/_utils/#login">CouchDB web interface</a>. Select your database and you will see the views on the left under `Monitor/Views`:
 
@@ -95,18 +102,21 @@ This example creates fast-running jobs that write a message to standard output.
 <details closed>
 <summary>Create tokens</summary>
 <br>
-The file <code>quickExample.txt</code> contains three lines with commands to be executed. You can generate three job tokens in the PiCaS DB by running: 
+
+The file `quickExample.txt` contains three lines with commands to be executed. You can generate three job tokens in the PiCaS DB by running: 
 
 ```
 python pushTokens.py quickExample.txt
 ```
 
-Check the DB if you can find the tokens in the View <code>Monitor/todo</code>. 
+Check the DB; you should see the tokens in the view `Monitor/todo`. 
 </details>
+
 
 <details closed>
 <summary>Running locally</summary>
 <br>
+
 To run the example locally (e.g. on your laptop) with:
 
 ```
@@ -130,7 +140,7 @@ exit_code 0
 -----------------------
 ```
 
-The token in the database will have attachments with the standard and error output of the terminal. There you will find the output file `logs_token_0.out`, containing the output of the input command:
+The token in the database will have attachments with the standard and error output of the terminal. There you will find the outputfile `logs_token_0.out`, containing the output of the input command:
 
 ```
 Tue 31 Dec 2024 00:00:00 CET
@@ -147,9 +157,11 @@ Once the script is running, it will start polling the Picas server for work. Onc
 Tokens have a status, which will go from "todo" to "done" once the work has been completed (or "failed" if the work fails). To do more work, you will have to add new tokens that in the "todo" state yet, otherwise the example script will just stop after finding no more work to do. If you are interested, you can look into the scripts `examples/local-example.py` and `examples/process_task.sh` to check what the actual work is.
 </details>
 
+
 <details closed>
 <summary>Running on a cluster with SLURM</summary>
 <br>
+
 To start the SLURM job which runs the PiCaS client, run the `slurm-example.sh` from the `examples` directory:
 
 ```
@@ -158,6 +170,7 @@ sbatch slurm-example.sh
 
 Now in a SLURM job array the work will be performed (you can set the number of array jobs in the script at `--array`) and each job will start polling the CouchDB instance for work. Once the work is complete, the SLURM job will finish.
 </details>
+
 
 <details closed>
 <summary>Running on the Grid with DIRAC</summary>
@@ -183,8 +196,8 @@ dirac-wms-job-submit grid-example.jdl
 ```
 
 And the status and output can be retrieved with DIRAC commands, while in the token you see the status of the token and the tokens' attachments contain the log files. Once all tokens have been processed (check the DB Views) the grid job will finish.
-
 </details>
+
 
 <details closed>
 <summary>Check results</summary>
@@ -201,13 +214,13 @@ To delete all the Tokens in a certain view, you can use the script `deteleTokens
 ```
 python deleteTokens.py Monitor/error
 ```
-
 </details>
 
 
 Long example: fractals
 ----------------------
 To get an idea on more realistic, longer running jobs there is also a "fractals" example. The fractals code will recursively generate an image based on parameters received from PiCas. The work can take from 10 seconds up to 30 minutes per token.
+
 
 <details closed>
 <summary>Create tokens</summary>
@@ -226,6 +239,7 @@ python pushTokens.py /tmp/tmp.abc123
 Now the tokens are available in the database. 
 </details>
 
+
 <details closed>
 <summary>Prepare code</summary>
 <br>
@@ -235,7 +249,7 @@ Next, the binary for the fractal calculation needs to be built:
 cc src/fractals.c -o bin/fractals -lm
 ```
 
-And finally, the `process_task.sh` code needs to call a different command. Replace
+And finally, the `process_task.sh` code needs to call a different command. Replace:
 
 ```
 bash -c "$INPUT"
@@ -248,15 +262,19 @@ bin/fractals -o $OUTPUT $INPUT
 to ensure that the fractals code is called.
 </details>
 
+
 <details closed>
 <summary>Run jobs locally, SLURM cluster or Grid</summary>
 <br>
+
 Now, you can run your jobs whichever way you want (locally, SLURM cluster or the Grid), using the general instructions as described above for the quick example!
 </details>
+
 
 <details closed>
 <summary>Check results</summary>
 <br>
+
 The fractals code will generate an outputfile named `output_token_X`. If the jobs are run locally or on Spider, you can find the outputfile in your work directory. For jobs that are processed on the Grid, you can transfer the outputfile to a remote storage location at the end of your job script `process_task.sh`. To check the results, convert the output file to .png format and display the picture: 
   
 ```
@@ -266,10 +284,9 @@ display output_token_6.png
 </details>
 
 
-
-Picas overview
+PiCaS overview
 ==============
 
-Here is an overview of the layers in picas and how they relate to the code in the `examples` folder.
+Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. The scripts `slurm-example.sh` and `grid-example.jdl` are for scheduling jobs on a SLURM cluster and the Grid, respectively. For the Grid, there is an extra script `startpilot.sh` needed to start the job on the GRID Computing Environment (CE).
 
 ![picas layers](./docs/picas-layers.png)
