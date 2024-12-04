@@ -161,8 +161,7 @@ Tokens have a status, which will go from "todo" to "done" once the work has been
 <details closed>
 <summary>Running on a cluster with SLURM</summary>
 <br>
-
-To start the SLURM job which runs the PiCaS client, run the `slurm-example.sh` from the `examples` directory:
+You can run this example on a login node of a SLURM cluster, e.g. Spider at SURF. To start the SLURM job which runs the PiCaS client, submit the `slurm-example.sh` script with:
 
 ```
 sbatch slurm-example.sh
@@ -176,7 +175,9 @@ Now in a SLURM job array the work will be performed (you can set the number of a
 <summary>Running on the Grid with DIRAC</summary>
 <br>
 
-On the grid, in our screnario, you need to supply the entire environment through the sandbox (a more grid-native CVMFS example is available in the [picas-profile](https://github.com/sara-nl/picas-profile) repository). The binaries and python code need to be in this sandbox.
+In order to run this example on the Grid, you need the three [Grid Prerequisites](https://doc.grid.surfsara.nl/en/latest/Pages/Basics/prerequisites.html#prerequisites): User Interface (UI) machine, Grid certificate, VO membership.
+
+On the Grid, in our scenario, you need to supply the entire environment through the sandbox (a more grid-native CVMFS example is available in the [picas-profile](https://github.com/sara-nl/picas-profile) repository). The binaries and python code need to be in this sandbox.
 First we need to create a tar of the picas code, so that it can be sent to the Grid:
 
 ```
@@ -186,16 +187,16 @@ tar cfv grid-sandbox/picas.tar ../picas/
 Secondly, the CouchDB python API needs to be available too, so download and extract it:
 
 ```
-wget https://files.pythonhosted.org/packages/7c/c8/f94a107eca0c178e5d74c705dad1a5205c0f580840bd1b155cd8a258cb7c/CouchDB-1.2.tar.gz
+wget https://files.pythonhosted.org/packages/7c/c8/f94a107eca0c178e5d74c705dad1a5205c0f580840bd1b155cd8a258cb7c/CouchDB-1.2.tar.gz -P grid-sandbox
 ```
 
-Now you can start the example from a grid login node with (in this case DIRAC is used for job submission):
+Now you can start the example from the Grid UI with (in this case [DIRAC](https://dirac.readthedocs.io/en/latest/index.html) is used for job submission):
 
 ```
 dirac-wms-job-submit grid-example.jdl
 ```
 
-And the status and output can be retrieved with DIRAC commands, while in the token you see the status of the token and the tokens' attachments contain the log files. Once all tokens have been processed (check the DB Views) the grid job will finish.
+The status and output can be retrieved with DIRAC commands, while in the token you see the token status and the token attachments contain the log files. Once all tokens have been processed (check the DB views) the Grid job will finish. For more Grid-specific information, see the [Grid documentation](https://doc.grid.surfsara.nl/en/latest/index.html).
 </details>
 
 
