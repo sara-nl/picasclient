@@ -5,6 +5,7 @@ picasclient
 
 Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as a token pool server.
 
+
 Installation
 ============
 
@@ -31,6 +32,7 @@ flake8 picas tests
 pytest tests
 ```
 
+
 Installing package
 ------------------
 The latest release of `picas` can be installed as a package from PyPI with:
@@ -42,20 +44,20 @@ You can then write your custom Python program to use `picas` based on the exampl
 
 Examples
 ========
-The examples directory contains examples to use the picasclient. There are examples for running locally, [Spider](https://doc.spider.surfsara.nl/en/latest/Pages/about.html) (SLURM cluster) and the [Grid](https://doc.grid.surfsara.nl/en/latest/), and in principle the jobs can be sent to any machine that can run this client.
+The `examples` directory contains two examples how to use the PiCaS client: a short example and a long example. These also include scripts for running locally, on [Spider](https://doc.spider.surfsara.nl/en/latest/Pages/about.html) (SLURM cluster) and the [Grid](https://doc.grid.surfsara.nl/en/latest/). The examples will show how PiCaS provides a single interface that can store tokens (on the CouchDB instance) with work to be done. Then jobs can be sent to any machine where the PiCaS client can be deployed.
 
 Prerequisites
 -------------
 <details closed>
 <summary>Get a PiCaS account</summary>
 <br>
-To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you are have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>
+To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>
 </details>
 
 <details closed>
 <summary>Connect to the PiCaS server</summary>
 <br>
-To connect to the PiCaS server, fill `examples/picasconfig.py` with the information needed to log in to your PiCaS account and the database you want use for storing the work tokens. Specifically, the information needed are:
+To connect to the PiCaS server, fill `examples/picasconfig.py` with the information needed to log in to your PiCaS account and the database you want to use for storing the work tokens. Specifically, the information needed are:
   
 ```
 PICAS_HOST_URL="https://picas.surfsara.nl:6984"
@@ -68,19 +70,20 @@ PICAS_PASSWORD=""
 <details closed>
 <summary>Create DB Views</summary>
 <br>
-When you you use the DB for the first time, you need to define "view" logic and create views. <a href="https://docs.couchdb.org/en/stable/ddocs/views/index.html">CouchDB Views</a> are the primary tool used for querying and reporting on CouchDB documents. You can, for example, create views to filter on new, running, finished, and failed job tokens. Some pre-defined views can be created with:
+When you you use the DB for the first time, you need to define "view" logic and create views. <a href="https://docs.couchdb.org/en/stable/ddocs/views/index.html">CouchDB Views</a> are the primary tool used for querying and reporting on CouchDB documents. For example, you can create views to filter on new, running, finished, and failed job tokens. Some pre-defined views can be created with:
 
 ```
+cd examples
 python createViews.py
 ```
 This will create the following views:
- * Monitor/todo: all the tasks that still need to be done
- * Monitor/locked: the tasks that are currently running
+ * Monitor/todo: tasks that still need to be done
+ * Monitor/locked: tasks that are currently running
  * Monitor/error: tasks that encountered errors 
  * Monitor/done: tasks that are finished 
  * Monitor/overview_total: all tasks and their states
    
-After a few moments, you should be able to find the generated views in the <a href="https://picas.surfsara.nl:6984/_utils/#login">CouchDB web interface</a> . Click on your database and you will see the views on the left under `Monitor/Views`:
+After a few moments, you should be able to find the generated views in the <a href="https://picas.surfsara.nl:6984/_utils/#login">CouchDB web interface</a>. Select your database and you will see the views on the left under `Monitor/Views`:
 
 ![picas views](docs/picas-views.png)
 </details>
@@ -88,21 +91,23 @@ After a few moments, you should be able to find the generated views in the <a hr
 
 Quick example
 -------------
+This example creates fast-running jobs that write a message to standard output.
 <details closed>
 <summary>Create tokens</summary>
 <br>
-Now you can send some tokens containing work to the Picas server. For fast running jobs, a <code>quickExample.txt</code> file is prepared containing three tokens. Run:
+The file <code>quickExample.txt</code> contains three lines with commands to be executed. You can generate three job tokens in the PiCaS DB by running: 
 
 ```
 python pushTokens.py quickExample.txt
 ```
+
 Check the DB if you can find the tokens in the View <code>Monitor/todo</code>. 
 </details>
 
 <details closed>
 <summary>Running locally</summary>
 <br>
-To run the example locally (e.g. on your laptop), run from the <code>examples</code> directory:
+To run the example locally (e.g. on your laptop) with:
 
 ```
 python local-example.py
@@ -125,7 +130,7 @@ exit_code 0
 -----------------------
 ```
 
-The token in the database will have attachments with the regular and error output of the terminal. There you will find the output file `logs_token_0.out`, containing the output of the input command:
+The token in the database will have attachments with the standard and error output of the terminal. There you will find the output file `logs_token_0.out`, containing the output of the input command:
 
 ```
 Tue 31 Dec 2024 00:00:00 CET
@@ -137,10 +142,9 @@ this is token A
 Tue 31 Dec 2024 00:00:00  CET
 ```
 
-
 Once the script is running, it will start polling the Picas server for work. Once the work is complete, the script will finish.
 
-Tokens have status, which will go from "todo" to "done" once the work has been completed (or "failed" if the work fails). To do more work, you will have to add new tokens that are not in a "done" state yet, otherwise the example script will just stop after finding no more work to do.
+Tokens have a status, which will go from "todo" to "done" once the work has been completed (or "failed" if the work fails). To do more work, you will have to add new tokens that in the "todo" state yet, otherwise the example script will just stop after finding no more work to do. If you are interested, you can look into the scripts `examples/local-example.py` and `examples/process_task.sh` to check what the actual work is.
 </details>
 
 <details closed>
@@ -153,7 +157,6 @@ sbatch slurm-example.sh
 ```
 
 Now in a SLURM job array the work will be performed (you can set the number of array jobs in the script at `--array`) and each job will start polling the CouchDB instance for work. Once the work is complete, the SLURM job will finish.
-If you are interested, you can look into scripts `examples/local-example.py` and `examples/process_task.sh` to check what the actual work is. 
 </details>
 
 <details closed>
@@ -179,9 +182,8 @@ Now you can start the example from a grid login node with (in this case DIRAC is
 dirac-wms-job-submit grid-example.jdl
 ```
 
-And the status and output can be retrieved with DIRAC commands, while in the token you see the status of the token and the tokens' attachments contain the log files. Once all tokens have been processed (this can be seen in the CouchDB instance) the grid job will finish.
+And the status and output can be retrieved with DIRAC commands, while in the token you see the status of the token and the tokens' attachments contain the log files. Once all tokens have been processed (check the DB Views) the grid job will finish.
 
-As we have seen, through PiCaS you have a single interface that can store tokens with work to be done (the CouchDB instance). Then on any machine where you can deploy the PiCaS client, one can perform the tasks hand.
 </details>
 
 <details closed>
@@ -194,36 +196,35 @@ When all your pilot jobs are finished, ideally you'd want all tasks to be 'done'
 
 In other cases, there could be errors with your task: maybe you've sent the wrong parameters or forgot to download all necessary input files. Reviewing these failed tasks gives you the possibility to correct them and improve your submission scripts. After that, you could run those tasks again, either by removing their locks or delete older tokens and creating new tokens. After that, you can submit new pilot jobs.
 
-To delete all the Tokens in a certain view, you can use the `deteleTokens.py` under the `examples` directory. For example to delete all the tokens in todo view, run
+To delete all the Tokens in a certain view, you can use the script `deteleTokens.py`. For example to delete all the tokens in `error` view, run:
 
 ```
-python /path-to-script/deleteTokens.py Monitor/todo
+python deleteTokens.py Monitor/error
 ```
 
 </details>
 
+
 Long example: fractals
 ----------------------
+To get an idea on more realistic, longer running jobs there is also a "fractals" example. The fractals code will recursively generate an image based on parameters received from PiCas. The work can take from 10 seconds up to 30 minutes per token.
 
 <details closed>
 <summary>Create tokens</summary>
 <br>
-
-The example above is very fast in running (it only echos to your shell). To get an idea on longer running jobs there is also a "fractal" example. The work in this example takes from 10 seconds up to 30 minutes per token. To add these tokens to your DB, do:
+To add the fractals job tokens to your DB, run:
 
 ```
 ./createTokens
 >>> /tmp/tmp.abc123
 ```
-
-And pass the output file to the push tokens code:
+This will generate an outputfile, in this case called `/tmp/tmp.abc123`. Pass the outputfile to the `pushTokens.py` code:
 
 ```
 python pushTokens.py /tmp/tmp.abc123
 ```
 Now the tokens are available in the database. 
 </details>
-
 
 <details closed>
 <summary>Prepare code</summary>
@@ -244,19 +245,19 @@ with:
 ```
 bin/fractals -o $OUTPUT $INPUT
 ```
-to ensure the fractal code is called.
+to ensure that the fractals code is called.
 </details>
 
 <details closed>
 <summary>Run jobs locally, SLURM cluster or Grid</summary>
 <br>
-Now, you can run your jobs whichever way you want (locally, SLURM cluster or the Grid, using the general instructions as described above for the short example!
+Now, you can run your jobs whichever way you want (locally, SLURM cluster or the Grid), using the general instructions as described above for the quick example!
 </details>
 
 <details closed>
 <summary>Check results</summary>
 <br>
-The fractals code will recursively generate an image based on parameters received from PiCas. If the jobs are run locally or on Spider, you can find the output in your work directory. For jobs that are processed on the Grid, you can send the output to the Grid Storage or some other remote location. To check the results, convert the output file to .png format and display the picture: 
+The fractals code will generate an outputfile named `output_token_X`. If the jobs are run locally or on Spider, you can find the outputfile in your work directory. For jobs that are processed on the Grid, you can transfer the outputfile to a remote storage location at the end of your job script `process_task.sh`. To check the results, convert the output file to .png format and display the picture: 
   
 ```
 convert output_token_6 output_token_6.png # replace with your output filename
@@ -265,22 +266,6 @@ display output_token_6.png
 </details>
 
 
-Token commands
-==============
-
-For the most used commands for preparing and editing tokens, check [Picas token commands](/docs/token-commands.md).
-
-Check job status
-========
-
-While your pilot jobs process tasks, you can keep track of their progress through the CouchDB web interface. There are views installed to see:
-
- * all the tasks that still need to be done (Monitor/todo)
- * the tasks that are locked (Monitor/locked)
- * tasks that encountered errors (Monitor/error)
- * tasks that are finished (Monitor/done)
-
-When all your pilot jobs are finished, ideally, you'd want all tasks to be 'done'. However, often you will find that not all jobs finished successfully and some are still in a 'locked' or 'error' state. If this happens, you should investigate what went wrong with these jobs. Incidentally, this will be due to errors with the middleware, network or storage. In those cases, you can remove the locks and submitting some new pilot jobs to try again. In other cases, there could be errors with your task: maybe you've sent the wrong parameters or forgot to download all necessary input files. Reviewing these failed tasks gives you the possibility to correct them and improve your submission scripts. After that, you could run those tasks again, either by removing their locks or by creating new tokens if needed and then submitting new pilot jobs.
 
 Picas overview
 ==============
