@@ -299,10 +299,10 @@ In the main program of `local-example.py`, the work is executed by this line:
 actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
 ```
 The arguments in this function allow the user to speficy criteria to stop processing:
-* max_token_time: maximum time (seconds) to run a single token before going stopping
-* max_total_time: maximum time (seconds) to run picas before stopping
-* max_tasks: number of tasks that are performed before stopping
-* max_scrub: number of times a token can be reset ('scrubbed') after failing
+* `max_token_time`: maximum time (seconds) to run a single token before going stopping
+* `max_total_time`: maximum time (seconds) to run picas before stopping
+* `max_tasks`: number of tasks that are performed before stopping
+* `max_scrub`: number of times a token can be reset ("scrubbed") after failing
 So in our example: if a token is not finished in 30 minutes, the token is "scrubbed" (i.e. reset to "todo"), and the next token will be fetched. If a token is scrubbed more than 2 times, it will be set to "error". Nore more tokens will be processed after one hour or after 10 tokens have finished, whatever happens earlier.
 
 Users can even define a custom `stop_function` (with `**kwargs`) and pass that to `actors.run()`. See for details, `picas/actors.py`.
