@@ -3,7 +3,7 @@ picasclient
 
 ![CICD](https://github.com/sara-nl/picasclient/actions/workflows/python-app.yml/badge.svg) [![License - MIT](https://img.shields.io/github/license/sara-nl/picasclient)](https://github.com/sara-nl/picasclient/blob/main/LICENSE)
 
-Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as a token pool server (PiCaS). PiCaS is a [pilot job framework](https://doc.spider.surfsara.nl/en/latest/Pages/pilotjob_picas.html). Pilot jobs, instead of executing a task directly, contact a central server to be assigned a task and get all the information needed for executing this task.
+Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as a token pool server (PiCaS). PiCaS is a [pilot job framework](https://doc.spider.surfsara.nl/en/latest/Pages/pilotjob_picas.html).
 
 
 Installation
@@ -45,7 +45,7 @@ You can then write your custom Python program to use PiCaS as a library based on
 Examples
 ========
 
-The `examples` directory contains two examples how to use the PiCaS client: a short example and a long example. These also include scripts for running locally, on [Spider](https://doc.spider.surfsara.nl/en/latest/Pages/about.html) (SLURM cluster) and the [Grid](https://doc.grid.surfsara.nl/en/latest/). The examples will show how PiCaS provides a single interface that can store tokens (on the CouchDB instance) with work to be done. Then pilot jobs can be sent to any machine where the PiCaS client can be deployed. 
+The `examples` directory contains two examples how to use the PiCaS client: a short example and a long example. These also include scripts for running locally, on [Spider](https://doc.spider.surfsara.nl/en/latest/Pages/about.html) (SLURM cluster) and the [Grid](https://doc.grid.surfsara.nl/en/latest/). The examples will show how PiCaS provides a single interface that can store tokens (on the CouchDB instance) with work to be done. Then pilot jobs can be sent to any machine where the PiCaS client can be deployed. Pilot jobs, instead of executing a task directly, contact a central server to be assigned a task and get all the information needed for executing this task.
 
 Prerequisites
 -------------
@@ -54,7 +54,7 @@ Prerequisites
 <summary>Get a PiCaS account</summary>
 <br>
 
-To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>
+To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>.
 </details>
 
 
@@ -313,7 +313,7 @@ Users can even define a custom `stop_function` (with `**kwargs`) and pass that t
 <summary>Change iterator</summary>
 <br>
 
-Normally, if there are no more tokens in the DB to be processed, the pilot job will stop. However, you can tell the pilot job to continue polling the PiCaS server for work untill `max_total_time` has been reached. This is be done by uncommenting this line in `local-example.py`, in the function `ExampleActor.__init()`:
+Normally, if there are no more tokens in the DB to be processed, the pilot job will stop. However, you can tell the pilot job to continue polling the PiCaS server for work untill `max_total_time` has been reached. This is done by uncommenting this line in `local-example.py`, in the function `ExampleActor.__init()`:
 ```
 self.iterator = EndlessViewIterator(self.iterator)    
 ```
