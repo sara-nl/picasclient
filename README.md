@@ -3,7 +3,7 @@ picasclient
 
 ![CICD](https://github.com/sara-nl/picasclient/actions/workflows/python-app.yml/badge.svg) [![License - MIT](https://img.shields.io/github/license/sara-nl/picasclient)](https://github.com/sara-nl/picasclient/blob/main/LICENSE)
 
-Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as a token pool server (PiCaS).
+Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as a token pool server (PiCaS). PiCaS is a [pilot job framework](https://doc.spider.surfsara.nl/en/latest/Pages/pilotjob_picas.html). Pilot jobs, instead of executing a task directly, contact a central server to be assigned a task and get all the information needed for executing this task.
 
 
 Installation
@@ -12,7 +12,7 @@ Installation
 Development & Testing
 ---------------------
 
-To install the PiCaS source code for development, first clone this repository and then use [`poetry`](https://python-poetry.org/docs/) to install. Poetry is a tool for dependency managing and packaging in Python. If you don't have Poetry, install it first with `pipx install poetry`.
+To install the PiCaS source code for development, first clone this repository and then use [Poetry](https://python-poetry.org/docs/) to install. Poetry is a tool for dependency managing and packaging in Python. If you don't have Poetry, install it first with `pipx install poetry`.
 ```
 git clone https://github.com/sara-nl/picasclient.git
 cd picasclient
@@ -45,7 +45,7 @@ You can then write your custom Python program to use PiCaS as a library based on
 Examples
 ========
 
-The `examples` directory contains two examples how to use the PiCaS client: a short example and a long example. These also include scripts for running locally, on [Spider](https://doc.spider.surfsara.nl/en/latest/Pages/about.html) (SLURM cluster) and the [Grid](https://doc.grid.surfsara.nl/en/latest/). The examples will show how PiCaS provides a single interface that can store tokens (on the CouchDB instance) with work to be done. Then jobs can be sent to any machine where the PiCaS client can be deployed.
+The `examples` directory contains two examples how to use the PiCaS client: a short example and a long example. These also include scripts for running locally, on [Spider](https://doc.spider.surfsara.nl/en/latest/Pages/about.html) (SLURM cluster) and the [Grid](https://doc.grid.surfsara.nl/en/latest/). The examples will show how PiCaS provides a single interface that can store tokens (on the CouchDB instance) with work to be done. Then pilot jobs can be sent to any machine where the PiCaS client can be deployed. 
 
 Prerequisites
 -------------
@@ -54,7 +54,7 @@ Prerequisites
 <summary>Get a PiCaS account</summary>
 <br>
 
-To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>.
+To run the examples, you need a PiCaS account and access to a database (DB) on the PiCaS CouchDB instance. If you are following a workshop organized by SURF, this has already been arranged for you. If you have a Grid or Spider project at SURF, you can request access through the <a href="https://servicedesk.surf.nl">Service Desk</a>
 </details>
 
 
@@ -86,7 +86,7 @@ python createViews.py
 ```
 This will create the following views:
  * `Monitor/todo`: tasks that still need to be done
- * ` Monitor/locked`: tasks that are currently running
+ * `Monitor/locked`: tasks that are currently running
  * `Monitor/error`: tasks that encountered errors 
  * `Monitor/done`: tasks that are finished 
  * `Monitor/overview_total`: all tasks and their states
@@ -162,13 +162,14 @@ Tokens have a status, which will go from "todo" to "done" once the work has been
 <details closed>
 <summary>Running on a cluster with SLURM</summary>
 <br>
+
 You can run this example on a login node of a SLURM cluster, e.g. Spider at SURF. To start the SLURM job which runs the PiCaS client, submit the `slurm-example.sh` script with:
 
 ```
 sbatch slurm-example.sh
 ```
 
-Now the work will be performed in parallel by a SLURM job array, and each job will start polling the CouchDB instance for work. Once the work is complete, the SLURM job will finish. You can set the number of array jobs in the script with `--array`. For more information on SLURM, see the [SLURM documentation](https://slurm.schedmd.com/).
+Now the work will be performed in parallel by a SLURM job array, and each job will start polling the CouchDB instance for work. Once the work is complete, the SLURM job will finish. You can set the number of array jobs in the script with `--array`. For more information on SLURM job scheduler, see the [SLURM documentation](https://slurm.schedmd.com/).
 </details>
 
 
@@ -178,8 +179,7 @@ Now the work will be performed in parallel by a SLURM job array, and each job wi
 
 In order to run this example on the Grid, you need the three [Grid Prerequisites](https://doc.grid.surfsara.nl/en/latest/Pages/Basics/prerequisites.html#prerequisites): User Interface (UI) machine, Grid certificate, VO membership.
 
-On the Grid, in our scenario, you need to supply the entire environment through the sandbox (a more grid-native CVMFS example is available in the [picas-profile](https://github.com/sara-nl/picas-profile) repository). The binaries and python code need to be in this sandbox.
-First we need to create a tar of the picas code, so that it can be sent to the Grid:
+On the Grid, you can install software you need either on [Softdrive](https://doc.grid.surfsara.nl/en/stable/Pages/Advanced/grid_software.html#softdrive), download it during job execution, or provide it through the "input sandbox". In this example, we supply the entire environment through the sandbox. The binaries and python code need to be in this sandbox. First we need to create a tar of the PiCaS code, so that it can be sent to the Grid. On you Grid UI, run:
 
 ```
 tar cfv grid-sandbox/picas.tar ../picas/
@@ -191,13 +191,12 @@ Secondly, the CouchDB python API needs to be available too, so download and extr
 wget https://files.pythonhosted.org/packages/7c/c8/f94a107eca0c178e5d74c705dad1a5205c0f580840bd1b155cd8a258cb7c/CouchDB-1.2.tar.gz -P grid-sandbox
 ```
 
-Now you can start the example from the Grid UI with (in this case [DIRAC](https://dirac.readthedocs.io/en/latest/index.html) is used for job submission):
+Now you can start the example from the Grid UI with:
 
 ```
 dirac-wms-job-submit grid-example.jdl
 ```
-
-The status and output can be retrieved with DIRAC commands, while in the token you see the token status and the token attachments contain the log files. Once all tokens have been processed (check the DB views) the Grid job will finish. For more Grid-specific information, see the [Grid documentation](https://doc.grid.surfsara.nl/en/latest/index.html).
+In this case [DIRAC](https://dirac.readthedocs.io/en/latest/index.html) is used for job submission. The status and output can be retrieved with DIRAC commands, while in the token you see the token status and the token attachments contain the log files. Once all tokens have been processed (check the DB views) the Grid job will finish. For more Grid-specific information, see the [Grid documentation](https://doc.grid.surfsara.nl/en/latest/index.html).
 </details>
 
 
@@ -221,7 +220,7 @@ python deleteTokens.py Monitor/error
 
 Long example: fractals
 ----------------------
-To get an idea on more realistic, longer running jobs there is also a "fractals" example. The fractals code will recursively generate an image based on parameters received from PiCas. The work can take from 10 seconds up to 30 minutes per token.
+To get an idea on more realistic, longer running jobs there is also a "fractals" example. The fractals code will recursively generate an image based on parameters received from PiCaS. The work can take from 10 seconds up to 30 minutes per token.
 
 
 <details closed>
@@ -277,12 +276,48 @@ Now, you can run your jobs whichever way you want (locally, SLURM cluster or the
 <summary>Check results</summary>
 <br>
 
-The fractals code will generate an outputfile named `output_token_X`. If the jobs are run locally or on Spider, you can find the outputfile in your work directory. For jobs that are processed on the Grid, you can transfer the outputfile to a remote storage location at the end of your job script `process_task.sh`. To check the results, convert the output file to .png format and display the picture: 
+The fractals code will generate an outputfile named `output_token_X`. If the jobs are run locally or on Spider, you can find the outputfile in your work directory. For jobs that are processed on the Grid, you can transfer the outputfile to a remote storage location at the end of your job script `process_task.sh`. To check the results, convert the output file to PNG format and display the picture: 
   
 ```
-convert output_token_6 output_token_6.png # replace with your output filename
-display output_token_6.png
+convert output_token_X output_token_X.png
+display output_token_X.png
 ```
+</details>
+
+
+Advanced features
+-------------
+
+
+<details closed>
+<summary>Stop criteria</summary>
+<br>
+
+In the main program of `local-example.py`, the work is executed by this line:
+
+```
+actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
+```
+The arguments in this function allow the user to speficy criteria to stop processing:
+* max_token_time: maximum time (seconds) to run a single token before going stopping
+* max_total_time: maximum time (seconds) to run picas before stopping
+* max_tasks: number of tasks that are performed before stopping
+* max_scrub: number of times a token can be reset ('scrubbed') after failing
+So in our example: if a token is not finished in 30 minutes, the token is "scrubbed" (i.e. reset to "todo"), and the next token will be fetched. If a token is scrubbed more than 2 times, it will be set to "error". Nore more tokens will be processed after one hour or after 10 tokens have finished, whatever happens earlier.
+
+Users can even define a custom `stop_function` (with `**kwargs`) and pass that to `actors.run()`. See for details, `picas/actors.py`.
+
+</details>
+
+<details closed>
+<summary>Change iterator</summary>
+<br>
+
+Normally, if there are no more tokens in the DB to be processed, the pilot job will stop. However, you can tell the pilot job to continue polling the PiCaS server for work untill `max_total_time` has been reached. This is be done by uncommenting this line in `local-example.py`, in the function `ExampleActor.__init()`:
+```
+self.iterator = EndlessViewIterator(self.iterator)    
+```
+
 </details>
 
 
