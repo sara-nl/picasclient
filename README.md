@@ -118,7 +118,7 @@ Check the DB; you should see the tokens in the view `Monitor/todo`.
 <summary>Running locally</summary>
 <br>
 
-To run the example locally (e.g. on your laptop) with:
+To run the example locally (e.g. on your laptop):
 
 ```
 python local-example.py
@@ -153,9 +153,9 @@ this is token A
 Tue 31 Dec 2024 00:00:00  CET
 ```
 
-Once the script is running, it will start polling the PiCaS server for work. Once the work is complete, the script will finish.
+Once the script is running, it will start polling the PiCaS server for work. A pilot job will not die after it has completed a task, but immediately ask for another one. It will keep asking for new jobs, until all work is done, or the maximum time is up. 
 
-Tokens have a status, which will go from "todo" to "done" once the work has been completed (or "failed" if the work fails). To do more work, you will have to add new tokens that in the "todo" state yet, otherwise the example script will just stop after finding no more work to do. If you are interested, you can look into the scripts `examples/local-example.py` and `examples/process_task.sh` to check what the actual work is.
+Tokens have a status, which will go from "todo" to "done" once the work has been completed (or "error" if the work fails). To do more work, you will have to add new tokens that in the "todo" state yet, otherwise the example script will just stop after finding no more work to do. If you are interested, you can look into the scripts `examples/local-example.py` and `examples/process_task.sh` to check what the actual work is.
 </details>
 
 
@@ -206,9 +206,7 @@ In this case [DIRAC](https://dirac.readthedocs.io/en/latest/index.html) is used 
 
 While your pilot jobs process tasks, you can keep track of their progress through the CouchDB web interface and the views we created earlier. 
 
-When all pilot jobs are finished, ideally, you want all tasks to be "done". However, often you will find that not all jobs finished successfully and some are still in a "locked" or "error" state. If this happens, you should investigate what went wrong with these jobs. Incidentally, this might be due to errors with the middleware, network or storage. In those cases, you can remove the locks and submit new pilot jobs to try again. 
-
-In other cases, there could be errors with your task: maybe you've sent the wrong parameters or forgot to download all necessary input files. Reviewing these failed tasks gives you the possibility to correct them and improve your submission scripts. After that, you could run those tasks again, either by removing their locks or delete older tokens and creating new tokens. After that, you can submit new pilot jobs.
+When all pilot jobs are finished, ideally, you want all tasks to be "done". However, often you will find that not all jobs finished successfully and some are still in a "locked" or "error" state. If this happens, you should investigate what went wrong with these jobs. Incidentally, this might be due to errors with the middleware, network or storage. In other cases, there could be errors with your task: maybe you've sent the wrong parameters or forgot to download all necessary input files. Reviewing these failed tasks gives you the possibility to correct them and improve your submission scripts. After that, you could run those tasks again, either by removing their locks or delete older tokens and creating new tokens. After that, you can submit new pilot jobs.
 
 To delete all the tokens in a certain view, you can use the script `deteleTokens.py`. For example to delete all the tokens in "error" view, run:
 
@@ -299,7 +297,7 @@ In the main program of `local-example.py`, the work is executed by this line:
 actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
 ```
 The arguments in this function allow the user to speficy criteria to stop processing:
-* `max_token_time`: maximum time (seconds) to run a single token before going stopping
+* `max_token_time`: maximum time (seconds) to run a single token before stopping and going to next token
 * `max_total_time`: maximum time (seconds) to run picas before stopping
 * `max_tasks`: number of tasks that are performed before stopping
 * `max_scrub`: number of times a token can be reset ("scrubbed") after failing
