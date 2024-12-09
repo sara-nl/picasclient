@@ -324,6 +324,7 @@ If you want to delete all the tokens in a certain view, use the script `deteleTo
 ```
 python deleteTokens.py Monitor/error
 ```
+</details>
 
 <details closed>
 <summary>Change iterator</summary>
