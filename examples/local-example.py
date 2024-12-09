@@ -35,7 +35,7 @@ class ExampleActor(RunActor):
     def __init__(self, db, modifier, view="todo", **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
-        self.iterator = EndlessViewIterator(self.iterator)
+        # self.iterator = EndlessViewIterator(self.iterator)    
         self.modifier = modifier
         self.client = db
 
@@ -48,8 +48,7 @@ class ExampleActor(RunActor):
         print("-----------------------")
 
         # Start running the main job, the logging is done internally and saved below
-        # /usr/bin/time -v ./process_task.sh [input] [tokenid]
-        command = ["/usr/bin/time", "-v", "./process_task.sh", token['input'], token['_id']]
+        command = ["/usr/bin/time", "./process_task.sh", token['input'], token['_id']]
         out = execute(command)
 
         logsout = f"logs_{token['_id']}.out"
@@ -88,7 +87,7 @@ def main():
     # Create actor
     actor = ExampleActor(client, modifier)
     # Start work!
-    actor.run(max_token_time=10, max_total_time=100, max_tasks=10, max_scrub=2)
+    actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
 
 if __name__ == '__main__':
     main()
