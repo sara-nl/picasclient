@@ -6,11 +6,10 @@ picasclient
 Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as a token pool server (PiCaS). PiCaS is a [pilot job framework](https://doc.spider.surfsara.nl/en/latest/Pages/pilotjob_picas.html).
 
 
-Installation
-============
+# Installation
 
-Development & Testing
----------------------
+
+## Development & Testing
 
 To install the PiCaS source code for development, first clone this repository and then use [Poetry](https://python-poetry.org/docs/) to install. Poetry is a tool for dependency managing and packaging in Python. If you don't have Poetry, install it first with `pipx install poetry`.
 ```
@@ -33,8 +32,8 @@ pytest tests
 ```
 
 
-Installing package
-------------------
+## Installing package
+
 Alternatively, the latest release of PiCaS can be installed as a package from PyPI with:
 ```
 pip install picas
@@ -42,13 +41,11 @@ pip install picas
 You can then write your custom Python program to use PiCaS as a library based on the examples below. 
 
 
-Examples
-========
+# Examples
 
 The `examples` directory contains two examples how to use the PiCaS client: a short example and a long example. These also include scripts for running locally, on [Spider](https://doc.spider.surfsara.nl/en/latest/Pages/about.html) (SLURM cluster) and the [Grid](https://doc.grid.surfsara.nl/en/latest/). The examples will show how PiCaS provides a single interface that can store tokens (on the CouchDB instance) with work to be done. Then pilot jobs can be sent to any machine where the PiCaS client can be deployed. Pilot jobs, instead of executing a task directly, contact a central server to be assigned a task and get all the information needed for executing this task.
 
-Prerequisites
--------------
+## Prerequisites
 
 <details closed>
 <summary>Get a PiCaS account</summary>
@@ -97,8 +94,8 @@ After a few moments, you should be able to find the generated views in the <a hr
 </details>
 
 
-Quick example
--------------
+## Quick example
+
 This example creates fast-running jobs that write a message to standard output.
 <details closed>
 <summary>Create tokens</summary>
@@ -206,18 +203,16 @@ In this case [DIRAC](https://dirac.readthedocs.io/en/latest/index.html) is used 
 
 While your pilot jobs process tasks, you can keep track of their progress through the CouchDB web interface and the views we created earlier. 
 
-When all pilot jobs are finished, ideally, you want all tasks to be "done". However, often you will find that not all jobs finished successfully and some are still in a "locked" or "error" state. If this happens, you should investigate what went wrong with these jobs. Incidentally, this might be due to errors with the middleware, network or storage. In other cases, there could be errors with your task: maybe you've sent the wrong parameters or forgot to download all necessary input files. Reviewing these failed tasks gives you the possibility to correct them and improve your submission scripts. After that, you could run those tasks again, either by removing their locks or delete older tokens and creating new tokens. After that, you can submit new pilot jobs.
+When all pilot jobs are finished, ideally, you want all tasks to be "done". However, often you will find that not all jobs finished successfully and some are still in a "locked" or "error" state. If this happens, you should investigate what went wrong with these jobs by checking the attached logfiles. Incidentally, this might be due to errors with the middleware, network or storage. In other cases, there could be errors with your task: maybe you've sent the wrong parameters or forgot to download all necessary input files. Reviewing these failed tasks gives you the possibility to correct them and improve your submission scripts. 
 
-To delete all the tokens in a certain view, you can use the script `deteleTokens.py`. For example to delete all the tokens in "error" view, run:
+You can re-run failed tasks, either by resetting failed/locked tokens or deleting them and creating new tokens, see [Advanced features](#advanced-features). After that, you can submit new pilot jobs.
 
-```
-python deleteTokens.py Monitor/error
-```
+
 </details>
 
 
-Long example: fractals
-----------------------
+## Long example: fractals
+
 To get an idea on more realistic, longer running jobs there is also a "fractals" example. The fractals code will recursively generate an image based on parameters received from PiCaS. The work can take from 10 seconds up to 30 minutes per token.
 
 
@@ -283,9 +278,10 @@ display output_token_X.png
 </details>
 
 
-Advanced features
--------------
+## Advanced features
 
+
+</details>
 
 <details closed>
 <summary>Stop criteria</summary>
@@ -307,6 +303,28 @@ Users can even define a custom `stop_function` (with `**kwargs`) and pass that t
 
 </details>
 
+
+<details closed>
+<summary>Resetting and deleting tokens</summary>
+<br>
+
+To reset tokens in a certain view back to "todo", you can use the script `resetTokens.py`. For example, to reset all locked tokens:
+
+```
+python resetTokens.py Monitor/locked
+```
+This will also increase the "scrub_count" of the tokens. Optionally, one can provide a locktime argument. For example, to reset tokens that have been locked more than 24 hours, run:
+
+```
+python resetTokens.py Monitor/locked 24
+```
+
+If you want to delete all the tokens in a certain view, use the script `deteleTokens.py`. For example, to delete all the tokens in "error" view, run:
+
+```
+python deleteTokens.py Monitor/error
+```
+
 <details closed>
 <summary>Change iterator</summary>
 <br>
@@ -319,8 +337,7 @@ self.iterator = EndlessViewIterator(self.iterator)
 </details>
 
 
-PiCaS overview
-==============
+# PiCaS overview
 
 Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. 
 * The scripts `slurm-example.sh` and `grid-example.jdl` are for scheduling jobs on a SLURM cluster and the Grid, respectively. 

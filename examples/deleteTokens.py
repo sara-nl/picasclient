@@ -3,7 +3,7 @@
 @helpdesk: SURFsara helpdesk <helpdesk@surfsara.nl>
 
 usage: python deleteTokens.py [viewname]
-  e.g. python deleteTokens.py Monitor/todo
+  e.g. python deleteTokens.py Monitor/error
 
 description:
 	Connect to PiCaS server
@@ -16,8 +16,7 @@ import couchdb
 import picasconfig
 
 
-def deleteDocs(db, viewname):
-    # v=db.view("Monitor/todo")
+def deleteDocs(db, viewname="Monitor/error"):
     v = db.view(viewname)
     for x in v:
         document = db[x['key']]
