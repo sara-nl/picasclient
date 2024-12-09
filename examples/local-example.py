@@ -87,7 +87,7 @@ def main():
     # Create actor
     actor = ExampleActor(client, modifier)
     # Start work!
-    actor.run(max_token_time=10, max_total_time=3600, max_tasks=10, max_scrub=2)
+    actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
 
 if __name__ == '__main__':
     main()
