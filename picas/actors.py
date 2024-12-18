@@ -70,18 +70,12 @@ class AbstractRunActor(object):
 
         try:
             self.db.save(task)
-        except ResourceConflict as ex:
+        except Exception as ex:
             # simply overwrite changes - model results are more important
-            msg = f"Warning: {type(ex)} occurred while saving task to database: " + \
-                "Document exists with different revision or was deleted"
+            msg = f"Warning: {type(ex)} occurred while saving task to database: {ex}"
             log.info(msg)
             new_task = self.db.get(task.id)
             task['_rev'] = new_task.rev
-        except Exception as ex:
-            # re-raise Exception
-            msg = f"Error: {type(ex)} occurred while saving task to database: {ex}"
-            log.info(msg)
-            raise
 
         self.cleanup_run()
         self.tasks_processed += 1
