@@ -5,6 +5,7 @@
 @author: Jan Bot, Joris Borgdorff
 """
 
+import ssl
 import logging
 import signal
 import subprocess
@@ -48,6 +49,12 @@ class AbstractRunActor(object):
         else:
             self.iterator = iterator
 
+
+    def reconnect(self):
+        self.db = self.db.copy()
+        self.iterator.reconnect(self.db)
+
+
     def _run(self, task, timeout):
         """
         Execution of the work on the iterator used in the run method.
@@ -70,12 +77,31 @@ class AbstractRunActor(object):
 
         try:
             self.db.save(task)
-        except Exception as ex:
+        except ResourceConflict as ex:
             # simply overwrite changes - model results are more important
-            msg = f"Warning: {type(ex)} occurred while saving task to database: {ex}"
+            msg = f"Warning: {type(ex)} occurred while saving task to database: " + \
+                "Document exists with different revision or was deleted"
             log.info(msg)
             new_task = self.db.get(task.id)
             task['_rev'] = new_task.rev
+        except ssl.SSLEOFError as ex:
+            # SSLEOFError can occur for long-lived connections, re-establish connection
+            msg = f"Warning: {type(ex)} occurred while saving task to database: " + \
+                "Trying ro reconnect to database"
+            log.info(msg)        
+            self.reconnect()
+            try:
+                self.db.save(task)
+            except:
+                msg = f"Error: {type(ex)} occurred while saving task to database: " + \
+                    "Not able to reconnect to database"
+                log.info(msg)                 
+                raise
+        except Exception as ex:
+            #re-raise unknown exception, this will terminate the iterator
+            msg = f"Error: {type(ex)} occurred while saving task to database: {ex}"
+            log.info(msg)
+            raise 
 
         self.cleanup_run()
         self.tasks_processed += 1
