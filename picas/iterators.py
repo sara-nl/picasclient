@@ -56,7 +56,7 @@ class ViewIterator:
     def claim_task(self):
         """Get the first available task from a view."""
         raise NotImplementedError("claim_task function not implemented.")
-    
+
     def reconnect(self, database):
         """Reconnect to database"""
         self.database = database
