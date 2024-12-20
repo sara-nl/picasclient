@@ -3,6 +3,7 @@ import signal
 import subprocess
 import time
 import unittest
+import ssl
 
 from test_mock import MockDB, MockEmptyDB
 from unittest.mock import patch
@@ -71,6 +72,16 @@ class TestRun(unittest.TestCase):
         runner = ExampleRun(self._callback)
         runner._run(task=Task({'_id': 'c', 'lock': None, 'done': None}), timeout=None)
         self.assertEqual(runner.tasks_processed, 1)
+
+    @patch('test_mock.MockDB.save')
+    def test_run_ssleoferror(self, mock_save):
+        """
+        Test the _run function, in case the DB throws a an SSLEOFError
+        """
+        with pytest.raises(ssl.SSLEOFError):
+            mock_save.side_effect = ssl.SSLEOFError
+            runner = ExampleRun(self._callback)
+            runner._run(task=Task({'_id': 'c', 'lock': None, 'done': None}), timeout=None)
 
     @patch('test_mock.MockDB.save')
     def test_run_exception(self, mock_save):

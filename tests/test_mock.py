@@ -41,6 +41,9 @@ class MockDB(object):
 
         return doc
 
+    def copy(self):
+        return self
+
 
 class MockEmptyDB(MockDB):
     TASKS = []
