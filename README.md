@@ -361,14 +361,13 @@ This can be achieved by adjusting:
 
 In this example, two types of tokens are to be executed: single-core tokens and multi-core (4 cores) tokens. It is written for a slurm cluster, so the user may have to adjust the code if they want to run it elsewhere.
 And like the examples in the root exmample folder, a running CouchDB instance is needed.
-To run this example, do:
+To run this example, create the views, but uncomment the two extra views at the bottom. Then execute:
 
 ```
-source setup.sh
 python createViews.py
 ```
 
-to add the picasconfig to your `PYTHONPATH` and to create the views needed in your CouchDB instance. Next, run 
+Next, run:
 
 ```
 python pushAutoPilotExampleTokens.py
