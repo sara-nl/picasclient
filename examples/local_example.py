@@ -16,6 +16,7 @@ import logging
 import os
 import time
 import couchdb
+import picasconfig
 
 from picas.actors import RunActor
 from picas.clients import CouchDB
@@ -24,7 +25,6 @@ from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
 from picas.util import Timer
-from . import picasconfig
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ def arg_parser():
     parser = argparse.ArgumentParser(description="Arguments used in the different classes in the example.")
     parser.add_argument("-d", "--design_doc", default="Monitor", type=str, help="Select the designdoc used by the actor class")
     parser.add_argument("-V", "--view", default="todo", type=str, help="Select the view used by the actor class")
-    parser.add_argument("-v", "--verbose", action="store_true", type=bool, help="Set verbose") # add v for optional verbosity in the future
+    parser.add_argument("-v", "--verbose", action="store_true", help="Set verbose") # add v for optional verbosity in the future
     return parser.parse_args()
 
 

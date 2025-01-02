@@ -2,4 +2,4 @@
 
 #SBATCH -c 4
 
-python local_example.py -d MonitorMultiCore
+python local_example.py -d MultiCore

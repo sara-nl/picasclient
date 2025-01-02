@@ -91,5 +91,5 @@ if __name__ == '__main__':
     db = get_db()
     # Create the Views in database
     createViews(db)
-    createViews(db, design_doc_name='MonitorSingleCore', logic_appendix=' && doc.cores == 1')
-    createViews(db, design_doc_name='MonitorMultiCore', logic_appendix=' && doc.cores == 4')
+    createViews(db, design_doc_name='SingleCore', logic_appendix=' && doc.cores == 1')
+    createViews(db, design_doc_name='MultiCore', logic_appendix=' && doc.cores == 4')

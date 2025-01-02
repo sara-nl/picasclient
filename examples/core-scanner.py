@@ -12,8 +12,8 @@ picaslogger.propagate = False
 
 client = CouchDB(url=picasconfig.PICAS_HOST_URL, db=picasconfig.PICAS_DATABASE, username=picasconfig.PICAS_USERNAME, password=picasconfig.PICAS_PASSWORD)
 
-design_doc_1c = "MonitorSingleCore"
-design_doc_4c = "MonitorMultiCore"
+design_doc_1c = "SingleCore"
+design_doc_4c = "MultiCore"
 work_1c_avail = client.is_view_nonempty("todo", design_doc=design_doc_1c)
 work_4c_avail = client.is_view_nonempty("todo", design_doc=design_doc_4c)
 
