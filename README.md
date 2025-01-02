@@ -338,6 +338,57 @@ self.iterator = EndlessViewIterator(self.iterator)
 </details>
 
 
+### Autopiloting
+
+
+This example shows how to automatically start a picas client (or pilot) to process tokens from the database.
+While this example explicitly shows the case of two types of tokens, that is single-core and multi-core work, you can adjust the code to:
+ - Run for a single view, such as your default tokens.
+ - Add more than the 2 views, to process as many types of tokens as you want (where type could also be GPU, high-memory, or other properties of a job).
+ - Add properties to the tokens in your "pushTokens" code, such as 
+    - "gpu: 1" and start a GPU-based job
+    - "time: 72:00:00" and then start a job with a 3-day walltime
+    - "cores: 8" and start a high-memory job
+
+This can be achieved by adjusting:
+ 1. The view code to create all the necessary views
+ 2. The scanner code to scan these views and submit the necessary jobs
+ 3. The job scripts (.sh) that end up in slurm / your scheduler
+ 4. The pilot jobs that scan the views containing the work
+ 5. Finally, The tokens need to be available in your database
+
+#### Running the autopilot
+
+In this example, two types of tokens are to be executed: single-core tokens and multi-core (4 cores) tokens. It is written for a slurm cluster, so the user may have to adjust the code if they want to run it elsewhere.
+And like the examples in the root exmample folder, a running CouchDB instance is needed.
+To run this example, do:
+
+```
+source setup.sh
+python createViews.py
+```
+
+to add the picasconfig to your `PYTHONPATH` and to create the views needed in your CouchDB instance. Next, run 
+
+```
+python pushAutoPilotExampleTokens.py
+```
+
+to push the relevant tokens. Next you can start scanning for work with:
+
+```
+python core-scanner.py
+```
+
+And this process will start the picas clients needed to process your tokens. The process will see single-core tokens and multi-core tokens and start two jobs on the cluster:
+one job with 1 core, and one job with 4 cores, to process the different kinds of work that require differing resources.
+
+#### Running autopilot on a schedule
+
+To run the scanner on a schedule, one can start it using (in slurm) scrontab, as described in https://doc.spider.surfsara.nl/en/latest/Pages/workflows.html#recurring-jobs and https://slurm.schedmd.com/scrontab.html or other automation tools.
+
+
+
 # PiCaS overview
 
 Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. 
