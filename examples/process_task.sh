@@ -28,6 +28,9 @@ if [[ "$?" != "0" ]]; then
     exit 1
 fi
 
+#Copy output to the remote storage, e.g.
+#globus-url-copy file:///${PWD}/${OUTPUT} gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lsgrid/homer/${OUTPUT}
+
 echo `date`
 
 exit 0
