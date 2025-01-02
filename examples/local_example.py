@@ -11,6 +11,7 @@ description:
     Attach the logs to the token
 '''
 
+import argparse
 import logging
 import os
 import time
@@ -78,14 +79,28 @@ class ExampleActor(RunActor):
             pass
 
 
+def arg_parser():
+    """
+    Arguments parser for optional values of the example
+    returns: argparse object
+    """
+    parser = argparse.ArgumentParser(description="Arguments used in the different classes in the example.")
+    parser.add_argument("-d", "--design_doc", default="Monitor", type=str, help="Select the designdoc used by the actor class")
+    parser.add_argument("-V", "--view", default="todo", type=str, help="Select the view used by the actor class")
+    parser.add_argument("-v", "--verbose", action="store_true", type=bool, help="Set verbose") # add v for optional verbosity in the future
+    return parser.parse_args()
+
+
 def main():
+    # parse user arguments
+    args = arg_parser()
     # setup connection to db
     client = CouchDB(url=picasconfig.PICAS_HOST_URL, db=picasconfig.PICAS_DATABASE, username=picasconfig.PICAS_USERNAME, password=picasconfig.PICAS_PASSWORD)
     print("Connected to the database %s sucessfully. Now starting work..." %(picasconfig.PICAS_DATABASE))
     # Create token modifier
     modifier = BasicTokenModifier()
     # Create actor
-    actor = ExampleActor(client, modifier)
+    actor = ExampleActor(client, modifier, view=args.view, design_doc=args.design_doc)
     # Start work!
     actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
 
