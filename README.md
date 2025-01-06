@@ -340,6 +340,8 @@ self.iterator = EndlessViewIterator(self.iterator)
 <details closed>
 <summary>Autopiloting</summary>
 
+### Automatically start your client
+
 This example shows how to automatically start a picas client (or pilot) to process tokens from the database.
 While this example explicitly shows the case of two types of tokens, that is single-core and multi-core work, you can adjust the code to:
  - Run for a single view, such as your default tokens.
