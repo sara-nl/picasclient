@@ -2,4 +2,4 @@
 
 #SBATCH -c 4
 
-python local_example.py -d MultiCore
+python local_example.py --design_doc MultiCore
