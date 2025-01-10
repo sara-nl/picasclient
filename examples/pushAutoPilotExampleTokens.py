@@ -12,8 +12,7 @@ import sys
 import os
 import couchdb
 import random
-
-from examples import picasconfig
+import picasconfig
 
 def getNextIndex():
     db = get_db()
