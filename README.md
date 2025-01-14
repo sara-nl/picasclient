@@ -360,28 +360,51 @@ This can be achieved by adjusting:
 
 ### Running the autopilot
 
-In this example, two types of tokens are to be executed: single-core tokens and multi-core (4 cores) tokens. It is written for a slurm cluster, so the user may have to adjust the code if they want to run it elsewhere.
-And like the examples in the root exmample folder, a running CouchDB instance is needed.
-To run this example, create the views, but uncomment the two extra views at the bottom. Then execute:
+In this example, two types of tokens are to be executed: single-core tokens and multi-core (4 cores) tokens. It is written for a slurm cluster, so the user may have to adjust the code if they want to run it elsewhere. Like the examples in the example folder, a running CouchDB instance is needed.
+
+To run this example, first the design documents for specific resources have to be created. This is explained next, and then the execution of the autopiloting code is shown. 
+
+#### Creating custom made design documents
+
+To select tokens based on some property in the body of the token, we want to create design documents with views that can do so.
+This is already present in the `createViews.py` script. Open the script and _uncomment_ the two extra views at the bottom. Then execute:
 
 ```
 python createViews.py
 ```
 
-Next, run:
+This will create two extra design documents with the same views (todo, error, done, etc.) but with the extra logic added to check for the property `doc.cores`. The documents are called `SingleCore` and `MultiCore`: one for tokens that will use 1 CPU core, and one for tokens that need 4 CPU cores (the number 4 is arbitrary).
+The property in the token can be any property you want, in this case we couple it to the number of cores the job needs. The value is set to what the job requires and is when it will be run this property is used.
+
+In the database, these design docs and their views are present and can be used. To push some tokens with the `cores` propery to the database, run:
 
 ```
 python pushAutoPilotExampleTokens.py
 ```
 
-to push the relevant tokens. Next you can start scanning for work with:
+If you inspect the `pushAutoPilotExampleTokens.py` script, you will see that the `cores` property is added, and set to either 1 or 4 in this case.
+Now we want to select the tokens that have a specific number of cores, and start a picas pilot with these cores, to execute the token body.
+
+#### Running picas with different design documents and views.
+
+To start scanning the different design documents, for example, to execute the work with different numbers of cores, run:
 
 ```
 python core-scanner.py
 ```
+which will default to view `SingleCore` that was created above and filters on a core count of 1. To run this with multiple cores and a different design document do:
+```
+python core_scanner.py --cores 4 --design_doc MultiCore
+```
 
-And this process will start the picas clients needed to process your tokens. The process will see single-core tokens and multi-core tokens and start two jobs on the cluster:
-one job with 1 core, and one job with 4 cores, to process the different kinds of work that require differing resources.
+For completeness, if you want to explicitly use the default values, you could execute:
+```
+python core_scanner.py --cores 1 --design_doc SingleCore
+```
+
+And this process will start the picas clients needed to process your tokens. The process will check for either single-core tokens and multi-core tokens and start the jobs on the cluster: either for a job with 1 core, or a job with 4 cores, to process the different kinds of work that require differing resources. The number of cores is passed through `core_scanner.py` to sbatch.
+
+This example can be adjusted to use any user defined design document and type of job on a cluster you need. Using different number of cores, GPUs, or other resources can now be done with specified jobs tailor made for each resource.
 
 ### Running autopilot on a schedule
 
