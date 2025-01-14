@@ -337,6 +337,83 @@ self.iterator = EndlessViewIterator(self.iterator)
 
 </details>
 
+<details closed>
+<summary>Autopiloting</summary>
+
+### Automatically start your client
+
+This example shows how to automatically start a picas client (or pilot) to process tokens from the database.
+While this example explicitly shows the case of two types of tokens, that is single-core and multi-core work, you can adjust the code to:
+ - Run for a single view, such as your default tokens.
+ - Add more than the 2 views, to process as many types of tokens as you want (where type could also be GPU, high-memory, or other properties of a job).
+ - Add properties to the tokens in your "pushTokens" code, such as 
+    - "gpu: 1" and start a GPU-based job
+    - "time: 72:00:00" and then start a job with a 3-day walltime
+    - "cores: 8" and start a high-memory job
+
+This can be achieved by adjusting:
+ 1. The view code to create all the necessary views
+ 2. The scanner code to scan these views and submit the necessary jobs
+ 3. The job scripts (.sh) that end up in slurm / your scheduler
+ 4. The pilot jobs that scan the views containing the work
+ 5. Finally, The tokens need to be available in your database
+
+### Running the autopilot
+
+In this example, two types of tokens are to be executed: single-core tokens and multi-core (4 cores) tokens. It is written for a slurm cluster, so the user may have to adjust the code if they want to run it elsewhere. Like the examples in the example folder, a running CouchDB instance is needed.
+
+To run this example, first the design documents for specific resources have to be created. This is explained next, and then the execution of the autopiloting code is shown. 
+
+#### Creating custom made design documents
+
+To select tokens based on some property in the body of the token, we want to create design documents with views that can do so.
+This is already present in the `createViews.py` script. Open the script and _uncomment_ the two extra views at the bottom. Then execute:
+
+```
+python createViews.py
+```
+
+This will create two extra design documents with the same views (todo, error, done, etc.) but with the extra logic added to check for the property `doc.cores`. The documents are called `SingleCore` and `MultiCore`: one for tokens that will use 1 CPU core, and one for tokens that need 4 CPU cores (the number 4 is arbitrary).
+The property in the token can be any property you want, in this case we couple it to the number of cores given to the job in slurm. The value should be set to what the job requires and then will be used at execution time.
+
+In the database, these design docs and their views are present and can be used. To push some tokens with the `cores` propery to the database, run:
+
+```
+python pushAutoPilotExampleTokens.py
+```
+
+If you inspect the `pushAutoPilotExampleTokens.py` script, you will see that the `cores` property is added, and set to either 1 or 4 for this example.
+Now we want to select the tokens that have a specific number of cores, and start a picas pilot with these cores, to execute the token body.
+
+#### Running picas with different design documents and views.
+
+To start scanning the different design documents, for example, to execute the work with different numbers of cores, run:
+
+```
+python core-scanner.py
+```
+
+which will default to view `SingleCore` that was created above and filters on a core count of 1. This is equivalent to running explicitly:
+
+```
+python core_scanner.py --cores 1 --design_doc SingleCore
+```
+
+To run this with multiple cores and a different design document do:
+
+```
+python core_scanner.py --cores 4 --design_doc MultiCore
+```
+
+And now your process will start the picas clients needed to evaluate your tokens. The process will check for either single-core tokens and multi-core tokens and start the jobs on the cluster: either for a job with 1 core, or a job with 4 cores, to process the different kinds of work that require differing resources. The number of cores is passed through `core_scanner.py` to sbatch.
+
+This example can be adjusted to use any user defined design document and type of job on a cluster you need. Using different number of cores, GPUs, or other resources can now be done with specified jobs tailor made for each resource.
+
+### Running autopilot on a schedule
+
+To run the scanner on a schedule, one can start it using (in slurm) scrontab, as described in https://doc.spider.surfsara.nl/en/latest/Pages/workflows.html#recurring-jobs and https://slurm.schedmd.com/scrontab.html or other automation tools.
+
+</details>
 
 # PiCaS overview
 
