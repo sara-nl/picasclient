@@ -374,7 +374,7 @@ python createViews.py
 ```
 
 This will create two extra design documents with the same views (todo, error, done, etc.) but with the extra logic added to check for the property `doc.cores`. The documents are called `SingleCore` and `MultiCore`: one for tokens that will use 1 CPU core, and one for tokens that need 4 CPU cores (the number 4 is arbitrary).
-The property in the token can be any property you want, in this case we couple it to the number of cores the job needs. The value is set to what the job requires and is when it will be run this property is used.
+The property in the token can be any property you want, in this case we couple it to the number of cores given to the job in slurm. The value should be set to what the job requires and then will be used at execution time.
 
 In the database, these design docs and their views are present and can be used. To push some tokens with the `cores` propery to the database, run:
 
@@ -382,7 +382,7 @@ In the database, these design docs and their views are present and can be used. 
 python pushAutoPilotExampleTokens.py
 ```
 
-If you inspect the `pushAutoPilotExampleTokens.py` script, you will see that the `cores` property is added, and set to either 1 or 4 in this case.
+If you inspect the `pushAutoPilotExampleTokens.py` script, you will see that the `cores` property is added, and set to either 1 or 4 for this example.
 Now we want to select the tokens that have a specific number of cores, and start a picas pilot with these cores, to execute the token body.
 
 #### Running picas with different design documents and views.
@@ -392,17 +392,20 @@ To start scanning the different design documents, for example, to execute the wo
 ```
 python core-scanner.py
 ```
-which will default to view `SingleCore` that was created above and filters on a core count of 1. To run this with multiple cores and a different design document do:
-```
-python core_scanner.py --cores 4 --design_doc MultiCore
-```
 
-For completeness, if you want to explicitly use the default values, you could execute:
+which will default to view `SingleCore` that was created above and filters on a core count of 1. This is equivalent to running explicitly:
+
 ```
 python core_scanner.py --cores 1 --design_doc SingleCore
 ```
 
-And this process will start the picas clients needed to process your tokens. The process will check for either single-core tokens and multi-core tokens and start the jobs on the cluster: either for a job with 1 core, or a job with 4 cores, to process the different kinds of work that require differing resources. The number of cores is passed through `core_scanner.py` to sbatch.
+To run this with multiple cores and a different design document do:
+
+```
+python core_scanner.py --cores 4 --design_doc MultiCore
+```
+
+And now your process will start the picas clients needed to evaluate your tokens. The process will check for either single-core tokens and multi-core tokens and start the jobs on the cluster: either for a job with 1 core, or a job with 4 cores, to process the different kinds of work that require differing resources. The number of cores is passed through `core_scanner.py` to sbatch.
 
 This example can be adjusted to use any user defined design document and type of job on a cluster you need. Using different number of cores, GPUs, or other resources can now be done with specified jobs tailor made for each resource.
 
