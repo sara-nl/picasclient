@@ -24,9 +24,23 @@ from picas.executers import execute
 from picas.iterators import TaskViewIterator
 from picas.iterators import EndlessViewIterator
 from picas.modifiers import BasicTokenModifier
-from picas.util import Timer, arg_parser
+from picas.util import Timer
+
 
 log = logging.getLogger(__name__)
+
+
+def arg_parser():
+    """
+    Arguments parser for optional values of the example
+    returns: argparse object
+    """
+    parser = argparse.ArgumentParser(description="Arguments used in the different classes in the example.")
+    parser.add_argument("--design_doc", default="Monitor", type=str, help="Select the designdoc used by the actor class")
+    parser.add_argument("--view", default="todo", type=str, help="Select the view used by the actor class")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Set verbose")
+    return parser
+
 
 class ExampleActor(RunActor):
     """
