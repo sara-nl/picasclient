@@ -236,17 +236,17 @@ class CouchDB:
         """
         # To ensure proper logging when design_doc is not passed into is_view_nonempty,
         # the variable is created as the default used in self.view. Otherwise the f-string below breaks on default input.
-        design_doc = view_params.setdefault('design_doc', "Monitor") 
+        design_doc = view_params.setdefault('design_doc', "Monitor")
         try:
             doc = self.get_single_from_view(view, **view_params)
             task = Task(doc)
             picaslogger.debug(doc)
-            picaslogger.debug(task['input'])
+            picaslogger.debug(task['_id'])
             picaslogger.info(f"View {view} under design document {design_doc} is non-empty.")
             return True
         except IndexError as e:
             picaslogger.info(f"View {view} under design document {design_doc} is empty: {e}")
             return False
-        except ResourceNotFound as e:
+        except ResourceNotFound:
             picaslogger.info(f"Non-existing view and design document passed: {view} in {design_doc}")
             return False

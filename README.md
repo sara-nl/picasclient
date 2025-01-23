@@ -390,7 +390,7 @@ Now we want to select the tokens that have a specific number of cores, and start
 To start scanning the different design documents, for example, to execute the work with different numbers of cores, run:
 
 ```
-python core-scanner.py
+python core_scanner.py
 ```
 
 which will default to view `SingleCore` that was created above and filters on a core count of 1. This is equivalent to running explicitly:
