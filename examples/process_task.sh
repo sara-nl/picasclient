@@ -23,6 +23,7 @@ echo $OUTPUT
 
 #Start processing
 bash -c "$INPUT"
+#bin/fractals -o $OUTPUT $INPUT
 if [[ "$?" != "0" ]]; then
     echo "Program interrupted. Exit now..."
     exit 1

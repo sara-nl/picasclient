@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --array=0-5
-
+#SBATCH --export=DESIGN_DOC=Monitor,VIEW=todo
 
 #@helpdesk: SURF helpdesk <helpdesk@surf.nl>
 #
@@ -18,4 +18,5 @@
 # You may set environmental variables needed in the SLURM job
 # For example, when using the LUMI container wrapper:
 # export PATH="/path/to/install_dir/bin:$PATH"
-python local_example.py
+
+python local_example.py --design_doc $DESIGN_DOC --view $VIEW

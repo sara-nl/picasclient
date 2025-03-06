@@ -10,6 +10,7 @@ description: create the following Views in [picas_db_name]:
     overview_total View : sum tokens per View (Map/Reduce)
 '''
 
+import sys
 import couchdb
 from couchdb.design import ViewDefinition
 import picasconfig
@@ -90,7 +91,11 @@ if __name__ == '__main__':
     # Create a connection to the server
     db = get_db()
     # Create the Views in database
-    createViews(db)
+    if len(sys.argv)==1:
+        createViews(db)
+    elif sys.argv[1]=="autopilot":
     # Create the Views for the autopilot example
-    #createViews(db, design_doc_name='SingleCore', logic_appendix=' && doc.cores == 1')
-    #createViews(db, design_doc_name='MultiCore', logic_appendix=' && doc.cores == 4')
+        createViews(db, design_doc_name='SingleCore', logic_appendix=' && doc.cores == 1')
+        createViews(db, design_doc_name='MultiCore', logic_appendix=' && doc.cores == 4')
+    else:
+        exit('Unknown example. Can only create extra views for example "autopilot".')

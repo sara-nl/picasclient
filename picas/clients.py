@@ -250,3 +250,13 @@ class CouchDB:
         except ResourceNotFound:
             picaslogger.info(f"Non-existing view and design document passed: {view} in {design_doc}")
             return False
+
+
+    def doc_count(self):
+        """
+        Count number of documents in database
+
+        :return: int
+        """        
+        return self.db.info()['doc_count']
+
