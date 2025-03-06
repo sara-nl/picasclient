@@ -43,7 +43,7 @@ client = CouchDB(url=picasconfig.PICAS_HOST_URL, db=picasconfig.PICAS_DATABASE, 
 work_avail = client.is_view_nonempty(args.view, design_doc=args.design_doc)
 if work_avail:
     picaslogger.info(f"Starting a picas clients checking view {args.view} in design document {args.design_doc}")
-    command = ["sbatch", f"--cpus-per-task={args.cores}", f"--export=VIEW={args.view},DESIGN_DOC={args.design_doc}", "slurm_example.sh"]
+    command = ["sbatch", f"--cpus-per-task={args.cores}", f"--export=ALL,VIEW={args.view},DESIGN_DOC={args.design_doc}", "slurm_example.sh"]
     execute(command)
 else:
     picaslogger.info(f"Not starting a picas client, there is nothing to do in view {args.view} and for the design document {args.design_doc}.")

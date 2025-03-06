@@ -59,7 +59,7 @@ To run the examples, you need a PiCaS account and access to a database (DB) on t
 <summary>Connect to the PiCaS server</summary>
 <br>
 
-To connect to the PiCaS server, fill `examples/picasconfig.py` with the information needed to log in to your PiCaS account and the database you want to use for storing the work tokens. Specifically, the information needed are:
+To connect to the PiCaS server, create a file `examples/picasconfig.py` with the information needed to log in to your PiCaS account and the database you want to use for storing the work tokens. A template can be found in `examples/picasconfig_example.py`. Specifically, the information needed are:
   
 ```
 PICAS_HOST_URL="https://picas.surfsara.nl:6984"

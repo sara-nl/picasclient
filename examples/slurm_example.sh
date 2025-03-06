@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --array=0-5
-#SBATCH --export=DESIGN_DOC=Monitor,VIEW=todo
+#SBATCH --export=ALL,DESIGN_DOC=Monitor,VIEW=todo
 
 #@helpdesk: SURF helpdesk <helpdesk@surf.nl>
 #

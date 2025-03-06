@@ -54,7 +54,7 @@ if __name__ == '__main__':
         tokens = createTokens(fields)
     elif example == "autopilot":
         # create tokens with number of cores specified
-        fields = {"ncores": [ 1, 1, 4]}
+        fields = {"cores": [ 1, 1, 4]}
         tokens = createTokens(fields)
         for token in tokens:
             token.input = "echo $SLURM_CPUS_PER_TASK"
