@@ -28,4 +28,4 @@ pip-log.txt
 .mr.developer.cfg
 
 # PiCaS DB information
-scripts/picasconfig.py
+examples/picasconfig.py
