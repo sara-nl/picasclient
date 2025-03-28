@@ -59,7 +59,7 @@ To run the examples, you need a PiCaS account and access to a database (DB) on t
 <summary>Connect to the PiCaS server</summary>
 <br>
 
-To connect to the PiCaS server, fill `examples/picasconfig.py` with the information needed to log in to your PiCaS account and the database you want to use for storing the work tokens. Specifically, the information needed are:
+To connect to the PiCaS server, create a file `examples/picasconfig.py` with the information needed to log in to your PiCaS account and the database you want to use for storing the work tokens. A template can be found in `examples/picasconfig_example.py`. Specifically, the information needed are:
   
 ```
 PICAS_HOST_URL="https://picas.surfsara.nl:6984"
@@ -104,7 +104,7 @@ This example creates fast-running jobs that write a message to standard output.
 The file `quickExample.txt` contains three lines with commands to be executed. You can generate three job tokens in the PiCaS DB by running: 
 
 ```
-python pushTokens.py quickExample.txt
+python pushTokens.py quick
 ```
 
 Check the DB; you should see the tokens in the view `Monitor/todo`. 
@@ -118,7 +118,7 @@ Check the DB; you should see the tokens in the view `Monitor/todo`.
 To run the example locally (e.g. on your laptop):
 
 ```
-python local-example.py
+python local_example.py
 ```
 
 If all goes well, you should see output like:
@@ -222,15 +222,9 @@ To get an idea on more realistic, longer running jobs there is also a "fractals"
 To add the fractals job tokens to your DB, run:
 
 ```
-./createTokens
->>> /tmp/tmp.abc123
+python pushTokens.py fractals
 ```
-This will generate an outputfile, in this case called `/tmp/tmp.abc123`. Pass the outputfile to the `pushTokens.py` code:
-
-```
-python pushTokens.py /tmp/tmp.abc123
-```
-Now the tokens are available in the database. 
+This will execute `./createTokens` and create a temporary outputfile that is then used to generate tokens in the database. 
 </details>
 
 
@@ -367,10 +361,10 @@ To run this example, first the design documents for specific resources have to b
 #### Creating custom made design documents
 
 To select tokens based on some property in the body of the token, we want to create design documents with views that can do so.
-This is already present in the `createViews.py` script. Open the script and _uncomment_ the two extra views at the bottom. Then execute:
+This is already present in the `createViews.py` script. Run the script again with:
 
 ```
-python createViews.py
+python createViews.py autopilot
 ```
 
 This will create two extra design documents with the same views (todo, error, done, etc.) but with the extra logic added to check for the property `doc.cores`. The documents are called `SingleCore` and `MultiCore`: one for tokens that will use 1 CPU core, and one for tokens that need 4 CPU cores (the number 4 is arbitrary).
@@ -379,10 +373,10 @@ The property in the token can be any property you want, in this case we couple i
 In the database, these design docs and their views are present and can be used. To push some tokens with the `cores` propery to the database, run:
 
 ```
-python pushAutoPilotExampleTokens.py
+python pushTokens.py autopilot
 ```
 
-If you inspect the `pushAutoPilotExampleTokens.py` script, you will see that the `cores` property is added, and set to either 1 or 4 for this example.
+If you inspect the `pushTokens.py` script, you will see that the `cores` property is added, and set to either 1 or 4 for this example.
 Now we want to select the tokens that have a specific number of cores, and start a picas pilot with these cores, to execute the token body.
 
 #### Running picas with different design documents and views.
@@ -390,19 +384,19 @@ Now we want to select the tokens that have a specific number of cores, and start
 To start scanning the different design documents, for example, to execute the work with different numbers of cores, run:
 
 ```
-python core_scanner.py
+python run_autopilot.py
 ```
 
 which will default to view `SingleCore` that was created above and filters on a core count of 1. This is equivalent to running explicitly:
 
 ```
-python core_scanner.py --cores 1 --design_doc SingleCore
+python run_autopilot.py --cores 1 --design_doc SingleCore
 ```
 
 To run this with multiple cores and a different design document do:
 
 ```
-python core_scanner.py --cores 4 --design_doc MultiCore
+python run_autopilot.py --cores 4 --design_doc MultiCore
 ```
 
 And now your process will start the picas clients needed to evaluate your tokens. The process will check for either single-core tokens and multi-core tokens and start the jobs on the cluster: either for a job with 1 core, or a job with 4 cores, to process the different kinds of work that require differing resources. The number of cores is passed through `core_scanner.py` to sbatch.
@@ -420,6 +414,6 @@ To run the scanner on a schedule, one can start it using (in slurm) scrontab, as
 Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. 
 * The scripts `slurm-example.sh` and `grid-example.jdl` are for scheduling jobs on a SLURM cluster and the Grid, respectively. 
 * For the Grid, there is an extra script `startpilot.sh` needed to start the job on the Grid Computing Environment.
-* Finally, a job is run with `local-example.py` in the same way when tokens are processed locally.
+* Finally, a job is run with `local_example.py` in the same way when tokens are processed locally.
 
 ![picas layers](./docs/picas-layers.png)

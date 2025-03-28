@@ -22,7 +22,10 @@ echo $TOKENID
 echo $OUTPUT
 
 #Start processing
+# Use this command for the short example
 bash -c "$INPUT"
+# Use this command for the fractals example
+#bin/fractals -o $OUTPUT $INPUT
 if [[ "$?" != "0" ]]; then
     echo "Program interrupted. Exit now..."
     exit 1
