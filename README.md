@@ -104,7 +104,7 @@ This example creates fast-running jobs that write a message to standard output.
 The file `quickExample.txt` contains three lines with commands to be executed. You can generate three job tokens in the PiCaS DB by running: 
 
 ```
-python pushTokens.py quickExample.txt
+python pushTokens.py quick
 ```
 
 Check the DB; you should see the tokens in the view `Monitor/todo`. 
