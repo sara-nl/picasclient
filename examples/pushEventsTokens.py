@@ -1,13 +1,14 @@
 '''
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
-usage: python pushEventsTokens.py
+usage: python pushEventsTokens.py --folder <dCache_directory> --tokenfile <tokenfile> [--event <write/stage>] [--api <dCache_api>]
 description:
    Connects to PiCaS server
    Creates token when file is written to a dCache folder or staged (brought online)
    Loads the tokens
 '''
 
+import argparse
 import couchdb
 import picasconfig
 from subprocess import Popen, PIPE, CalledProcessError
@@ -44,17 +45,36 @@ def get_db():
     db = server[picasconfig.PICAS_DATABASE]
     return db
 
+def arg_parser():
+    """
+    Arguments parser for optional values of the example
+    returns: argparse object
+    """
+    parser = argparse.ArgumentParser(description="Subscribe to changes in a given dCache directory and create tokens when a new files are added or staged.")
+    parser.add_argument("--folder", required=True, type=str, help="dCache directory to track")
+    parser.add_argument("--tokenfile", required=True, type=str, help="Name of tokenfile containing macaroon")
+    parser.add_argument("--event", default="write", type=str, help="Type of event to track, write or stage?")
+    parser.add_argument("--api", default="https://dcacheview.grid.surfsara.nl:22880/api/v1", type=str, help="dCache api endpoint")
+
+    return parser
+
+
 if __name__ == '__main__':
     #Create a connection to the server
     db = get_db()
 
+    # parse user arguments
+    args = arg_parser().parse_args()
+
+    # Get configurations from commandline arguments:
     # dCache folder to follow:
-    folder = "/pnfs/grid.sara.nl/data/users/hailih/tape/100filesx2GB"
+    folder = args.folder
     # tokenfile with macaroon for accessing dCache
-    ada_tokenfile = "tokenfile_prod.conf"
-    api = "https://dcacheview.grid.surfsara.nl:22880/api/v1"
+    ada_tokenfile = args.tokenfile
+    # dCache API endpoint
+    api = args.api 
     # Choose which events you want to to follow: "write" or "stage"
-    event = "stage" # or choose "write"
+    event = args.event
 
     if event == "write":
         channel_name = "test_" + event    # channel_name = "test_write"
@@ -91,9 +111,10 @@ if __name__ == '__main__':
                         filename = column[2]
                         # create token with filename
                         loadTokens(db, filename)
-
             for line in p.stderr:
                 print(line, end='')
+    else:
+        exit('Unknown option for event. Options are "write" or "stage".')
 
     if p.returncode != 0:
         raise CalledProcessError(p.returncode, p.args)

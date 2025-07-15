@@ -409,6 +409,60 @@ To run the scanner on a schedule, one can start it using (in slurm) scrontab, as
 
 </details>
 
+<details closed>
+<summary>dCache event handler</summary>
+
+### Prerequisites
+In this advanced example, we will subscribe to changes in a given dCache directory and track when a new file is added or staged. i.e. brought online from tape to disk. We can then create tokens when a file becomes available for processing. In order to run this example, you need to have accesss to dCache. First, create a macaroon for dCache authentication according to these [instructions](https://doc.spider.surfsara.nl/en/latest/Pages/storage/ada-interface.html#create-a-macaroon). In the following, it is assumed that your tokenfile is named `tokenfile.conf`.
+
+### Create a token when a file is written to dCache
+With the following command, a channel named "test_write" is created that will register write events to the specified directory `/pnfs/grid.sara.nl/data/users/username/testdir` on dCache. Then, if a write event occurs, a token is created in the "todo" view in the PiCaS database.
+
+```
+python pushEventsTokens.py --folder /pnfs/grid.sara.nl/data/users/username/disk/testdir --tokenfile tokenfile.conf --event write --api https://dcacheview.grid.surfsara.nl:22880/api/v1
+```
+
+You can test this by transferring a local testfile to dCache with:
+```
+rclone -P copyto --config=tokenfile.conf ${PWD}/testfile tokenfile:/pnfs/grid.sara.nl/data/users/username/disk/testdir/testfile
+```
+
+Check the DB; you should see a new token in the view `Monitor/todo`. 
+
+### Create a token when a file is staged on dCache
+
+With the following command, a channel named "test_stage is created that will register staging events in the specified directory `/pnfs/grid.sara.nl/data/users/username/testdir` on dCache. Then, if a staging event occurs - i.e. a file is brough online - a token is created in the "todo" view in the PiCaS database.
+
+```
+python pushEventsTokens.py --folder /pnfs/grid.sara.nl/data/users/username/tape/testdir --tokenfile tokenfile.conf --event stage --api https://dcacheview.grid.surfsara.nl:22880/api/v1
+```
+You can only test this, when you have a file on dCache that has status "NEARLINE", i.e. is only available on tape and not disk. Check this with:
+
+```
+ada --tokenfile tokenfile.conf --longlist /pnfs/grid.sara.nl/data/users/hailih/tape/testfile --api https://dcacheview.grid.surfsara.nl:22880/api/v1
+```
+
+If so, then you can stage this file with:
+
+```
+ada --tokenfile tokenfile.conf --stage /pnfs/grid.sara.nl/data/users/hailih/tape/testfile  --api https://dcacheview.grid.surfsara.nl:22880/api/v1
+```
+
+It can take a while for the file to come online. When it does, check the DB; you should see a new token in the view `Monitor/todo`. 
+
+
+### Clean up channels
+
+After you stopped the above commands, the channels will still exist because you have the option to resume listening to channels. If you want to clean up, you need to delete the channels with
+```
+ada --tokenfile tokenfile.conf --delete-channel test_write --api https://dcacheview.grid.surfsara.nl:22880/api/v1
+ada --tokenfile tokenfile.conf --delete-channel test_stage --api https://dcacheview.grid.surfsara.nl:22880/api/v
+```
+
+
+</details>
+
+
 # PiCaS overview
 
 Below is an overview of the layers in PiCaS and how they relate to the code in the `examples` folder. 
