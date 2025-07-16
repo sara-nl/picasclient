@@ -53,7 +53,7 @@ def arg_parser():
     parser = argparse.ArgumentParser(description="Subscribe to changes in a given dCache directory and create tokens when a new files are added or staged.")
     parser.add_argument("--folder", required=True, type=str, help="dCache directory to track")
     parser.add_argument("--tokenfile", required=True, type=str, help="Name of tokenfile containing macaroon")
-    parser.add_argument("--event", default="write", type=str, help="Type of event to track, write or stage?")
+    parser.add_argument("--event", required=True, type=str, help="Type of event to track, write or stage?")
     parser.add_argument("--api", default="https://dcacheview.grid.surfsara.nl:22880/api/v1", type=str, help="dCache api endpoint")
 
     return parser
