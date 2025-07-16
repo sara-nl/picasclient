@@ -1,17 +1,20 @@
 '''
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
-usage: python pushEventsTokens.py --folder <dCache_directory> --tokenfile <tokenfile> [--event <write/stage>] [--api <dCache_api>]
+usage: python pushEventsTokens.py --dir <dCache_directory> --tokenfile <tokenfile> --event <write/stage> [--api <dCache_api>]
 description:
    Connects to PiCaS server
-   Creates token when file is written to a dCache folder or staged (brought online)
+   Create a channel to listen to events on dCache
+   Creates token when file is written to a dCache directory or staged (brought online)
    Loads the tokens
 '''
+
 
 import argparse
 import couchdb
 import picasconfig
 from subprocess import Popen, PIPE, CalledProcessError
+
 
 def getNextIndex():
     db = get_db()
@@ -51,7 +54,7 @@ def arg_parser():
     returns: argparse object
     """
     parser = argparse.ArgumentParser(description="Subscribe to changes in a given dCache directory and create tokens when a new files are added or staged.")
-    parser.add_argument("--folder", required=True, type=str, help="dCache directory to track")
+    parser.add_argument("--dir", required=True, type=str, help="dCache directory to track")
     parser.add_argument("--tokenfile", required=True, type=str, help="Name of tokenfile containing macaroon")
     parser.add_argument("--event", required=True, type=str, help="Type of event to track, write or stage?")
     parser.add_argument("--api", default="https://dcacheview.grid.surfsara.nl:22880/api/v1", type=str, help="dCache api endpoint")
@@ -67,8 +70,8 @@ if __name__ == '__main__':
     args = arg_parser().parse_args()
 
     # Get configurations from commandline arguments:
-    # dCache folder to follow:
-    folder = args.folder
+    # dCache directory to follow:
+    dir = args.dir
     # tokenfile with macaroon for accessing dCache
     ada_tokenfile = args.tokenfile
     # dCache API endpoint
@@ -78,7 +81,7 @@ if __name__ == '__main__':
 
     if event == "write":
         channel_name = "test_" + event    # channel_name = "test_write"
-        command = ["ada", "--tokenfile", ada_tokenfile, "--events", channel_name, folder, "--api", api, "--resume", "--force"]
+        command = ["ada", "--tokenfile", ada_tokenfile, "--events", channel_name, dir, "--api", api, "--resume", "--force"]
         with Popen(command, stdout=PIPE, stderr=PIPE, bufsize=1, universal_newlines=True) as p:
             for line in p.stdout:
                 print(line, end='')
@@ -92,7 +95,7 @@ if __name__ == '__main__':
                 print(line, end='')
     elif event == "stage":
         channel_name = "test_" + event    #channel_name = "test_staged"
-        command = ["ada", "--tokenfile", ada_tokenfile, "--report-staged", channel_name, folder, "--api", api, "--resume", "--force"]
+        command = ["ada", "--tokenfile", ada_tokenfile, "--report-staged", channel_name, dir, "--api", api, "--resume", "--force"]
         file_change = 0
         filename = ""
         with Popen(command, stdout=PIPE, stderr=PIPE, bufsize=1, universal_newlines=True) as p:
