@@ -1,0 +1,27 @@
+#!/bin/bash
+#SBATCH --array=0-5
+#SBATCH -t 00:30:00
+#SBATCH -p rome
+
+#how to use this example:
+#1.clone the Picasclient github
+#git clone https://github.com/sara-nl/picasclient.git
+#cd picasclient
+#2.install packages
+#pip install picas
+#3.create examples/picasconfig.py using template picasconfig_example.py
+#4.submit pilot job
+#sbatch snellius-example.sh
+#ALERT: The minimal allocation on Snellius is 16 cores.
+
+
+## adding software modules load for Snellius
+module load 2024
+module load Python/3.12.3-GCCcore-13.3.0
+pip install --user picas
+
+
+# You may set environmental variables needed in the SLURM job
+# For example, when using the LUMI container wrapper:
+# export PATH="/path/to/install_dir/bin:$PATH"
+python local_example.py
