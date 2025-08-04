@@ -48,7 +48,7 @@ class ExampleActor(RunActor):
     def __init__(self, db, modifier, view="todo", **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
-        # self.iterator = EndlessViewIterator(self.iterator)    
+        # self.iterator = EndlessViewIterator(self.iterator)
         self.modifier = modifier
         self.client = db
 
@@ -94,13 +94,21 @@ class ExampleActor(RunActor):
 def main():
     # parse user arguments
     args = arg_parser().parse_args()
+
     # setup connection to db
-    client = CouchDB(url=picasconfig.PICAS_HOST_URL, db=picasconfig.PICAS_DATABASE, username=picasconfig.PICAS_USERNAME, password=picasconfig.PICAS_PASSWORD)
+    client = CouchDB(
+        url=picasconfig.PICAS_HOST_URL,
+        db=picasconfig.PICAS_DATABASE,
+        username=picasconfig.PICAS_USERNAME,
+        password=picasconfig.PICAS_PASSWORD)
     print("Connected to the database %s sucessfully. Now starting work..." %(picasconfig.PICAS_DATABASE))
+
     # Create token modifier
     modifier = BasicTokenModifier()
+
     # Create actor
     actor = ExampleActor(client, modifier, view=args.view, design_doc=args.design_doc)
+
     # Start work!
     actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
 

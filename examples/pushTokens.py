@@ -1,3 +1,4 @@
+# .. todo Mher:: add a proper argument parser
 '''
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
@@ -37,17 +38,21 @@ if __name__ == '__main__':
     else:
         exit('Please give example as commandline argument. Options are "quick", "fractals, or "autopilot".')
 
-    #Create a connection to the server
-    db = CouchDB(url=picasconfig.PICAS_HOST_URL, db=picasconfig.PICAS_DATABASE, username=picasconfig.PICAS_USERNAME, password=picasconfig.PICAS_PASSWORD)
+    # Create a connection to the server
+    db = CouchDB(
+        url=picasconfig.PICAS_HOST_URL,
+        db=picasconfig.PICAS_DATABASE,
+        username=picasconfig.PICAS_USERNAME,
+        password=picasconfig.PICAS_PASSWORD)
 
     # Create tokens
-    if example=="quick":
+    if example == "quick":
         # create tokens with inputs given in file
         tokensfile = "quickExample.txt"
         with open(tokensfile) as f:
             fields = {"input": f.read().splitlines()}
         tokens = createTokens(fields)
-    elif example=="fractals":
+    elif example == "fractals":
         tokensfile = subprocess.check_output("./createTokens", text=True).rstrip('\n')
         with open(tokensfile) as f:
             fields = {"input": f.read().splitlines()}
@@ -61,5 +66,5 @@ if __name__ == '__main__':
     else:
         exit('Unknown example. Options are "quick", "fractals, or "autopilot".')
 
-    #Save tokens in database
+    # Save tokens in database
     db.save_documents(tokens)
