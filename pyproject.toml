@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.10"
 couchdb = "^1.2"
 stopit = "^1.1.2"
-setuptools = "^66"
+setuptools = "^6.0.2"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.3"
