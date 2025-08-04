@@ -1,5 +1,5 @@
 # .. todo:: import some of the content from the pyproject.toml file
-project = 'picasclient
+project = 'picasclient'
 
 project_no_spaces = project.replace(' ', '')
 version = '1.1.0.dev0'  # import from the toml file
