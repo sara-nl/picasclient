@@ -66,6 +66,18 @@ def parse_args() -> argparse.ArgumentParser:
     # end define the sub-parser for initializing the picas configuration
     #
 
+    #
+    # define the sub-parser for changing the picas couch db password
+    #
+    parser_passwd = subparsers.add_parser(
+        'passwd',
+        help='Change the picas couch db password',
+    )
+    parser_passwd.set_defaults(func=change_picas_password)
+
+    #
+    # end define the sub-parser for changing the picas couch db password
+    #
 
     return parser
 
@@ -75,6 +87,14 @@ def initialize_picas_configuration(parsed_args, *args, **kwargs):
     Function that initializes the picas configuration
     """
     print('Initializing picas configuration...')
+
+
+def change_picas_password(parsed_args, *args, **kwargs):
+    """
+    Function that changes the picas couch db password
+    """
+    print('Changing picas couch db password...')
+
 
 def main():
 
