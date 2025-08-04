@@ -2,6 +2,8 @@ import sys
 import argparse
 from argparse import RawTextHelpFormatter
 
+from picas.picas_config import PicasConfig
+
 
 def parse_args() -> argparse.ArgumentParser:
     """
@@ -48,6 +50,14 @@ def parse_args() -> argparse.ArgumentParser:
     )
 
     parser_init.add_argument(
+        '--database',
+        type=str,
+        default='mypicasdb',
+        help='Name of the CouchDB database to use',
+        dest='database'
+    )
+
+    parser_init.add_argument(
         '--username',
         type=str,
         default=None,
@@ -62,6 +72,7 @@ def parse_args() -> argparse.ArgumentParser:
         help='Password for CouchDB, if it is not set it will be prompted',
         dest='password'
     )
+
     #
     # end define the sub-parser for initializing the picas configuration
     #
@@ -87,6 +98,7 @@ def initialize_picas_configuration(parsed_args, *args, **kwargs):
     Function that initializes the picas configuration
     """
     print('Initializing picas configuration...')
+    picas_config = PicasConfig()
 
 
 def change_picas_password(parsed_args, *args, **kwargs):
