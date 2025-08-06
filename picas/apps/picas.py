@@ -4,6 +4,7 @@ from argparse import RawTextHelpFormatter
 
 from ..picas_config import PicasConfig
 
+# .. todo:: use the picas logger instead of print statements
 
 def parse_args() -> argparse.ArgumentParser:
     """
@@ -119,7 +120,7 @@ def change_picas_password(parsed_args, *args, **kwargs):
     """
     Function that changes the picas couch db password
     """
-    print('Changing picas couch db password...')
+    print('changing picas couch db password...')
 
 
 def main():
