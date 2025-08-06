@@ -2,6 +2,16 @@ import os
 import yaml
 from jsonschema import validate, ValidationError
 
+
+class PicasConfigSchemaError(Exception):
+    """
+    Exception raised for schema validation errors in the PicasConfig.
+    """
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+
 PICAS_CONFIG_SCHEMA = {
     'type': 'object',
     'properties': {
@@ -63,7 +73,7 @@ class PicasConfig:
             validate(instance=self.config, schema=PICAS_CONFIG_SCHEMA)
             print("Configuration validation passed.")
         except ValidationError as exc:
-            raise ValueError(f"Configuration validation failed: {exc.message}")
+            raise PicasConfigSchemaError(f"Configuration validation failed: {exc.message}")
 
     def save_config(self, args):
         """
