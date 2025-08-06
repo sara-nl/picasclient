@@ -1,6 +1,8 @@
 import os
 import yaml
 import getpass
+import requests
+import json
 from jsonschema import validate, ValidationError
 
 from .crypto import generate_and_save_key, encrypt_password, decrypt_password
@@ -149,17 +151,17 @@ class PicasConfig:
             yaml.safe_dump(self.config, fobj, default_flow_style=False)
 
     def change_couchdb_password(self,
-                                uri,
-                                username,
-                                old_password,
-                                new_password):
+                                uri: str,
+                                username: str,
+                                old_password: str,
+                                new_password: str) -> None:
         """
         Change the CouchDB password on the server.
 
         The procedure is described in the Picas documentation.
         https://doc.grid.surfsara.nl/en/latest/Pages/Practices/picas/picas_change_password.html
 
-        That is equivelent to the following curl commands:
+        That is equivalent to the following curl commands:
 
         ```bash
 
@@ -174,8 +176,59 @@ class PicasConfig:
                 -H "Content-Type: application/json" \
                 -H "If-Match:$(</dev/stdin)" -d '{"name":"'$username'", "roles":[], "type":"user", "password":"'$newpassword'"}'
         ```
+
+        :param uri: The URI of the CouchDB server.
+        :param username: The username for the CouchDB account.
+        :param old_password: The current password for the CouchDB account.
+        :param new_password: The new password to set for the CouchDB account.
+        :raises ValueError: If the password change fails.
         """
-        pass
+        # convert bytes to string if needed
+        if isinstance(old_password, bytes):
+            old_password = old_password.decode('utf-8')
+        if isinstance(new_password, bytes):
+            new_password = new_password.decode('utf-8')
+
+        # get the current user document to retrieve _rev
+        user_doc_url = f"{uri}/_users/org.couchdb.user:{username}"
+        try:
+            # retrieve the user document and the revision
+            response = requests.get(user_doc_url, auth=(username, old_password), headers={'Accept': 'application/json'})
+            response.raise_for_status()
+
+            user_doc = response.json()
+            rev = user_doc.get('_rev')
+        except requests.exceptions.RequestException as exc:
+            raise ValueError(f"Failed to retrieve user document from CouchDB server: {exc}")
+
+        if not rev:
+            raise ValueError("Could not retrieve revision from user document")
+
+        # use the new password to update the user document using a put request
+        new_user_doc = {
+            "name": username,
+            "roles": [],
+            "type": "user",
+            "password": new_password
+        }
+
+        try:
+            response = requests.put(
+                user_doc_url,
+                auth=(username, old_password),
+                headers={
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'If-Match': rev
+                },
+                data=json.dumps(new_user_doc)
+            )
+            response.raise_for_status()
+        except requests.exceptions.RequestException as exc:
+            raise ValueError(f"Failed to change password on CouchDB server: {exc}")
+
+        print("Password changed successfully on CouchDB server")
+
 
     def change_password(self, args):
         """
