@@ -2,7 +2,7 @@ import sys
 import argparse
 from argparse import RawTextHelpFormatter
 
-from picas.picas_config import PicasConfig
+from ..picas_config import PicasConfig
 
 
 def parse_args() -> argparse.ArgumentParser:
@@ -97,8 +97,22 @@ def initialize_picas_configuration(parsed_args, *args, **kwargs):
     """
     Function that initializes the picas configuration
     """
-    print('Initializing picas configuration...')
-    picas_config = PicasConfig()
+    print('initialize the picas configuration...')
+    picas_config = PicasConfig(
+        config_path=parsed_args.config_path,
+        load=False)
+
+    # try to load the configuration, if the file does not exist then it is ok
+    try:
+        picas_config.load_config()
+    except FileNotFoundError:
+        print('Configuration file not found, creating a new one...')
+    except Exception as exc:
+        print(f"Error loading configuration: {exc}")
+        sys.exit(1)
+
+    # save the configuration
+    picas_config.save_config(parsed_args)
 
 
 def change_picas_password(parsed_args, *args, **kwargs):
