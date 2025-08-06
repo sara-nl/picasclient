@@ -59,11 +59,11 @@ class PicasConfig:
         """
         Load the configuration yaml file from the specified path and validate against schema.
         """
-        print(f"Loading configuration from {self.config_path}")
+        print(f"load the configuration from {self.config_path}")
         expanded_path = os.path.expanduser(self.config_path)
 
         if not os.path.exists(expanded_path):
-            raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
+            raise FileNotFoundError(f"configuration file not found: {self.config_path}")
 
         with open(expanded_path, 'r') as fobj:
             self.config = yaml.safe_load(fobj)
@@ -71,13 +71,13 @@ class PicasConfig:
         # validate configuration against schema
         try:
             validate(instance=self.config, schema=PICAS_CONFIG_SCHEMA)
-            print("Configuration validation passed.")
+            print("configuration validation passed.")
         except ValidationError as exc:
-            raise PicasConfigSchemaError(f"Configuration validation failed: {exc.message}")
+            raise PicasConfigSchemaError(f"configuration validation failed: {exc.message}")
 
     def save_config(self, args):
         """
         Save the current configuration to the specified path.
         """
         # Implementation to save the configuration file
-        print(f"Saving configuration to {self.config_path}")
+        print(f"save the configuration to {self.config_path}")
