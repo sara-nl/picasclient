@@ -27,6 +27,6 @@ test:
 	@pytest tests
 
 clean:
-	@rm -fvr \#* *~ *.exe out build
+	@rm -fvr \#* *~ *.exe out build *.egg* dist
 	@rm -fvr examples/*.out examples/*.err
 	@find . -name __pycache__ -exec rm -fvr '{}' \;
