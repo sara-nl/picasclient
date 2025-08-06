@@ -11,22 +11,22 @@ all:
 	echo hello world
 
 build:
-	@echo "Building picasclient..."
+	@echo "building picasclient..."
 	@python setup.py build
 
 install:
-	@echo "Installing picasclient..."
+	@echo "installing picasclient..."
 	@pip install -e .
 
 uninstall:
-	@echo "Uninstalling picasclient..."
+	@echo "uninstalling picasclient..."
 	@pip uninstall -y picasclient
 
 test:
-	@echo "Running tests..."
+	@echo "running tests..."
 	@pytest tests
 
 clean:
-	rm -fvr \#* *~ *.exe out build
-	rm -fvr examples/*.out examples/*.err
-	find . -name __pycache__ -exec rm -fvr '{}' \;
+	@rm -fvr \#* *~ *.exe out build
+	@rm -fvr examples/*.out examples/*.err
+	@find . -name __pycache__ -exec rm -fvr '{}' \;
