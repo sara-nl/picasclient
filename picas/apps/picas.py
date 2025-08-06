@@ -23,6 +23,14 @@ def parse_args() -> argparse.ArgumentParser:
         formatter_class=RawTextHelpFormatter
     )
 
+    parser.add_argument(
+        '--config',
+        type=str,
+        default='~/.config/picas/conf.yml',
+        help='Path to the picas configuration file',
+        dest='config_path'
+    )
+
     subparsers = parser.add_subparsers(help='these are the supported verbs/actions')
 
     #
@@ -33,14 +41,6 @@ def parse_args() -> argparse.ArgumentParser:
         help='Initialize the picas configuration',
     )
     parser_init.set_defaults(func=initialize_picas_configuration)
-
-    parser_init.add_argument(
-        '--config',
-        type=str,
-        default='~/.config/picas/conf.yml',
-        help='Path to the picas configuration file',
-        dest='config_path'
-    )
 
     parser_init.add_argument(
         '--host-url',
@@ -87,6 +87,13 @@ def parse_args() -> argparse.ArgumentParser:
     )
     parser_passwd.set_defaults(func=change_picas_password)
 
+    parser_passwd.add_argument(
+        '--new-password',
+        type=str,
+        default=None,
+        help='New password for CouchDB, if it is not set it will be prompted',
+        dest='new_password'
+    )
     #
     # end define the sub-parser for changing the picas couch db password
     #
@@ -103,16 +110,6 @@ def initialize_picas_configuration(parsed_args, *args, **kwargs):
         config_path=parsed_args.config_path,
         load=False)
 
-    # try to load the configuration, if the file does not exist then it is ok
-    try:
-        picas_config.load_config()
-    except FileNotFoundError:
-        print('Configuration file not found, creating a new one...')
-    except Exception as exc:
-        print(f"Error loading configuration: {exc}")
-        sys.exit(1)
-
-    # save the configuration
     picas_config.save_config(parsed_args)
 
 
@@ -122,6 +119,8 @@ def change_picas_password(parsed_args, *args, **kwargs):
     """
     print('changing picas couch db password...')
 
+    picas_config = PicasConfig(config_path=parsed_args.config_path)
+    picas_config.change_password(parsed_args)
 
 def main():
 

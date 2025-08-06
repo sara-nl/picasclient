@@ -126,17 +126,55 @@ class PicasConfig:
         #    msg = "The decrypted password does not match the original password."
         #    raise ValueError(msg)
 
-        print(f"save the configuration to {self.config_path}")
-        expanded_path = os.path.expanduser(self.config_path)
+        self.write_config(self.config)
+
+    def write_config(self, config):
+        """
+        Write the provided configuration to the specified path.
+        """
+        print(f"write the configuration to {self.config_path}")
+        self.config = config
+
+        config_path = os.path.expanduser(self.config_path)
 
         # make the config directory if it does not exist
-        config_dir = os.path.dirname(expanded_path)
+        config_dir = os.path.dirname(config_path)
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
 
+
         self.validate_config()
 
-        # write the configuration to the file
-        config_path = expanded_path
         with open(config_path, 'w') as fobj:
             yaml.safe_dump(self.config, fobj, default_flow_style=False)
+
+    def change_password(self, args):
+        """
+        Change the CouchDB password in the configuration.
+        """
+        # if the password is not set, it will be prompted, do not echo it
+        if args.new_password is None:
+            new_password = getpass.getpass(
+                f"enter the CouchDB password for the account "
+                f"'{self.config['username']}' and database '{self.config['database']}': ")
+        else:
+            new_password = args.new_password
+
+        # convert the password to bytes
+        if isinstance(new_password, str):
+            new_password = new_password.encode('utf-8')
+
+        if 'encrypted_password' not in self.config:
+            raise ValueError("No encrypted password found in the configuration.")
+
+        # encrypt the new password
+        encrypted_new_password = encrypt_password(new_password).decode()
+
+        # show the old and new un-encrypted passwords
+        old_password = decrypt_password(self.config['encrypted_password'])
+        print(f"old password: {old_password.decode('utf-8')}")
+        print(f"new password: {new_password.decode('utf-8')}")
+
+        # save the updated configuration
+        self.config['encrypted_password'] = encrypted_new_password
+        self.write_config(self.config)
