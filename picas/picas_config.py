@@ -3,6 +3,8 @@ import yaml
 import getpass
 from jsonschema import validate, ValidationError
 
+from .crypto import generate_and_save_key, encrypt_password, decrypt_password
+
 
 class PicasConfigSchemaError(Exception):
     """
@@ -31,13 +33,13 @@ PICAS_CONFIG_SCHEMA = {
             'default': None,
             'description': 'Username for CouchDB'
         },
-        'password': {
+        'encrypted_password': {
             'type': 'string',
             'default': None,
-            'description': 'Password for CouchDB, if it is not set it will be prompted'
+            'description': 'Encrypted password for CouchDB, if it is not set it will be prompted'
         }
     },
-    'required': ['host_url', 'database', 'username', 'password'],
+    'required': ['host_url', 'database', 'username', 'encrypted_password'],
     'additionalProperties': False
 }
 
@@ -65,9 +67,9 @@ class PicasConfig:
         """
         try:
             validate(instance=config or self.config, schema=PICAS_CONFIG_SCHEMA)
-            print("Configuration validation passed.")
+            print("configuration validation passed.")
         except ValidationError as exc:
-            raise PicasConfigSchemaError(f"Configuration validation failed: {exc.message}")
+            raise PicasConfigSchemaError(f"configuration validation failed: {exc.message}")
 
     def load_config(self):
         """
@@ -84,24 +86,47 @@ class PicasConfig:
 
         self.validate_config()
 
+    def enrypt_password(self, password):
+        """
+        Encrypt the password using a simple reversible method (for demonstration purposes).
+        In production, use a secure encryption method.
+        """
+        return password[::-1]
+
     def save_config(self, args):
         """
         Save the current configuration to the specified path.
         """
-        print(f"save the configuration to {self.config_path}")
 
         self.config['host_url'] = args.host_url
         self.config['database'] = args.database
         self.config['username'] = args.username
 
+        # setup / check the encryption key
+        generate_and_save_key()
+
         # if the password is not set, it will be prompted, do not echo it
         if args.password is None:
-            args.password = getpass.getpass(
+            password = getpass.getpass(
                 f"enter the CouchDB password for the account "
                 f"'{args.username}' and database '{args.database}': ")
-        self.config['password'] = args.password
+        else:
+            password = args.password
+        # convert the password to bytes
+        if isinstance(password, str):
+            password = password.encode('utf-8')
 
+        # encrypt the password
+        self.config['encrypted_password'] = encrypt_password(password).decode()
 
+        # test decrypting the password and check if it matches the original
+        #_decrypted_password = decrypt_password(self.config['encrypted_password'])
+        #if _decrypted_password != password:
+        #    breakpoint()
+        #    msg = "The decrypted password does not match the original password."
+        #    raise ValueError(msg)
+
+        print(f"save the configuration to {self.config_path}")
         expanded_path = os.path.expanduser(self.config_path)
 
         # make the config directory if it does not exist
