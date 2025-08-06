@@ -148,6 +148,35 @@ class PicasConfig:
         with open(config_path, 'w') as fobj:
             yaml.safe_dump(self.config, fobj, default_flow_style=False)
 
+    def change_couchdb_password(self,
+                                uri,
+                                username,
+                                old_password,
+                                new_password):
+        """
+        Change the CouchDB password on the server.
+
+        The procedure is described in the Picas documentation.
+        https://doc.grid.surfsara.nl/en/latest/Pages/Practices/picas/picas_change_password.html
+
+        That is equivelent to the following curl commands:
+
+        ```bash
+
+        uri=https://picas.surfsara.nl:6984
+        username=USERNAME
+        password=PASSWORD
+        newpassword=NEWPASSWORD
+        curl --silent --user "$username:$password" -X GET $uri/_users/org.couchdb.user:$username | \
+            jq '._rev' |  \
+            curl --user "$username:$password" -X PUT $uri/_users/org.couchdb.user:$username \
+                -H "Accept: application/json" \
+                -H "Content-Type: application/json" \
+                -H "If-Match:$(</dev/stdin)" -d '{"name":"'$username'", "roles":[], "type":"user", "password":"'$newpassword'"}'
+        ```
+        """
+        pass
+
     def change_password(self, args):
         """
         Change the CouchDB password in the configuration.
@@ -172,8 +201,16 @@ class PicasConfig:
 
         # show the old and new un-encrypted passwords
         old_password = decrypt_password(self.config['encrypted_password'])
-        print(f"old password: {old_password.decode('utf-8')}")
-        print(f"new password: {new_password.decode('utf-8')}")
+        # DEBUG
+        #print(f"old password: {old_password.decode('utf-8')}")
+        #print(f"new password: {new_password.decode('utf-8')}")
+
+        self.change_couchdb_password(
+            uri=self.config['host_url'],
+            username=self.config['username'],
+            old_password=old_password,
+            new_password=new_password
+        )
 
         # save the updated configuration
         self.config['encrypted_password'] = encrypted_new_password
