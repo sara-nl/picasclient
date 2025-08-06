@@ -1,5 +1,6 @@
 import os
 import yaml
+from jsonschema import validate, ValidationError
 
 PICAS_CONFIG_SCHEMA = {
     'type': 'object',
@@ -31,7 +32,7 @@ PICAS_CONFIG_SCHEMA = {
 
 class PicasConfig:
     """
-    Class to handle the configuration for Picas.
+    Handle the configuration for Picas.
     """
     def __init__(self, config_path=None) -> None:
         """
@@ -46,14 +47,23 @@ class PicasConfig:
 
     def load_config(self):
         """
-        Load the configuration yaml file from the specified path.
+        Load the configuration yaml file from the specified path and validate against schema.
         """
         print(f"Loading configuration from {self.config_path}")
-        if not os.path.exists(self.config_path):
+        expanded_path = os.path.expanduser(self.config_path)
+
+        if not os.path.exists(expanded_path):
             raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
-        else:
-            with open(os.path.expanduser(self.config_path), 'r') as fobj:
-                self.config = yaml.safe_load(fobj)
+
+        with open(expanded_path, 'r') as fobj:
+            self.config = yaml.safe_load(fobj)
+
+        # validate configuration against schema
+        try:
+            validate(instance=self.config, schema=PICAS_CONFIG_SCHEMA)
+            print("Configuration validation passed.")
+        except ValidationError as exc:
+            raise ValueError(f"Configuration validation failed: {exc.message}")
 
     def save_config(self, args):
         """
