@@ -5,7 +5,7 @@ from jsonschema import validate, ValidationError
 
 from .crypto import generate_and_save_key, encrypt_password, decrypt_password
 
-
+# .. todo:: use the picas logger instead of print statements
 class PicasConfigSchemaError(Exception):
     """
     Exception raised for schema validation errors in the PicasConfig.
