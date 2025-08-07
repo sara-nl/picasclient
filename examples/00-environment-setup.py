@@ -42,11 +42,14 @@
 ! git status
 ! ls
 
+# %% [markdown]
 ### Create the virtual environment
 # %%
 ! mkdir .venv
 ! python3 -m venv .venv/picas-tutorial
 
+# %% [markdown]
+### Install the dependencies
 # %%
 ! .venv/picas-tutorial/bin/python3 -m pip install --upgrade pip
 ! .venv/picas-tutorial/bin/python3 -m pip install poetry

@@ -29,6 +29,7 @@ test:
 tutorial:
 	@echo "running tutorial..."
 	@cd examples && jupytext --to ipynb 00-environment-setup.py --output 00-environment-setup.ipynb
+	@cd examples && jupytext --to ipynb 01-database-setup.py --output 01-database-setup.ipynb
 
 clean:
 	@rm -fvr \#* *~ *.exe out build *.egg* dist
