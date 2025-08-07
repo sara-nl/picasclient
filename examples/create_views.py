@@ -16,9 +16,9 @@ from couchdb.design import ViewDefinition
 import picasconfig
 
 
-def getViewCode(s):
+def getViewCode(s: str) -> str:
     # double { } are needed for formatting
-    generalViewCode='''
+    generalViewCode = '''
 function(doc) {{
    if(doc.type == "token") {{
     if({0}) {{
@@ -29,8 +29,17 @@ function(doc) {{
 '''
     return generalViewCode.format(s)
 
-def createViews(db, design_doc_name = 'Monitor', logic_appendix = ''):
+
+def createViews(db: couchdb.Database,
+                design_doc_name: str = 'Monitor',
+                logic_appendix: str = '') -> None:
     """
+    Create the Views in the Picas database.
+
+    :param db: The Picas database connection.
+    :param design_doc_name: The name of the design document to create.
+    :param logic_appendix: Additional logic to append to the view conditions.
+    :raises ValueError: If the design document already exists.
     """
     # todo View
     todoCondition = 'doc.lock == 0 && doc.done == 0'
@@ -57,7 +66,7 @@ def createViews(db, design_doc_name = 'Monitor', logic_appendix = ''):
     error_view.sync(db)
 
     # overview_total View -- lists all views and the number of tokens in each view
-    overviewMapCode=f'''
+    overviewMapCode = f'''
 function(doc) {{
    if(doc.type == "token") {{
        if ({todoCondition}){{
@@ -75,7 +84,7 @@ function(doc) {{
    }}
 }}
 '''
-    overviewReduceCode='''
+    overviewReduceCode = '''
 function (key, values, rereduce) {
    return sum(values);
 }
@@ -84,7 +93,7 @@ function (key, values, rereduce) {
     overview_total_view.sync(db)
 
 
-def get_db():
+def get_db() -> couchdb.Database:
     """
     Get the Picas database connection from the picasconfig module.
     """
@@ -107,7 +116,7 @@ if __name__ == '__main__':
         createViews(db)
     elif sys.argv[1] == "autopilot":
         # Create the Views for the autopilot example
-        createViews(db, design_doc_name = 'SingleCore', logic_appendix = ' && doc.cores == 1')
-        createViews(db, design_doc_name = 'MultiCore', logic_appendix = ' && doc.cores == 4')
+        createViews(db, design_doc_name='SingleCore', logic_appendix=' && doc.cores == 1')
+        createViews(db, design_doc_name='MultiCore', logic_appendix=' && doc.cores == 4')
     else:
         exit('Unknown example. Can only create extra views for example "autopilot".')
