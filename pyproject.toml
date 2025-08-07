@@ -12,6 +12,7 @@ couchdb = "^1.2"
 stopit = "^1.1.2"
 setuptools = "^80"
 jsonschema = "^4.19.0"
+ipykernel = "^6.24.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.3"
