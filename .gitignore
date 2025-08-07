@@ -33,3 +33,5 @@ examples/picasconfig.py
 # output and error files
 *.out
 *.err
+.venv
+venv
