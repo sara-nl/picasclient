@@ -26,6 +26,10 @@ test:
 	@echo "running tests..."
 	@pytest tests
 
+tutorial:
+	@echo "running tutorial..."
+	@cd examples && jupytext --to ipynb 00-environment-setup.py --output 00-environment-setup.ipynb
+
 clean:
 	@rm -fvr \#* *~ *.exe out build *.egg* dist
 	@rm -fvr examples/*.out examples/*.err
