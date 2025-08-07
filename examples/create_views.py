@@ -10,7 +10,7 @@ description: create the following Views in [picas_db_name]:
     overview_total View : sum tokens per View (Map/Reduce)
 """
 
-import sys
+import argparse
 import couchdb
 from couchdb.design import ViewDefinition
 import picasconfig
@@ -106,15 +106,35 @@ def get_db() -> couchdb.Database:
     return db
 
 
+def parse_args() -> argparse.Namespace:
+    """
+    Parse command line arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Create CouchDB views in Picas database",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+
+    parser.add_argument(
+        'example',
+        nargs='?',
+        choices=['autopilot'],
+        help='Optional example type to create specific views for'
+    )
+
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
+    args = parse_args()
 
     # Create a connection to the server
     db = get_db()
 
     # Create the Views in database
-    if len(sys.argv) == 1:
+    if args.example is None:
         createViews(db)
-    elif sys.argv[1] == "autopilot":
+    elif args.example == "autopilot":
         # Create the Views for the autopilot example
         createViews(db, design_doc_name='SingleCore', logic_appendix=' && doc.cores == 1')
         createViews(db, design_doc_name='MultiCore', logic_appendix=' && doc.cores == 4')
