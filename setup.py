@@ -23,8 +23,5 @@ setup(
         'console_scripts': [
             'picas=picas.apps.picas:main',
         ],
-    },
-#    cmdclass={
-#        'install': InstallCommand,
-#    }
+    }
 )
