@@ -2,7 +2,7 @@ import os
 import sys
 import pathlib
 import shutil
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.install import install
 
 setup_cwd = pathlib.Path(__file__).parent.resolve()
@@ -17,13 +17,8 @@ setup(
     author=metadata.authors,
     author_email=metadata.emails,
     url=metadata.url,
-    packages=[
-        'picas',
-        'picas.apps',
-    ],
-    package_dir={
-        'picas': 'picas'
-    },
+    packages=find_packages(where='.', include=['picas', 'picas.*']),
+    package_dir={'picas': 'picas'},
     entry_points={
         'console_scripts': [
             'picas=picas.apps.picas:main',
