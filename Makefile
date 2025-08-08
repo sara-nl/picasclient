@@ -11,16 +11,22 @@ all:
 	echo hello world
 
 build:
-	@echo "building picasclient..."
+	@echo "building picas..."
 	@python setup.py build
 
-install:
-	@echo "installing picasclient..."
-	@pip install -e .
+clean-build:
+	@echo "cleaning build artifacts..."
+	@rm -rf picas.egg-info picasclient.egg-info build dist
+	@python -m pip uninstall -y picas || true
+
+install: | build clean-build
+	@echo "installing picasclient (editable)..."
+	@rm -rf picas.egg-info
+	@python -m pip install -e .
 
 uninstall:
 	@echo "uninstalling picasclient..."
-	@pip uninstall -y picasclient
+	@python -m pip uninstall -y picas || true
 
 test:
 	@echo "running tests..."
@@ -31,7 +37,7 @@ tutorial:
 	@cd examples && jupytext --to ipynb 00-environment-setup.py --output 00-environment-setup.ipynb
 	@cd examples && jupytext --to ipynb 01-database-setup.py --output 01-database-setup.ipynb
 
-clean:
+clean: clean-build
 	@rm -fvr \#* *~ *.exe out build *.egg* dist
 	@rm -fvr examples/*.out examples/*.err
 	@find . -name __pycache__ -exec rm -fvr '{}' \;

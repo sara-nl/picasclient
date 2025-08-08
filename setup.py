@@ -3,12 +3,10 @@ import sys
 import pathlib
 import shutil
 from setuptools import setup, find_packages
-from setuptools.command.install import install
 
 setup_cwd = pathlib.Path(__file__).parent.resolve()
 sys.path.insert(0, os.path.join(setup_cwd, '.'))
 from picas import metadata
-import picas
 
 setup(
     name=metadata.package,
@@ -21,7 +19,7 @@ setup(
     package_dir={'picas': 'picas'},
     entry_points={
         'console_scripts': [
-            'picas=picas.apps.picas:main',
+            'picas-cli=picas.apps.picas:main'
         ],
     }
 )

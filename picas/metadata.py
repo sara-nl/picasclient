@@ -1,6 +1,6 @@
 # .. todo:: import some of the content from the pyproject.toml file
-project = 'picasclient'
-package = 'picasclient'
+project = 'picas'
+package = 'picasclient'  # keep in sync with setup.py name
 description = "Python client using CouchDB as a token pool server."  # import from the toml file
 project_no_spaces = project.replace(' ', '')
 version = '1.1.0.dev0'  # import from the toml file
