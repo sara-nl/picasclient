@@ -22,7 +22,7 @@ clean-build:
 install: | build clean-build
 	@echo "installing picasclient (editable)..."
 	@rm -rf picas.egg-info
-	@python -m pip install -e .
+	@python -m pip install .
 
 uninstall:
 	@echo "uninstalling picasclient..."
