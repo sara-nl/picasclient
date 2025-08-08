@@ -19,10 +19,16 @@ clean-build:
 	@rm -rf picas.egg-info picasclient.egg-info build dist
 	@python -m pip uninstall -y picas || true
 
-install: | build clean-build
-	@echo "installing picasclient (editable)..."
-	@rm -rf picas.egg-info
-	@python -m pip install .
+install: clean-build
+	@echo "installing picasclient..."
+	@python -m pip install -v --force-reinstall --no-deps .
+	@echo "Checking installed files..."
+	@python -m pip show -f picas | grep -E "(Location|Files|Entry)" || true
+	@echo "Checking for picas-cli executable..."
+	@which picas-cli || echo "picas-cli not found in PATH"
+	@ls -la $${VIRTUAL_ENV}/bin/picas* 2>/dev/null || echo "No picas scripts found in venv/bin"
+	@echo "Python path check:"
+	@python -c "import picas.apps.picas_cli; print('Module found:', picas.apps.picas_cli.__file__)"
 
 uninstall:
 	@echo "uninstalling picasclient..."

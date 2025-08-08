@@ -21,6 +21,9 @@ flake8 = "^7.1.1"
 [tool.poetry.group.test]
 optional = true
 
+[tool.poetry.scripts]
+picas-cli = "picas.apps.picas_cli:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
