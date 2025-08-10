@@ -71,7 +71,7 @@ PICAS_PASSWORD="mypassword"
 
 # %%
 # the password can also be specified on the command line, but it is not recommended
-! picas passwd --password mynewpassword
+! picas-cli passwd --password mynewpassword
 
 # %% [markdown]
 ### Create the DB views
