@@ -1,6 +1,6 @@
 # %% [markdown]
 
-## Setting up the the environment for using Picas
+## Set up the the environment for using Picas
 
 ### references
 # - the official picas client repository: https://github.com/sara-nl/picasclient
@@ -10,7 +10,7 @@
 # - more documentation: https://doc.grid.surfsara.nl/en/latest/
 # - change the picas couchdb password: https://doc.grid.surfsara.nl/en/latest/Pages/Practices/picas/picas_change_password.html
 
-### Minimum requirements
+### Minimum requirements (for local usage on your machine)
 # It is assumed that you are running a linux like operating system where git and python3 are
 # already available. The following commands should be available in your terminal:
 # - `git`

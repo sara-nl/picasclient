@@ -42,11 +42,11 @@ PICAS_PASSWORD="mypassword"
 
 # %%
 # you will be prompted for the password
-! picas init --host-url https://picas.surfsara.nl:6984 --database mydatabase --username myusername
+! picas-cli init --host-url https://picas.surfsara.nl:6984 --database mydatabase --username myusername
 
 # %%
 # you can also specify the password on the command line, but it is not recommended
-! picas init --host-url https://picas.surfsara.nl:6984 --database mydatabase --username myusername --password mypassword
+! picas-cli init --host-url https://picas.surfsara.nl:6984 --database mydatabase --username myusername --password mypassword
 
 
 # %% [markdown]
@@ -78,4 +78,4 @@ PICAS_PASSWORD="mypassword"
 
 # %%
 %cd examples
-!python createViews.py
+!python create_views.py

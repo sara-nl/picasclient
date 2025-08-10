@@ -114,6 +114,13 @@ def parse_args() -> argparse.ArgumentParser:
         help='Path to the picas configuration file',
         dest='config_path'
     )
+    parser_dump.add_argument(
+        '-o', '--output',
+        type=str,
+        default=None,
+        help='Output file path. If not specified, prints to stdout',
+        dest='output_file'
+    )
     parser_dump.set_defaults(func=dump_picas_config)
     #
     # end define the sub-parser for dumping the picas configuration
@@ -148,6 +155,8 @@ def dump_picas_config(parsed_args, *_, **__):
     Decrypts the stored encrypted password if available.
     """
     config_path = getattr(parsed_args, 'config_path', '~/.config/picas/conf.yml')
+    output_file = getattr(parsed_args, 'output_file', None)
+
     try:
         cfg = PicasConfig(config_path=config_path, load=True)
     except FileNotFoundError as exc:
@@ -176,7 +185,19 @@ PICAS_DATABASE = {db!r}
 PICAS_USERNAME = {user!r}
 PICAS_PASSWORD = {plain_pwd!r}
 """
-    print(script.rstrip())
+
+    if output_file:
+        import os
+        output_path = os.path.expanduser(output_file)
+        try:
+            with open(output_path, 'w') as f:
+                f.write(script)
+            print(f"Configuration dumped to {output_path}")
+        except IOError as e:
+            print(f"[picas] error writing to file {output_path}: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        print(script.rstrip())
 
 def main():
 
