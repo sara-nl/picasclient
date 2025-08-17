@@ -88,13 +88,6 @@ class PicasConfig:
 
         self.validate_config()
 
-    def enrypt_password(self, password):
-        """
-        Encrypt the password using a simple reversible method (for demonstration purposes).
-        In production, use a secure encryption method.
-        """
-        return password[::-1]
-
     def save_config(self, args):
         """
         Save the current configuration to the specified path.
