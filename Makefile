@@ -43,7 +43,12 @@ tutorial:
 	@cd examples && jupytext --to ipynb 00-environment-setup.py --output 00-environment-setup.ipynb
 	@cd examples && jupytext --to ipynb 01-database-setup.py --output 01-database-setup.ipynb
 
-clean: clean-build
+clean-tutorial:
+	@echo "cleaning tutorial files..."
+	@rm -fvr examples/*.ipynb
+	@rm -fvr examples/*.out examples/*.err
+
+clean: clean-build clean-tutorial
 	@rm -fvr \#* *~ *.exe out build *.egg* dist
 	@rm -fvr examples/*.out examples/*.err
 	@find . -name __pycache__ -exec rm -fvr '{}' \;

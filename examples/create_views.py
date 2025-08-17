@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 """
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
@@ -16,9 +17,9 @@ from couchdb.design import ViewDefinition
 import picasconfig
 
 
-def getViewCode(s: str) -> str:
+def get_view_code(s: str) -> str:
     # double { } are needed for formatting
-    generalViewCode = '''
+    general_view_code = '''
 function(doc) {{
    if(doc.type == "token") {{
     if({0}) {{
@@ -27,12 +28,12 @@ function(doc) {{
   }}
 }}
 '''
-    return generalViewCode.format(s)
+    return general_view_code.format(s)
 
 
-def createViews(db: couchdb.Database,
-                design_doc_name: str = 'Monitor',
-                logic_appendix: str = '') -> None:
+def create_views(db: couchdb.Database,
+                 design_doc_name: str = 'Monitor',
+                 logic_appendix: str = '') -> None:
     """
     Create the Views in the Picas database.
 
@@ -41,55 +42,59 @@ def createViews(db: couchdb.Database,
     :param logic_appendix: Additional logic to append to the view conditions.
     :raises ValueError: If the design document already exists.
     """
-    # todo View
-    todoCondition = 'doc.lock == 0 && doc.done == 0'
-    todoCondition = todoCondition + logic_appendix
-    todo_view = ViewDefinition(design_doc_name, 'todo', getViewCode(todoCondition))
+    # todo view
+    todo_condition = 'doc.lock == 0 && doc.done == 0'
+    todo_condition = todo_condition + logic_appendix
+    todo_view = ViewDefinition(design_doc_name, 'todo', get_view_code(todo_condition))
     todo_view.sync(db)
 
-    # locked View
-    lockedCondition = 'doc.lock > 0 && doc.done == 0'
-    lockedCondition = lockedCondition + logic_appendix
-    locked_view = ViewDefinition(design_doc_name, 'locked', getViewCode(lockedCondition))
+    # locked view
+    locked_condition = 'doc.lock > 0 && doc.done == 0'
+    locked_condition = locked_condition + logic_appendix
+    locked_view = ViewDefinition(design_doc_name, 'locked', get_view_code(locked_condition))
     locked_view.sync(db)
 
-    # done View
-    doneCondition = 'doc.lock > 0 && doc.done > 0 && parseInt(doc.exit_code) == 0'
-    doneCondition = doneCondition + logic_appendix
-    done_view = ViewDefinition(design_doc_name, 'done', getViewCode(doneCondition))
+    # done view
+    done_condition = 'doc.lock > 0 && doc.done > 0 && parseInt(doc.exit_code) == 0'
+    done_condition = done_condition + logic_appendix
+    done_view = ViewDefinition(design_doc_name, 'done', get_view_code(done_condition))
     done_view.sync(db)
 
-    # error View
-    errorCondition = 'doc.lock > 0 && doc.done > 0 && parseInt(doc.exit_code) != 0'
-    errorCondition = errorCondition + logic_appendix
-    error_view = ViewDefinition(design_doc_name, 'error', getViewCode(errorCondition))
+    # error view
+    error_condition = 'doc.lock > 0 && doc.done > 0 && parseInt(doc.exit_code) != 0'
+    error_condition = error_condition + logic_appendix
+    error_view = ViewDefinition(design_doc_name, 'error', get_view_code(error_condition))
     error_view.sync(db)
 
-    # overview_total View -- lists all views and the number of tokens in each view
-    overviewMapCode = f'''
+    # overview_total view -- lists all views and the number of tokens in each view
+    overview_map_code = f'''
 function(doc) {{
    if(doc.type == "token") {{
-       if ({todoCondition}){{
+       if ({todo_condition}){{
           emit('todo', 1);
        }}
-       if({lockedCondition}) {{
+       if({locked_condition}) {{
           emit('locked', 1);
        }}
-       if({doneCondition}) {{
+       if({done_condition}) {{
           emit('done', 1);
        }}
-       if({errorCondition}) {{
+       if({error_condition}) {{
           emit('error', 1);
        }}
    }}
 }}
 '''
-    overviewReduceCode = '''
+    overview_reduce_code = '''
 function (key, values, rereduce) {
    return sum(values);
 }
 '''
-    overview_total_view = ViewDefinition(design_doc_name, 'overview_total', overviewMapCode, overviewReduceCode)
+    overview_total_view = ViewDefinition(
+        design_doc_name,
+        'overview_total',
+        overview_map_code,
+        overview_reduce_code)
     overview_total_view.sync(db)
 
 
@@ -128,15 +133,15 @@ def parse_args() -> argparse.Namespace:
 if __name__ == '__main__':
     args = parse_args()
 
-    # Create a connection to the server
+    # create a connection to the server
     db = get_db()
 
-    # Create the Views in database
+    # create the views in database
     if args.example is None:
-        createViews(db)
+        create_views(db)
     elif args.example == "autopilot":
-        # Create the Views for the autopilot example
-        createViews(db, design_doc_name='SingleCore', logic_appendix=' && doc.cores == 1')
-        createViews(db, design_doc_name='MultiCore', logic_appendix=' && doc.cores == 4')
+        # create the views for the autopilot example
+        create_views(db, design_doc_name='SingleCore', logic_appendix=' && doc.cores == 1')
+        create_views(db, design_doc_name='MultiCore', logic_appendix=' && doc.cores == 4')
     else:
         exit('Unknown example. Can only create extra views for example "autopilot".')
