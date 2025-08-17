@@ -1,0 +1,102 @@
+#docker run -it --rm \
+#  -p 127.0.0.1:5984:5984 \
+#  --name couchdb \
+#  -e COUCHDB_USER=admin \
+#  -e COUCHDB_PASSWORD=mypassword \
+#  apache/couchdb:3
+#
+## to run in persistent mode
+#    -v couchdb-data:/opt/couchdb/data \
+#    -v couchdb-config:/opt/couchdb/etc/local.d \
+#
+## check that the server is reachable and running
+#    $ curl -u admin:mypassword http://127.0.0.1:5984/
+#
+## create a new database
+#    $ curl -u admin:mypassword -X PUT http://127.0.0.1:5984/mytestdb
+#
+## create a new non-admin user
+#    # list the databases
+#    curl -u admin:mypassword -X GET http://127.0.0.1:5984/_all_dbs
+#
+#    # check that the _users database exists
+#    curl -u admin:mypassword http://127.0.0.1:5984/_users
+#
+#    # create the _users database
+#    curl -u admin:mypassword -X PUT http://127.0.0.1:5984/_users
+#
+#    # check that the _users database exists
+#    curl -u admin:mypassword http://127.0.0.1:5984/_users
+#
+#    # then create the user document in the _users database (no shell prompt characters)
+#    curl -u admin:mypassword -X PUT http://127.0.0.1:5984/_users/org.couchdb.user:myuser1 \
+#         -H "Accept: application/json" \
+#         -H "Content-Type: application/json" \
+#         -d '{"name": "myuser1", "password": "myuser1password", "roles": [], "type": "user"}'
+#
+#    # check that the _security document exists
+#    curl -u admin:mypassword http://127.0.0.1:5984/_security
+#
+#    # create the _security document if it does not exist
+#    curl -u admin:mypassword -X PUT http://127.0.0.1:5984/mytestdb/_security \
+#         -H "Content-Type: application/json" \
+#         -d '{"admins": {"names": [], "roles": []}, "members": {"names": [], "roles": []}}'
+#
+#    # check the _security document
+#    curl -u admin:mypassword http://127.0.0.1:5984/mytestdb/_security
+#
+#    # grant the user access to the database
+#    curl -u admin:mypassword -X PUT http://127.0.0.1:5984/mytestdb/_security \
+#      -H "Content-Type: application/json" \
+#      -d '{
+#        "admins": {
+#          "names": [],
+#          "roles": []
+#        },
+#        "members": {
+#          "names": ["myuser1"],
+#          "roles": []
+#        }
+#      }'
+#
+#    # check the _security document again
+#    curl -u admin:mypassword http://localhost:5984/mytestdb/_security
+#
+#    # promote the user to admin on the database, add myuser1 as db admin (and keep as member)
+#    curl -u admin:mypassword -X PUT \
+#      http://localhost:5984/mytestdb/_security \
+#      -H 'Content-Type: application/json' \
+#      --data '{
+#        "admins":{"names":["myuser1"],"roles":[]},
+#        "members":{"names":["myuser1"],"roles":[]}
+#      }'
+#
+#    # create the monitor design document
+#    curl -u myuser1:myuser1password -X PUT \
+#      http://localhost:5984/mytestdb/_design/Monitor \
+#      -H 'Content-Type: application/json' \
+#      --data '{
+#        "language":"javascript",
+#        "views":{
+#          "todo":{"map":"function (doc) { if (doc.type === \"token\" && doc.lock == 0 && doc.done == 0) { emit(doc._id, doc._id); } }"}
+#        }
+#      }'
+
+version: '3.8'
+
+services:
+  couchdb:
+    image: apache/couchdb:3
+    container_name: couchdb
+    ports:
+      - "127.0.0.1:5984:5984"
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=mypassword
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+      - couchdb-config:/opt/couchdb/etc/local.d
+
+volumes:
+  couchdb-data:
+  couchdb-config:
