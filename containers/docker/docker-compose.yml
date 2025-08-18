@@ -82,21 +82,35 @@
 #        }
 #      }'
 
-version: '3.8'
-
 services:
   couchdb:
     image: apache/couchdb:3
-    container_name: couchdb
     ports:
       - "127.0.0.1:5984:5984"
     environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=mypassword
+      - COUCHDB_USER=${COUCHDB_USER:-admin}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-mypassword}
     volumes:
       - couchdb-data:/opt/couchdb/data
       - couchdb-config:/opt/couchdb/etc/local.d
 
+  setup:
+    image: python:3.12
+    depends_on:
+      - couchdb
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER:-admin}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-mypassword}
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      "cat /etc/os-release &&
+      apt-get update -y &&
+      apt-get install -y jq &&
+      echo 'couchdb user='$${COUCHDB_USER} &&
+      echo 'Running CouchDB setup script...' &&
+      /scripts/init_couchdb_user.sh"
 volumes:
   couchdb-data:
   couchdb-config:
