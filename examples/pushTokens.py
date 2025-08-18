@@ -33,7 +33,7 @@ def createTokens(fields):
 if __name__ == '__main__':
 
     # Choose for which example you are creating tokens
-    if len(sys.argv)==2:
+    if len(sys.argv) == 2:
         example = sys.argv[1]
     else:
         exit('Please give example as commandline argument. Options are "quick", "fractals, or "autopilot".')

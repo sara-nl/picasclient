@@ -3,9 +3,9 @@
 ## Setup and connect to the Picas database
 
 ### Outline
-- Initialize the Picas configuration using the `picas exec` CLI.
-- Change the Picas CouchDB password using the `picas exec` CLI.
-- Create the DB views
+# - Initialize the Picas configuration using the `picas exec` CLI.
+# - Change the Picas CouchDB password using the `picas exec` CLI.
+# - Create the DB views
 
 ### references
 # - the main couchdb database: https://picas.surfsara.nl:6984
@@ -22,7 +22,16 @@
 # - jupyter notebook --no-browser
 
 # %%
+! mkdir ~/workspaces/surf/picas
+
+# %%
 %cd ~/workspaces/surf/picas
+
+# %%
+! git clone https://github.com/mherkazandjian/picasclient.git
+
+# %%
+! ls -l picasclient
 
 # %% [markdown]
 ## Initialize the picas configuration
@@ -31,7 +40,7 @@
 # with the variables defining the connection to the picas database.
 
 # %%
-%%writefile picas/examples/picasconfig.py
+%%writefile picasclient/examples/picasconfig.py
 PICAS_HOST_URL="https://picas.surfsara.nl:6984"
 PICAS_DATABASE="mydatabase"
 PICAS_USERNAME="myusername"

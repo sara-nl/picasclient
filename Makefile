@@ -42,6 +42,7 @@ tutorial:
 	@echo "running tutorial..."
 	@cd examples && jupytext --to ipynb 00-environment-setup.py --output 00-environment-setup.ipynb
 	@cd examples && jupytext --to ipynb 01-database-setup.py --output 01-database-setup.ipynb
+	@cd examples && jupytext --to ipynb 02-local-run.py --output 02-local-run.ipynb
 
 clean-tutorial:
 	@echo "cleaning tutorial files..."

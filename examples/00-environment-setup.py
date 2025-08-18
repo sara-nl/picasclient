@@ -18,6 +18,15 @@
 # - `pip3`
 # - `curl`
 
+# .. todo:: will the tutorial be given on spider? (yes, spider)
+#      - publish the rendered notebooks (for the time being on github but then into the picas docs)
+# .. todo:: create a module for "module load picas"
+#      - look into doing that with eb
+# .. todo:: add a section in the readme to bootstrap the environment for the tutorial or make this
+#           a gist that can be also curled | sh
+# .. todo:: explore the multi-cluster setup for picas (snellius, spider, src at the same time)
+# .. todo:: add a subcommand to validate the credential by trying to connect to the database
+#             $ picas-cli check
 
 # %% [markdown]
 ### Setup the workspace and obtain a copy of the picas client
