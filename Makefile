@@ -48,6 +48,29 @@ clean-tutorial:
 	@rm -fvr examples/*.ipynb
 	@rm -fvr examples/*.out examples/*.err
 
+docker-compose-up:
+	@echo "starting docker-compose..."
+	@docker-compose -f containers/docker/docker-compose.yml up -d
+
+docker-compose-down:
+	@echo "stopping docker-compose..."
+	@docker-compose -f containers/docker/docker-compose.yml down
+
+docker-compose-logs:
+	@echo "showing docker-compose logs..."
+	@docker-compose -f containers/docker/docker-compose.yml logs --tail=100 --follow
+
+docker-compose-restart:
+	@echo "restarting docker-compose..."
+	@docker-compose -f containers/docker/docker-compose.yml restart
+
+docker-compose-clear:
+	@echo "clearing docker-compose containers..."
+	@docker-compose -f containers/docker/docker-compose.yml down --remove-orphans
+	@docker volume prune -f
+	@docker network prune -f
+	@echo "Docker-compose containers cleared."
+
 clean: clean-build clean-tutorial
 	@rm -fvr \#* *~ *.exe out build *.egg* dist
 	@rm -fvr examples/*.out examples/*.err
