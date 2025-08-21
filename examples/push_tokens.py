@@ -2,7 +2,7 @@
 """
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
-usage: python pushTokens.py <example>
+usage: python push_tokens.py <example>
 description:
 
    - Connects to PiCaS server
@@ -16,22 +16,33 @@ import picasconfig
 from picas.clients import CouchDB
 from picas.documents import Task
 
-
-def create_tokens(fields):
+def create_tokens(fields: dict) -> list:
     """
     Create the tokens as a list of Task documents.
+
+    The fields parameter is a dictionary where keys are field names and values are
+    lists of input values. For every 'input' value a unique id is assigned and the
+    corresponding input value is used to create a token.
+
+    :param fields: A dictionary where keys are field names and values are lists of input values.
+      for example:
+        {'input': ["echo 'this is token A'", "echo 'this is token B'", "echo 'this is token C'"]}
+    :return: A list of Task documents representing the tokens. For the example above,
+      it would return a list of three Task objects with .id attributes set to
+      'token_0', 'token_1', and 'token_2' respectively and .input attributes of each set to
+      "echo 'this is token A'", "echo 'this is token B'", and "echo 'this is token C'".
     """
     tokens = []
-    i = db.doc_count()
+    n_docs = db.doc_count()
     for arg in fields:
         for line in fields[arg]:
             token = {
-                '_id': 'token_' + str(i),
+                '_id': 'token_' + str(n_docs),
                 'type': 'token',
                 arg: line,
             }
             tokens.append(Task(token))
-            i += 1
+            n_docs += 1
 
     return tokens
 
@@ -71,5 +82,5 @@ if __name__ == '__main__':
     else:
         exit('Unknown example. Options are "quick", "fractals, or "autopilot".')
 
-    # Save tokens in database
+    # save tokens in database
     db.save_documents(tokens)

@@ -31,15 +31,16 @@
 # %% [markdown]
 ### Setup the workspace and obtain a copy of the picas client
 # %%
+# .. todo:: for the final version use ~/pics_tutorial
 ! mkdir -p ~/workspaces/surf/picas
 
 # %%
 %cd ~/workspaces/surf/picas
+! ls
 
 # %% [markdown]
 ### Clone the picas client repository
 # %%
-! pwd
 ! git clone https://github.com/sara-nl/picasclient.git
 ! ls -l picasclient
 
@@ -70,3 +71,7 @@
 # %% [markdown]
 ### Run the notebook in the new virtual environment
 # exit the current notebook kernel and start a new one in the virtual environment
+
+# .. todo:: add instructions and tips on how to run the notebook / jupyterlab on snellius or spider
+#           e.g use surf's jupyterhub or run a jupyter server on spider and connect to it
+#           or OOD

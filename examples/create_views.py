@@ -17,18 +17,18 @@ from couchdb.design import ViewDefinition
 import picasconfig
 
 
-def get_view_code(s: str) -> str:
+def get_view_code(condition: str) -> str:
     # double { } are needed for formatting
-    general_view_code = '''
+    general_view_code = f'''
 function(doc) {{
    if(doc.type == "token") {{
-    if({0}) {{
+    if({condition}) {{
       emit(doc._id, doc._id);
     }}
   }}
 }}
 '''
-    return general_view_code.format(s)
+    return general_view_code
 
 
 def create_views(db: couchdb.Database,
