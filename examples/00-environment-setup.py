@@ -32,10 +32,10 @@
 ### Setup the workspace and obtain a copy of the picas client
 # %%
 # .. todo:: for the final version use ~/pics_tutorial
-! mkdir -p ~/workspaces/surf/picas
+! mkdir -p ~/picas
 
 # %%
-%cd ~/workspaces/surf/picas
+%cd ~/picas
 ! ls
 
 # %% [markdown]
@@ -53,13 +53,40 @@
 ! ls
 
 # %% [markdown]
+### Setup virtual environemnt on clusters at SURF
+
+#### Spider
+
+# %%
+! source /cvmfs/software.eessi.io/versions/2023.06/init/bash
+! module load Python/3.11.3-GCCcore-12.3.0
+
+# %% [markdown]
+#### Snellius
+
+# %%
+! module load 2024
+! module load Python/3.12.3-GCCcore-13.3.0
+
+
+# %% [markdown]
 ### Create the virtual environment
 # %%
 ! mkdir .venv
 ! python3 -m venv .venv/picas-tutorial
 
 # %% [markdown]
-### Install the dependencies
+### Connect / execute example notebooks on the clusters
+# https://doc.spider.surfsara.nl/en/latest/Pages/jupyter_notebooks.html
+
+# %% [markdown]
+### Activate the environment and install picas using pip
+# %%
+! .venv/picas-tutorial/bin/python3 -m pip install --upgrade pip
+! pip install --user picas
+
+# %% [markdown]
+### Install the dependencies (advanced / latest version)
 # %%
 ! .venv/picas-tutorial/bin/python3 -m pip install --upgrade pip
 ! .venv/picas-tutorial/bin/python3 -m pip install poetry
