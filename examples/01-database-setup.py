@@ -88,3 +88,4 @@ PICAS_PASSWORD="mypassword"
 # %%
 %cd examples
 !python create_views.py
+# %%

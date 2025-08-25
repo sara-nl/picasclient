@@ -44,6 +44,7 @@ tutorial:
 	@cd examples && jupytext --to ipynb 00-environment-setup.py --output notebooks/00-environment-setup.ipynb
 	@cd examples && jupytext --to ipynb 01-database-setup.py --output notebooks/01-database-setup.ipynb
 	@cd examples && jupytext --to ipynb 02-local-run.py --output notebooks/02-local-run.ipynb
+	@cd examples && jupytext --to ipynb 04-slurm-snellius.py --output notebooks/04-slurm-snellius.ipynb
 
 clean-tutorial:
 	@echo "cleaning tutorial files..."

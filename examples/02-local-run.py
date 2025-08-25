@@ -22,7 +22,7 @@
 # - source .venv/picas-tutorial/bin/activate
 
 # %%
-%cd ~/workspaces/surf/picas
+%cd ~/picas
 ! ls
 
 # %%
@@ -377,6 +377,11 @@ from picas.util import Timer
 # The goal is to pass the parameters (tokens) to the .sh script and run it.
 # PiCaS is responsible and will take care of fetching the tokens.
 # The user's responsibility is implement the "process_task" method that PiCaS will call
+
+# %% [markdown]
+# To customize the processing, the user needs to implement the process_task method
+# https://github.com/sara-nl/picasclient/blob/master/examples/example_template.py
+# see actual example in the next cell
 
 # %%
 class ExampleActor(RunActor):
