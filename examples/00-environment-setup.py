@@ -18,25 +18,13 @@
 # - `pip3`
 # - `curl`
 
-# .. todo:: will the tutorial be given on spider? (yes, spider)
-#      - publish the rendered notebooks (for the time being on github but then into the picas docs)
-# .. todo:: create a module for "module load picas"
-#      - look into doing that with eb
-# .. todo:: add a section in the readme to bootstrap the environment for the tutorial or make this
-#           a gist that can be also curled | sh
-# .. todo:: explore the multi-cluster setup for picas (snellius, spider, src at the same time)
-# .. todo:: add a subcommand to validate the credential by trying to connect to the database
-#             $ picas-cli check
-
 # %% [markdown]
 ### Setup the workspace and obtain a copy of the picas client
 # %%
-# .. todo:: for the final version use ~/pics_tutorial
-! mkdir -p ~/picas
+! mkdir -p ~/picas_tutorial
 
 # %%
-%cd ~/picas
-! ls
+%cd ~/picas_tutorial
 
 # %% [markdown]
 ### Clone the picas client repository
@@ -46,7 +34,7 @@
 
 # %%
 %cd picasclient
-! git checkout 1.0.1
+! git checkout 1.0.1   # .. todo:: update to latest version before the tutorial
 
 # %%
 ! git status
@@ -70,10 +58,11 @@
 
 
 # %% [markdown]
-### Create the virtual environment
+### Create the virtual environment and activate it
 # %%
 ! mkdir .venv
 ! python3 -m venv .venv/picas-tutorial
+! . .venv/picas-tutorial/bin/activate
 
 # %% [markdown]
 ### Connect / execute example notebooks on the clusters
@@ -82,23 +71,70 @@
 # %% [markdown]
 ### Activate the environment and install picas using pip
 # %%
-! .venv/picas-tutorial/bin/python3 -m pip install --upgrade pip
+! python3 -m pip install --upgrade pip
 ! pip install --user picas
 
 # %% [markdown]
-### Install the dependencies (advanced / latest version)
+### [optional] Install PiCaS from the repo
 # %%
-! .venv/picas-tutorial/bin/python3 -m pip install --upgrade pip
-! .venv/picas-tutorial/bin/python3 -m pip install poetry
+! python3 -m pip install --upgrade pip
+! python3 -m pip install poetry
 # %%
-! .venv/picas-tutorial/bin/python3 -m poetry lock
+! python3 -m poetry lock
 # %%
-! .venv/picas-tutorial/bin/python3 -m poetry install
+! python3 -m poetry install
 
 # %% [markdown]
-### Run the notebook in the new virtual environment
-# exit the current notebook kernel and start a new one in the virtual environment
+### Next tutorials
+# The upcoming tutorials are based on the picasclient [README](https://github.com/sara-nl/picasclient/blob/mher/spd-512/course-material/README.md).
+#
+# The notebooks contain more details and explanations that can be be executed interactively.
 
-# .. todo:: add instructions and tips on how to run the notebook / jupyterlab on snellius or spider
-#           e.g use surf's jupyterhub or run a jupyter server on spider and connect to it
-#           or OOD
+#### Run a jupyter notebook server
+# Install the jupyterlab package in the virtual environment
+
+# %%
+! python3 -m pip install jupyterlab
+
+# %% [markdown]
+# run the jupyterlab server, this will work on all the platforms.
+
+# %%
+! jupyter lab --no-browser --ip="127.0.01"
+
+# %% [markdown]
+# the expected output should be something like:
+```bash
+(picas-tutorial) {EESSI 2023.06} [surfadvisors-mkazandjian@ui-02 picasclient]$ jupyter lab --no-browser --ip="127.0.0.1"
+[I 2025-08-25 23:50:51.633 ServerApp] jupyter_lsp | extension was successfully linked.
+[I 2025-08-25 23:50:51.638 ServerApp] jupyter_server_terminals | extension was successfully linked.
+[I 2025-08-25 23:50:51.644 ServerApp] jupyterlab | extension was successfully linked.
+[I 2025-08-25 23:50:52.127 ServerApp] notebook_shim | extension was successfully linked.
+[I 2025-08-25 23:50:52.163 ServerApp] notebook_shim | extension was successfully loaded.
+[I 2025-08-25 23:50:52.165 ServerApp] jupyter_lsp | extension was successfully loaded.
+[I 2025-08-25 23:50:52.167 ServerApp] jupyter_server_terminals | extension was successfully loaded.
+[I 2025-08-25 23:50:52.170 LabApp] JupyterLab extension loaded from /home/surfadvisors-mkazandjian/picas_tutorial/picasclient/.venv/picas-tutorial/lib/python3.11/site-packages/jupyterlab
+[I 2025-08-25 23:50:52.170 LabApp] JupyterLab application directory is /home/surfadvisors-mkazandjian/picas_tutorial/picasclient/.venv/picas-tutorial/share/jupyter/lab
+[I 2025-08-25 23:50:52.171 LabApp] Extension Manager is 'pypi'.
+[I 2025-08-25 23:50:52.210 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2025-08-25 23:50:52.210 ServerApp] Serving notebooks from local directory: /home/surfadvisors-mkazandjian/picas_tutorial/picasclient
+[I 2025-08-25 23:50:52.211 ServerApp] Jupyter Server 2.17.0 is running at:
+[I 2025-08-25 23:50:52.211 ServerApp] http://127.0.0.1:8888/lab?token=a9c930fe6c2d5e61845a543affac02dac7d050aeaa76a1f9
+[I 2025-08-25 23:50:52.211 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 2025-08-25 23:50:52.215 ServerApp]
+
+    To access the server, open this file in a browser:
+        file:///home/surfadvisors-mkazandjian/.local/share/jupyter/runtime/jpserver-1162549-open.html
+    Or copy and paste one of these URLs:
+        http://127.0.0.1:8888/lab?token=a9c930fe6c2d5e61845a543affac02dac7d050aeaa76a1f9
+````
+
+# %% [markdown]
+# You can now connect to the jupyterlab server using an ssh tunnel as explained in the
+# [documentation](https://doc.spider.surfsara.nl/en/latest/Pages/jupyter_notebooks.html)
+
+# %%
+! ssh -L 127.0.01:8888:127.0.0.1:8888 <user>@spider.surfsara.nl -N
+
+# %% [markdown]
+# open your browser and go to the url: http://localhost:8888
