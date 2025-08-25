@@ -1,6 +1,6 @@
 # %% [markdown]
 
-## Use PiCaS to run local tasks
+## Use PiCaS to run tasks on Snellius
 
 ### Outline
 # - Set up a non trivial example - the fractals example
