@@ -2,8 +2,12 @@
 
 #@helpdesk: SURF helpdesk <helpdesk@surf.nl>
 #
-# usage: ./process_task.sh [input] [tokenid]
-
+# usage: ./process_task.sh [task_type] [input] [tokenid]
+#
+# task_type:
+#   - echo_cmd
+#   - fractals
+#
 # enable verbosity
 set -x
 
@@ -13,24 +17,33 @@ echo `date`
 echo ${HOSTNAME}
 
 # initialize job arguments
-INPUT=$1
-TOKENID=$2
-OUTPUT=output_${TOKENID}
-echo $INPUT
-echo $TOKENID
-echo $OUTPUT
+TASK_TYPE=$1
+INPUT=$2
+TOKEN_ID=$3
+
+OUTPUT=output_${TOKEN_ID}
+echo "----------- input argument ----------------"
+echo "Task type: ${TASK_TYPE}"
+echo "Input command: ${INPUT}"
+echo "Token ID: ${TOKEN_ID}"
+echo "Output file: ${OUTPUT}"
+echo "------------ end input argument ---------------"
 
 #
 # start processing
 #
 
-# short example, just echo the input
-# use this command for the short example
-bash -c "$INPUT"
-
-# long example, run the fractals program (uncomment the next line to use it)
-# use this command for the fractals example
-#bin/fractals -o $OUTPUT $INPUT
+# execute the task based on the task type
+if [[ "${TASK_TYPE}" == "fractals" ]]; then
+    # long example, run the fractals program
+    bin/fractals -o $OUTPUT $INPUT
+elif [[ "${TASK_TYPE}" == "echo_cmd" ]]; then
+    # short example, just echo the input
+    bash -c "$INPUT"
+else
+    echo "Unknown task type: ${TASK_TYPE}"
+    exit 1
+fi
 
 if [[ "$?" != "0" ]]; then
     echo "Program interrupted. Exit now..."

@@ -3,19 +3,19 @@
 ## Use PiCaS to run tasks on Spider
 
 ### Outline
-# - Set up a non trivial example - the fractals example
+# - Set up a non trivial example - count the number of words in text files
 # - Create tokens and push them to the database
-# - Run the tasks on Snellius using PiCaS by pulling tokens from the database
+# - Run the tasks on Spider using PiCaS by pulling tokens from the database
 
 ### references
 # - 02-local-run.ipynb notebook
 
 ### Minimum requirements
 # - you have run the 02-local-run.ipynb notebook and have a working PiCaS database
-# - you have access to Snellius
+# - you have access to Spider (works also on Snellius but you need to update the slurm script)
 
 # %%
-%cd ~/picas
+%cd ~/picas_tutorial
 ! ls
 
 # %%

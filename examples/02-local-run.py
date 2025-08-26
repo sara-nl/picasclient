@@ -16,92 +16,103 @@
 # - the run local examples script https://github.com/sara-nl/picasclient/blob/master/examples/local_example.py
 
 ### Minimum requirements
-# - a configured environemt with login credentials and the picas configuration file
-# - The previous to notebooks: 00-environment-setup and 01-database-setup should have been run.
-# - cd ~/workspaces/surf/picas/picasclient
-# - source .venv/picas-tutorial/bin/activate
+# - Make sure that the [00-environment-setup](https://github.com/sara-nl/picasclient/blob/mher/spd-512/course-material/examples/notebooks/00-environment-setup.ipynb) notebook has been executed and that the virtual
+# - Make sure that the [01-database-setup](https://github.com/sara-nl/picasclient/blob/mher/spd-512/course-material/examples/notebooks/01-database-setup.ipynb) notebook has been executed and that the virtual
 
 # %%
-%cd ~/picas
+%cd ~/picas_tutorial
+
+# %%
 ! ls
-
-# %%
-! mkdir example_02
-
-# %% [markdown]
-## Initialize the picas configuration (if not already done)
-# See the 01-database-setup ( ..todo:: add hyperlink) notebook for details on how to do this.
 
 # %% [markdown]
 ### Hello world PiCaS example
+#
 # The simplest problem that can be run locally is to pass parameters (tokens) to a script and run it.
-# The example below depicts a typical workflow on a cluster, i.e a script that accepts one or more
-# parameters and runs a command with those parameters within the pilot job (that is already allocated
-# and running on the cluster). In the example below the script is run locally. In the next tutorials
-# the jobs will be run on a cluster using slurm.
+# This approach can be generalized to run on a cluster using slurm (or other schedulers) too.
+#
+# In this example tokens themselves are simple echo commands that will be passed to a runner script.
 #
 # The steps and components are:
-#   - The script that runs a tasks (e.g. `process_task.sh`): just accept the input parameters and print them.
-#   - The set of parameters (tokens) that first need to be pushed to the database, e.g quickExamples.txt
-#   - The script that pushes the tokens to the database ( e.g. `pushTokens.py`).
-#   - The script that is executed locally that pulls the tokens from the database and runs the task (e.g. `local_example.py`).
+#   - Define / examine the set of parameters (tokens) that first need to be pushed to the database, e.g [quickExamples.txt](https://github.com/sara-nl/picasclient/blob/master/examples/quickExample.txt)
+#   - Push the tokens to the database ( e.g. [push_tokens.py](https://github.com/sara-nl/picasclient/blob/master/examples/pushTokens.py) )
+#   - The script that runs a tasks (e.g. [process_task.sh](https://github.com/sara-nl/picasclient/blob/master/examples/process_task.sh)): just accepts the input parameters and print them in this tutorial
+#   - The runner script that is executed locally ( [local_example.py](https://github.com/sara-nl/picasclient/blob/master/examples/local_example.py) ), it pulls the tokens from the database and runs the tasks for each token.
+
+# %%
+%cd picasclient/examples
+
+# %%
+! ls -l
 
 # %% [markdown]
-#### The script that runs a task: process_task.sh
-# The script basically accepts the tokens as input command line parameters.
+#### Create the tokens
+# The file quickExample.txt contains three lines with commands to be executed. You can generate three job tokens in the PiCaS DB by running
+
+# %%
+! cat quickExample.txt
+
+# %% [markdown]
+# push the tokens to the database using the push_tokens.py script
+
+# %%
+! python3 push_tokens.py quick
+
+# %% [markdown]
+# Check the DB; you should see the tokens in the view [Monitor/todo](https://picas.grid.sara.nl:6984/_utils/#/database/mherawesomedb/_design/Monitor/_view/todo)
+
+# %% [markdown]
+#### Create the tokens
+# The file quickExample.txt contains three lines with commands to be executed. You can generate three job tokens in the PiCaS DB by running
+# The script accepts the tokens as input command line parameters.
 # The following is done in the script:
 #  - display the node name and date
 #  - initialize the job arguments and echo them (for verbosity)
 #  - for the sake of demonstration, run the input command as a bash command
 #  - wrap up the job by displaying the end date and exit code
 
-# %%
-%%writefile example_02/process_task.sh
-#!/bin/bash
-
-# usage
-#  ./process_task.sh <input_command> <token_id>
-#  ./process_task.sh 'sleep 1' my_token_id
-# enable verbosity
-#set -x
-
-# obtain/dump the information for the Worker Node to stdout
-echo ""
-echo `date`
-echo ${HOSTNAME}
-
-# initialize job arguments
-INPUT_CMD=$1
-TOKENID=$2
-OUTPUT=output_${TOKENID}
-echo "----------- input argument ----------------"
-echo "Input command: ${INPUT_CMD}"
-echo "Token ID: ${TOKENID}"
-echo "Output file: ${OUTPUT}"
-echo "------------ end input argument ---------------"
-
-#
-# start processing
-#
-
-# short example, just echo the input
-# use this command for the short example, replace this with something else
-# that does fancy things for a real life application
-# .. just run something, dummy task
-echo "----------------- start execute task --------------------------------"
-bash -c "${INPUT_CMD}" || { echo `date`; echo "Task failed"; exit 1; }
-echo "----------------- end execute task --------------------------------"
-
-# display the end date
-echo `date`
-
-exit 0
+# %% [markdown]
+#### Running the tasks locally
+# To run the example locally (e.g. on your laptop)
 
 # %%
-# set the execute permission on the script
-! chmod +x example_02/process_task.sh
+! python local_example.py
 
 # %% [markdown]
+# If all goes well, you should see output like (compare with what you see in the cell above)
+#
+# ```bash
+# -----------------------
+# Working on token: token_0
+# _id token_0
+# _rev 4-8b04da64c0a536bb88a3cdebe12e0a87
+# type token
+# lock 1692692693
+# done 0
+# hostname xxxxxxxxxxxx
+# scrub_count 0
+# input echo "this is token A"
+# exit_code 0
+# -----------------------
+# ```
+# The token in the database will have attachments with the standard and error output of the terminal. There you will find the outputfile logs_token_0.out, containing the output of the input command:
+#
+# ```bash
+# Tue 31 Dec 2024 00:00:00 CET
+# xxxxxxxxxxxx
+# echo 'this is token A'
+# token_0
+# output_token_0
+# this is token A
+# Tue 31 Dec 2024 00:00:00  CET
+# ```
+# Once the script is running, it will start polling the PiCaS server for work. A pilot job will not die after it has completed a task, but immediately ask for another one. It will keep asking for new jobs, until all work is done, or the maximum time is up.
+#
+# Tokens have a status, which will go from "todo" to "done" once the work has been completed (or "error" if the work fails). To do more work, you will have to add new tokens that in the "todo" state yet, otherwise the example script will just stop after finding no more work to do. If you are interested, you can look into the scripts examples/local-example.py and examples/process_task.sh to check what the actual work is.
+
+# %% [markdown]
+### Deep-dive into the example and code explanation
+### CONTINUE FROM HERE
 #### Define the bunch of parameters for the tasks.
 # In the file below, each line is one parameter of the task. This file will be processed by the
 # push tokens script and the content of the file will be translated into tokens to be consumed

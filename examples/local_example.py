@@ -36,6 +36,9 @@ def arg_parser():
     parser = argparse.ArgumentParser(
         description="Arguments used in the different classes in the example.")
     parser.add_argument(
+        "-t", "--task-type", default='echo_cmd', type=str,
+        help="Select the type of task to be processed")
+    parser.add_argument(
         "--design_doc", default="Monitor", type=str,
         help="Select the designdoc used by the actor class")
     parser.add_argument(
@@ -51,23 +54,24 @@ class ExampleActor(RunActor):
     The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
     Feel free to adjust to whatever you need, a template can be found at: example-template.py
     """
-    def __init__(self, db, modifier, view="todo", **viewargs):
+    def __init__(self, db, modifier, view="todo", task_type=None, **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
         # self.iterator = EndlessViewIterator(self.iterator)
         self.modifier = modifier
         self.client = db
+        self.task_type = task_type
 
     def process_task(self, token):
         # Print token information
         print("-----------------------")
-        print("Working on token: " +token['_id'])
+        print(f"Working on task '{self.task_type}' with token {token['_id']}")
         for key, value in token.doc.items():
             print(key, value)
         print("-----------------------")
 
         # Start running the main job, the logging is done internally and saved below
-        command = ["/usr/bin/time", "./process_task.sh", token['input'], token['_id']]
+        command = ["/usr/bin/time", "./process_task.sh", self.task_type, token['input'], token['_id']]
         out = execute(command)
 
         logsout = f"logs_{token['_id']}.out"
@@ -113,7 +117,7 @@ def main():
     modifier = BasicTokenModifier()
 
     # Create actor
-    actor = ExampleActor(client, modifier, view=args.view, design_doc=args.design_doc)
+    actor = ExampleActor(client, modifier, view=args.view, design_doc=args.design_doc, task_type=args.task_type)
 
     # Start work!
     actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
