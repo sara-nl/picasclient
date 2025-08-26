@@ -62,6 +62,21 @@ class PicasConfig:
         if load:
             self.load_config()
 
+    def __str__(self):
+        """
+        Return a string representation of the configuration.
+        Masks the encrypted password for security.
+        """
+        if not self.config:
+            return "PicasConfig: No configuration loaded"
+
+        # Create a copy of the config to mask sensitive data
+        display_config = self.config.copy()
+        if 'encrypted_password' in display_config:
+            display_config['encrypted_password'] = '***masked***'
+
+        return f"PicasConfig:\n{yaml.dump(display_config, default_flow_style=False, indent=2)}"
+
     def validate_config(self, config=None):
         """
         Validate the current configuration against the schema.

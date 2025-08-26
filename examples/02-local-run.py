@@ -112,274 +112,89 @@
 
 # %% [markdown]
 ### Deep-dive into the example and code explanation
-### CONTINUE FROM HERE
-#### Define the bunch of parameters for the tasks.
-# In the file below, each line is one parameter of the task. This file will be processed by the
-# push tokens script and the content of the file will be translated into tokens to be consumed
-# later on by the main run script that pulls the tokens and dispatches them as tasks in the pilot
-# allocated resources.
 
-# %% [markdown]
-# This file defined the parameters for the tasks (the tokens).
-# in this case the tokens are simple echo commands that will be passed by PiCaS
-# to the runner of the tasks (see the "local_example" below, the process_task method)
+#### Define the parameters that will be pushed the to database
+# Fetch the PiCaS configuration and create a connection to the database
 
 # %%
-%%writefile example_02/quickExample.txt
-echo 'this is token A'
-echo 'this is token B'
-echo 'this is token C'
-
-
-# %% [markdown]
-# The push tokens script
+# ---------------------------
+# DEVEL
+# ---------------------------
+# %%
+%cd picas/picasclient/examples
 
 # %%
-%%writefile example_02/push_tokens.py
-
-import picasconfig
-from picas.clients import CouchDB
-from picas.documents import Task
-
-def create_tokens(fields: dict) -> list:
-    """
-    Create the tokens as a list of Task documents.
-
-    The fields parameter is a dictionary where keys are field names and values are
-    lists of input values. For every 'input' value a unique id is assigned and the
-    corresponding input value is used to create a token.
-
-    For example, the following becomes a list of tokens:
-     {'input': [
-        "echo 'this is token A'",
-        "echo 'this is token B'",
-        "echo 'this is token C'"]
-     }
-
-
-    :param fields: A dictionary where keys are field names and values are lists of input values.
-    :return: A list of Task documents representing the tokens. For the example above,
-      it would return a list of three Task objects with .id attributes set to
-      'token_0', 'token_1', and 'token_2' respectively and .input attributes of each set to
-      "echo 'this is token A'", "echo 'this is token B'", and "echo 'this is token C'".
-    """
-    tokens = []
-    n_docs = db.doc_count()
-    for arg in fields:
-        for line in fields[arg]:
-            token = {
-                '_id': 'token_' + str(n_docs),
-                'type': 'token',
-                arg: line,
-            }
-            tokens.append(Task(token))
-            n_docs += 1
-
-    return tokens
-
-# create a connection to the server
-db = CouchDB(
-    url=picasconfig.PICAS_HOST_URL,
-    db=picasconfig.PICAS_DATABASE,
-    username=picasconfig.PICAS_USERNAME,
-    password=picasconfig.PICAS_PASSWORD)
-
-# create tokens with inputs given in file
-tokensfile = "quickExample.txt"
-with open(tokensfile) as fobj:
-    fields = {"input": fobj.read().splitlines()}
-tokens = create_tokens(fields)
-
-# save tokens in database
-db.save_documents(tokens)
+import sys
+sys.path = ['..']  + sys.path
 
 # %%
-%cd example_02
+import picas
+print(picas)
+# %%
+# ---------------------------
+# END DEVEL
+# ---------------------------
 
 # %%
-!ls -l
+from picas.picas_config import PicasConfig
+from picas.crypto import decrypt_password
+
 # %%
-import picasconfig
-from picas.clients import CouchDB
-from picas.documents import Task
-
-def create_tokens(fields: dict) -> list:
-    """
-    Create a list of Tasks from the tokens.
-
-    The fields parameter is a dictionary where keys are field names and values are
-    lists of input values. For every 'input' value a unique id is assigned and the
-    corresponding input value is used to create a token.
-
-    For example, the following becomes a list of tokens:
-     {'input': [
-        "echo 'this is token A'",
-        "echo 'this is token B'",
-        "echo 'this is token C'"]
-     }
-
-
-    :param fields: A dictionary where keys are field names and values are lists of input values.
-    :return: A list of Task documents representing the tokens. For the example above,
-      it would return a list of three Task objects with .id attributes set to
-      'token_0', 'token_1', and 'token_2' respectively and .input attributes of each set to
-      "echo 'this is token A'", "echo 'this is token B'", and "echo 'this is token C'".
-    """
-    tokens = []
-    n_docs = db.doc_count()
-    for arg in fields:
-        for line in fields[arg]:
-            token = {
-                '_id': 'token_' + str(n_docs),
-                'type': 'token',
-                arg: line,
-            }
-            tokens.append(Task(token))
-            n_docs += 1
-
-    return tokens
+config = PicasConfig(load=True)
+print(config)
 
 # %%
 # create a connection to the server
+from picas.clients import CouchDB
+from pprint import pprint
+
+# %%
 db = CouchDB(
-    url=picasconfig.PICAS_HOST_URL,
-    db=picasconfig.PICAS_DATABASE,
-    username=picasconfig.PICAS_USERNAME,
-    password=picasconfig.PICAS_PASSWORD)
+    url=config.config['host_url'],
+    db=config.config['database'],
+    username=config.config['username'],
+    password=decrypt_password(config.config['encrypted_password']).decode())
 
-# create tokens with inputs given in file
-tokensfile = "quickExample.txt"
-with open(tokensfile) as fobj:
-    fields = {"input": fobj.read().splitlines()}
-tokens = create_tokens(fields)
+# %% [markdown]
+# Define a bunch of parameters (echo commands) for the tasks that will be pushed as tokens to the database
 
-# save tokens in database
+token_inputs = [
+    "echo 'this is token A'",
+    "echo 'this is token B'",
+    "echo 'this is token C'"
+]
+
+fields = {"input": token_inputs}
+pprint(fields)
+
+# %% [markdown]
+# Convert the inputs to token objects that can be pushed to the database as token documents
+# using the utility function create_tokens from the create_tokens.py script
+
+# %%
+from create_tokens import create_tokens
+# %%
+tokens = create_tokens(fields, offset=db.doc_count())
+pprint(tokens)
+
+# %% [markdown]
+# The push tokens script (save them to the database)
 status = db.save_documents(tokens)
 
+# %%
 # check for errors
 if not any(status):
+    print("Error saving tokens:")
+    pprint(status)
+else:
     print("Tokens saved successfully.")
 
 # %% [markdown]
-# The picas local_example.py orchestrator script
-
-# %%
-%%writefile example_02/local_example.py
-"""
-usage: python local_example.py
-description:
-    Connect to PiCaS server
-    Get the next token in todo View
-    Fetch the token parameters, e.g. input value
-    Run main job (process_task.sh) with the input argument
-    When done, return the exit code to the token
-    Attach the logs to the token
-"""
-import argparse
-import logging
-import time
-import picasconfig
-
-from picas.actors import RunActor
-from picas.clients import CouchDB
-from picas.executers import execute
-from picas.modifiers import BasicTokenModifier
-from picas.util import Timer
-
-log = logging.getLogger(__name__)
-
-def arg_parser():
-    """
-    Arguments parser for optional values of the example
-    returns: argparse object
-    """
-    parser = argparse.ArgumentParser(description="Arguments used in the different classes in the example.")
-    parser.add_argument("--design_doc", default="Monitor", type=str, help="Select the designdoc used by the actor class")
-    parser.add_argument("--view", default="todo", type=str, help="Select the view used by the actor class")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Set verbose")
-    return parser
-
-class ExampleActor(RunActor):
-    """
-    The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
-    Feel free to adjust to whatever you need, a template can be found at: example-template.py
-    """
-    def __init__(self, db, modifier, view="todo", **viewargs):
-        super(ExampleActor, self).__init__(db, view=view, **viewargs)
-        self.timer = Timer()
-        # self.iterator = EndlessViewIterator(self.iterator)
-        self.modifier = modifier
-        self.client = db
-
-    def process_task(self, token):
-        # Print token information
-        print("-----------------------")
-        print("Working on token: " +token['_id'])
-        for key, value in token.doc.items():
-            print(key, value)
-        print("-----------------------")
-
-        # Start running the main job, the logging is done internally and saved below
-        command = ["/usr/bin/time", "./process_task.sh", token['input'], token['_id']]
-        out = execute(command)
-
-        logsout = f"logs_{token['_id']}.out"
-        logserr = f"logs_{token['_id']}.err"
-
-        # write the logs
-        with open(logsout, 'w') as f:
-            f.write(out[2].decode('utf-8'))
-        with open(logserr, 'w') as f:
-            f.write(out[3].decode('utf-8'))
-
-        self.subprocess = out[0]
-
-        # Get the job exit code and done in the token
-        token['exit_code'] = out[1]
-        token = self.modifier.close(token)
-
-        # Attach logs in token
-        curdate = time.strftime("%d/%m/%Y_%H:%M:%S_")
-        try:
-            log_handle = open(logsout, 'rb')
-            token.put_attachment(logsout, log_handle.read())
-
-            log_handle = open(logserr, 'rb')
-            token.put_attachment(logserr, log_handle.read())
-        except:
-            pass
-
-
-def main():
-    # parse user arguments
-    args = arg_parser().parse_args()
-
-    # setup connection to db
-    client = CouchDB(
-        url=picasconfig.PICAS_HOST_URL,
-        db=picasconfig.PICAS_DATABASE,
-        username=picasconfig.PICAS_USERNAME,
-        password=picasconfig.PICAS_PASSWORD)
-    print("Connected to the database %s sucessfully. Now starting work..." %(picasconfig.PICAS_DATABASE))
-
-    # create the token modifier
-    modifier = BasicTokenModifier()
-
-    # create the actor
-    actor = ExampleActor(client, modifier, view=args.view, design_doc=args.design_doc)
-
-    # start the work!
-    actor.run(max_token_time=1800, max_total_time=3600, max_tasks=10, max_scrub=2)
-
-if __name__ == '__main__':
-    main()
+# Process the tokens by pulling tokens and using the PiCaS framework to run the tasks locally
 
 # %%
 import time
-import picasconfig
-
 from picas.actors import RunActor
-from picas.clients import CouchDB
 from picas.executers import execute
 from picas.modifiers import BasicTokenModifier
 from picas.util import Timer
@@ -400,11 +215,12 @@ class ExampleActor(RunActor):
     The ExampleActor is the custom implementation of a RunActor that the user needs for the processing.
     Feel free to adjust to whatever you need, a template can be found at: example-template.py
     """
-    def __init__(self, db, modifier, view="todo", **viewargs):
+    def __init__(self, db, modifier, view="todo", task_type=None, **viewargs):
         super(ExampleActor, self).__init__(db, view=view, **viewargs)
         self.timer = Timer()
         self.modifier = modifier
         self.client = db
+        self.task_type = task_type
 
     def process_task(self, token):
         # Print token information
@@ -415,7 +231,7 @@ class ExampleActor(RunActor):
         print("-----------------------")
 
         # Start running the main job, the logging is done internally and saved below
-        command = ["/usr/bin/time", "./process_task.sh", token['input'], token['_id']]
+        command = ["/usr/bin/time", "./process_task.sh", self.task_type, token['input'], token['_id']]
         out = execute(command)
 
         logsout = f"logs_{token['_id']}.out"
@@ -445,20 +261,12 @@ class ExampleActor(RunActor):
             pass
 
 # %%
-# setup connection to db (same as before)
-client = CouchDB(
-    url=picasconfig.PICAS_HOST_URL,
-    db=picasconfig.PICAS_DATABASE,
-    username=picasconfig.PICAS_USERNAME,
-    password=picasconfig.PICAS_PASSWORD)
-print("Connected to the database %s sucessfully. Now starting work..." %(picasconfig.PICAS_DATABASE))
-
-# %%
 # create the token modifier
 modifier = BasicTokenModifier()
 
+# %%
 # create the actor
-actor = ExampleActor(client, modifier, view='todo', design_doc='Monitor')
+actor = ExampleActor(db, modifier, view='todo', design_doc='Monitor', task_type='echo_cmd')
 
 # %%
 # start the work!
