@@ -158,6 +158,7 @@ db = CouchDB(
 # %% [markdown]
 # Define a bunch of parameters (echo commands) for the tasks that will be pushed as tokens to the database
 
+# %%
 token_inputs = [
     "echo 'this is token A'",
     "echo 'this is token B'",
@@ -179,6 +180,8 @@ pprint(tokens)
 
 # %% [markdown]
 # The push tokens script (save them to the database)
+
+# %%
 status = db.save_documents(tokens)
 
 # %%
