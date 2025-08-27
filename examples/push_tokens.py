@@ -15,36 +15,7 @@ import subprocess
 import picasconfig
 from picas.clients import CouchDB
 from picas.documents import Task
-
-def create_tokens(fields: dict) -> list:
-    """
-    Create the tokens as a list of Task documents.
-
-    The fields parameter is a dictionary where keys are field names and values are
-    lists of input values. For every 'input' value a unique id is assigned and the
-    corresponding input value is used to create a token.
-
-    :param fields: A dictionary where keys are field names and values are lists of input values.
-      for example:
-        {'input': ["echo 'this is token A'", "echo 'this is token B'", "echo 'this is token C'"]}
-    :return: A list of Task documents representing the tokens. For the example above,
-      it would return a list of three Task objects with .id attributes set to
-      'token_0', 'token_1', and 'token_2' respectively and .input attributes of each set to
-      "echo 'this is token A'", "echo 'this is token B'", and "echo 'this is token C'".
-    """
-    tokens = []
-    n_docs = db.doc_count()
-    for arg in fields:
-        for line in fields[arg]:
-            token = {
-                '_id': 'token_' + str(n_docs),
-                'type': 'token',
-                arg: line,
-            }
-            tokens.append(Task(token))
-            n_docs += 1
-
-    return tokens
+from create_tokens import create_tokens
 
 if __name__ == '__main__':
 
@@ -67,16 +38,16 @@ if __name__ == '__main__':
         tokensfile = "quickExample.txt"
         with open(tokensfile) as f:
             fields = {"input": f.read().splitlines()}
-        tokens = create_tokens(fields)
+        tokens = create_tokens(fields, offset=db.doc_count())
     elif example == "fractals":
-        tokensfile = subprocess.check_output("./createTokens", text=True).rstrip('\n')
+        tokensfile = subprocess.check_output("./create_tokens.sh", text=True).rstrip('\n')
         with open(tokensfile) as f:
             fields = {"input": f.read().splitlines()}
-        tokens = create_tokens(fields)
+        tokens = create_tokens(fields, offset=db.doc_count())
     elif example == "autopilot":
         # create tokens with number of cores specified
         fields = {"cores": [ 1, 1, 4]}
-        tokens = create_tokens(fields)
+        tokens = create_tokens(fields, offset=db.doc_count())
         for token in tokens:
             token.input = "echo $SLURM_CPUS_PER_TASK"
     else:

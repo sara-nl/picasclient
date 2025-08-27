@@ -59,7 +59,7 @@
 ! python3 push_tokens.py quick
 
 # %% [markdown]
-# Check the DB; you should see the tokens in the view [Monitor/todo](https://picas.grid.sara.nl:6984/_utils/#/database/mherawesomedb/_design/Monitor/_view/todo)
+# Check the DB; you should see three new tokens in the todo view [Monitor/todo](https://picas.grid.sara.nl:6984/_utils/#/database/mherawesomedb/_design/Monitor/_view/todo)
 
 # %% [markdown]
 #### Create the tokens
