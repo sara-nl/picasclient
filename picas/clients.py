@@ -18,18 +18,28 @@ from .picaslogger import picaslogger
 
 
 class CouchDB:
-
-    """Client class to handle communication with the CouchDB back-end."""
-
-    def __init__(self, url="http://localhost:5984", db="test",
-                 username=None, password="", ssl_verification=True,
-                 create=False):
+    """
+    Client class to handle communication with the CouchDB back-end.
+    """
+    def __init__(self,
+                 url: str ="http://localhost:5984",
+                 db: str = "test",
+                 username: str = None,
+                 password: str = "",
+                 ssl_verification: bool = True,
+                 create: bool = False):
         """
         Create a CouchClient object.
+
         :param url: the location where the CouchDB instance is located,
-                    including the port at which it's listening.
-                    Default: http://localhost:5984
+          including the port at which it's listening.
+          Default: http://localhost:5984
         :param db: the database to use. Default: test.
+        :param username: the username to use for authentication. Default: None.
+        :param password: the password to use for authentication. Default: "".
+        :param ssl_verification: whether to verify the SSL certificate of the
+          server. Default: True.
+        :param create: whether to create the database if it does not exist.
         """
         server = couchdb.Server(url)
         if username is not None:
@@ -42,7 +52,7 @@ class CouchDB:
         else:
             self.db = server[db]
 
-    def copy(self):
+    def copy(self) -> "CouchDB":
         """Copy the DB connection."""
         resource = self.db.resource
         try:
@@ -51,19 +61,22 @@ class CouchDB:
             username, password = None, ""
 
         return CouchDB(
-            url=resource.url[:-len(self.db.name) - 1], db=self.db.name,
-            username=username, password=password,
+            url=resource.url[:-len(self.db.name) - 1],
+            db=self.db.name,
+            username=username,
+            password=password,
             ssl_verification=resource.session._disable_ssl_verification)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: str) -> Document:
         return self.db[idx]
 
-    def get_from_view(self, view, **view_params):
+    def get_from_view(self, view: str, **view_params) -> list[Document]:
         """
         Get Documents from the specified view that has task _id as key.
+
         :param view: name of the view that has a row id coupled to a document
         :param view_params: name of the view optional extra parameters for the
-                            view.
+          view.
         :return: a list of Task objects in the view
         """
         result = []
@@ -75,30 +88,34 @@ class CouchDB:
 
         return result
 
-    def get(self, id):
+    def get(self, id: str) -> Document:
         """
         Get raw data associated to the given ID
+
         :param id: _id string of the task
         """
         data = self.db.get(id)
         if data is None:
             raise ValueError(id + " is not a document ID in the database")
+
         return Document(data)
 
-    def get_single_from_view(self, view, window_size=1, **view_params):
-        """Get a document from the specified view.
+    def get_single_from_view(self, view: str, window_size: int = 1, **view_params) -> Document:
+        """
+        Get a document from the specified view.
+
         :param view: the view to get the document from.
         :param view_params: the parameters that should be added to the view
-        request. Optional.
+          request. Optional.
         :param window_size: the size of the initial request to CouchDB, only
-        one record within that set, which is randomly selected, is returned.
+          one record within that set, which is randomly selected, is returned.
         :return: a CouchDB document.
         """
         view = self.view(view, limit=window_size, **view_params)
         row = random.choice(view.rows)
         return self.get(row.id)
 
-    def view(self, view, design_doc="Monitor", **view_params):
+    def view(self, view: str, design_doc: str = "Monitor", **view_params) -> couchdb.client.View:
         """
         Get the data from a view
 
@@ -109,20 +126,21 @@ class CouchDB:
         """
         return self.db.view(design_doc + '/' + view, **view_params)
 
-    def save(self, doc):
-        """ Save a Document to the database.
+    def save(self, doc: Document) -> Document:
+        """
+        Save a Document to the database.
 
         Updates the document to have the new _rev value.
+
         :param doc: Document object
         :throws couchdb.http.ResourceConflict: when document exists with
                 different revision or was deleted.
         """
         _id, _rev = self.db.save(doc.value)
-        doc['_rev'] = _rev
-        doc['_id'] = _id
+        doc['_rev'], doc['_id'] = _rev, _id
         return doc
 
-    def save_documents(self, docs):
+    def save_documents(self, docs: list[Document]) -> list[bool]:
         """
         Save a sequence of Documents to the database.
 
@@ -138,28 +156,39 @@ class CouchDB:
         updated = self.db.update([doc.value for doc in docs])
 
         result = [False] * len(docs)
-        for i, doc in enumerate(docs):
+        for i, _ in enumerate(docs):
             is_added, _id, _rev = updated[i]
             if is_added:
-                docs[i]['_id'] = _id
-                docs[i]['_rev'] = _rev
+                docs[i]['_id'], docs[i]['_rev'] = _id, _rev
                 result[i] = True
 
         return result
 
-    def add_view(self, view, map_fun, *args, reduce_fun=None, design_doc="Monitor", **kwargs):
+    def add_view(self,
+                 view: str,
+                 map_fun: str,
+                 *args,
+                 reduce_fun: str = None,
+                 design_doc: str = "Monitor",
+                 **kwargs) -> None:
         """
         Add a view to the database
+
         All extra parameters are passed to couchdb.design.ViewDefinition
+
         :param view: name of the view
         :param map_fun: string of the javascript map function
         :param reduce_fun: string of the javascript reduce function (optional)
+        :param design_doc: name of the design document (default: Monitor)
+        :param args: extra arguments passed to couchdb.design.ViewDefinition
+        :param kwargs: extra keyword arguments passed to couchdb.design.ViewDefinition
+        :return: None
         """
         definition = ViewDefinition(
             design_doc, view, map_fun, reduce_fun, *args, **kwargs)
         definition.sync(self.db)
 
-    def delete(self, doc):
+    def delete(self, doc: Document) -> None:
         """
         Delete a Document from the database
 
@@ -167,20 +196,21 @@ class CouchDB:
         be retrieved from the database and not be altered there in the mean
         time.
         :param doc: Document object
-        :raise: ResouceConflict: if the document was updated in the database
+        :raise: ResourceConflict: if the document was updated in the database
         """
         self.db.delete(doc.value)
 
-    def delete_documents(self, docs):
+    def delete_documents(self, docs: list[Document]) -> list[bool]:
         """
         Delete a sequence of Documents from the database.
 
         The Documents must have a valid and current _id and _rev, so they must
         be retrieved from the database and not be altered there in the mean
         time.
-        :param tasks: list of Document objects
+
+        :param tasks: list of Document objects to be deleted
         :return: array of booleans indicating whether the respective Document
-                was deleted.
+          was deleted.
         """
         result = [True] * len(docs)
         for i, doc in enumerate(docs):
@@ -194,30 +224,42 @@ class CouchDB:
             except Exception as ex:
                 picaslogger.info(f"Could not delete document {str(doc)}: {str(ex)}", file=sys.stderr)
                 result[i] = False
+
         return result
 
-    def delete_from_view(self, view, design_doc="Monitor"):
+    def delete_from_view(self, view: str, design_doc: str = "Monitor") -> list[bool]:
         """
         Delete all documents in a view
 
-        :param view: name of the view
+        :param view: name of the view from which to delete all documents
         :return: array of booleans indicating whether the respective tasks
-                were deleted
+          were deleted
         """
         docs = self.get_from_view(view, design_doc=design_doc)
         return self.delete_documents(docs)
 
-    def set_users(self, admins=None, members=None, admin_roles=None,
-                  member_roles=None):
-        """Set permissions for users."""
+    def set_users(self,
+                  admins: list[str] = None,
+                  members: list[str] = None,
+                  admin_roles: list[str] = None,
+                  member_roles: list[str] = None) -> None:
+        """
+        Set permissions for users.
+
+        :param admins: list of admin usernames
+        :param members: list of member usernames
+        :param admin_roles: list of admin roles
+        :param member_roles: list of member roles
+        :return: None
+        """
         security = self.db.resource.get_json("_security")[2]
 
-        def try_set(value, d, key, subkey):
+        def try_set(value, doc, key, subkey):
             if value is not None:
                 try:
-                    d[key][subkey] = value
+                    doc[key][subkey] = value
                 except KeyError:
-                    d[key] = {subkey: value}
+                    doc[key] = {subkey: value}
 
         try_set(admins, security, 'admins', 'names')
         try_set(members, security, 'members', 'names')
@@ -226,16 +268,20 @@ class CouchDB:
 
         self.db.resource.put("_security", security)
 
-    def is_view_nonempty(self, view, **view_params):
+    def is_view_nonempty(self, view: str, **view_params) -> bool:
         """
         Database view scanner
-        Useful for starting pilot jobs automatically. When a view is non-empty, returns true: a pilot can be started.
+
+        Useful for starting pilot jobs automatically. When a view is non-empty,
+        returns true: a pilot can be started.
 
         :param view: database view to scan for tokens
+        :param view_params: optional parameters for the view
         :return: bool
         """
         # To ensure proper logging when design_doc is not passed into is_view_nonempty,
-        # the variable is created as the default used in self.view. Otherwise the f-string below breaks on default input.
+        # the variable is created as the default used in self.view. Otherwise the
+        # f-string below breaks on default input.
         design_doc = view_params.setdefault('design_doc', "Monitor")
         try:
             doc = self.get_single_from_view(view, **view_params)
@@ -244,14 +290,14 @@ class CouchDB:
             picaslogger.debug(task['_id'])
             picaslogger.info(f"View {view} under design document {design_doc} is non-empty.")
             return True
-        except IndexError as e:
-            picaslogger.info(f"View {view} under design document {design_doc} is empty: {e}")
+        except IndexError as exc:
+            picaslogger.info(f"View {view} under design document {design_doc} is empty: {exc}")
             return False
         except ResourceNotFound:
             picaslogger.info(f"Non-existing view and design document passed: {view} in {design_doc}")
             return False
 
-    def doc_count(self):
+    def doc_count(self) -> int:
         """
         Count number of documents in database
 
