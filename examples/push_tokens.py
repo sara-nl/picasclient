@@ -25,8 +25,6 @@ Description:
    - Creates tokens for <example>: "quick", "fractals, or "autopilot"
    - Upload/Save the tokens to the database
 """
-
-import sys
 import subprocess
 import picasconfig
 from picas.clients import CouchDB
