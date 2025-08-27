@@ -86,10 +86,10 @@ class ExampleActor(RunActor):
         logserr = f"logs_{token['_id']}.err"
 
         # write the logs
-        with open(logsout, 'w') as f:
-            f.write(out[2].decode('utf-8'))
-        with open(logserr, 'w') as f:
-            f.write(out[3].decode('utf-8'))
+        with open(logsout, 'w') as fobj:
+            fobj.write(out[2].decode('utf-8'))
+        with open(logserr, 'w') as fobj:
+            fobj.write(out[3].decode('utf-8'))
 
         self.subprocess = out[0]
 

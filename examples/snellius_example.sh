@@ -41,4 +41,4 @@ cd examples
 # You may set environmental variables needed in the SLURM job
 # For example, when using the LUMI container wrapper:
 # export PATH="/path/to/install_dir/bin:$PATH"
-python local_example.py --design_doc ${DESIGN_DOC} --view ${VIEW} --task-type ${TASK_TYPE}
+python3 local_example.py --design_doc ${DESIGN_DOC} --view ${VIEW} --task-type ${TASK_TYPE}

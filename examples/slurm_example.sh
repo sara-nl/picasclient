@@ -29,4 +29,4 @@ fi
 echo "current workdir: $(pwd)"
 echo "Task type: ${TASK_TYPE}"
 
-python local_example.py --design_doc ${DESIGN_DOC} --view ${VIEW} --task-type ${TASK_TYPE}
+python3 local_example.py --design_doc ${DESIGN_DOC} --view ${VIEW} --task-type ${TASK_TYPE}

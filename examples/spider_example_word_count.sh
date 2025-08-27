@@ -14,28 +14,30 @@
 #4.submit pilot job
 #sbatch spider_example.sh
 
-
-## adding software modules load for Spider
+# force a safer target and reinit EESSI
+module purge
+export EESSI_ARCHDETECT_OPTIONS_OVERRIDE="x86_64/generic"
 source /cvmfs/software.eessi.io/versions/2023.06/init/bash
-module load Python/3.11.3-GCCcore-12.3.0
 
-# parse the --task-type arguments using the shift method
-TASK_TYPE="echo_cmd"
-if [ "$1" == "--task-type" ]; then
-  shift
-  TASK_TYPE=$1
-  shift
-fi
+# confirm what EESSI picked
+echo "EESSI subdir: $EESSI_SOFTWARE_SUBDIR"   # should say x86_64/generic
+
+# check CPU model and flags
+lscpu | egrep 'Model name|Flags'
+# look for avx2, fma, bmi2, etc.
+
+# load python again and run
+module load Python/3.11.3-GCCcore-12.3.0
+python3 -V
+python3 -c "import sys; print(sys.version)"
 
 echo "current workdir: $(pwd)"
-echo "Task type: ${TASK_TYPE}"
 
 #pip install --user picas
 cd ~/picas_tutorial/picasclient
+python3 -m venv .venv/picas-tutorial
 . .venv/picas-tutorial/bin/activate
+#pip install .
 cd examples
 
-# You may set environmental variables needed in the SLURM job
-# For example, when using the LUMI container wrapper:
-# export PATH="/path/to/install_dir/bin:$PATH"
-python3 local_example.py --design_doc ${DESIGN_DOC} --view ${VIEW} --task-type ${TASK_TYPE}
+python3 word_count_example.py
