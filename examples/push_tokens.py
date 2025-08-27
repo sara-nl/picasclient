@@ -1,13 +1,29 @@
-# .. todo Mher:: add a proper argument parser
+#!/usr/bin/env python
 """
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
-usage: python push_tokens.py <example>
-description:
+Push tokens to the PiCaS database for various examples.
 
+The list of supported examples are:
+    - quick: push tokens for a quick example that just echos the input value
+    - fractals: push tokens for an example that runs the fractals executable
+    - autopilot: push tokens for an example that runs pilot jobs on slurm that checks for work loads
+
+Usage:
+    # general usage
+    python push_tokens.py <example>
+
+    # Push tokens for the quick example
+    python push_tokens.py
+
+    # Push tokens for the fractals example
+    python push_tokens.py fractals
+
+
+Description:
    - Connects to PiCaS server
    - Creates tokens for <example>: "quick", "fractals, or "autopilot"
-   - Loads the tokens to the database
+   - Upload/Save the tokens to the database
 """
 
 import sys
@@ -16,14 +32,24 @@ import picasconfig
 from picas.clients import CouchDB
 from picas.documents import Task
 from create_tokens import create_tokens
+import argparse
 
 if __name__ == '__main__':
 
-    # choose for which example you are creating tokens
-    if len(sys.argv) == 2:
-        example = sys.argv[1]
-    else:
-        exit('Please give example as commandline argument. Options are "quick", "fractals, or "autopilot".')
+    parser = argparse.ArgumentParser(
+        prog='push_tokens.py',
+        description=__doc__,
+        formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument(
+        'example',
+        nargs='?',
+        choices=['quick', 'fractals', 'autopilot'],
+        default='quick',
+        help='Example for which tokens will be created and pushed'
+    )
+
+    args = parser.parse_args()
+    example = args.example
 
     # create a connection to the server
     db = CouchDB(

@@ -1,16 +1,22 @@
-'''
+#!/usr/bin/env python
+"""
 @helpdesk: SURF helpdesk <helpdesk@surf.nl>
 
-usage: python local_example.py
-description:
-    Connect to PiCaS server
-    Get the next token in todo View
-    Fetch the token parameters, e.g. input value
-    Run main job (process_task.sh) with the input argument
-    When done, return the exit code to the token
-    Attach the logs to the token
-'''
+Run a local example processing tasks from the database for vartious task types.
+The task types are set through command line arguments.
 
+usage:
+    # default run, processes tasks of type 'echo_cmd'
+    python local_example.py
+
+description:
+    - Connect to PiCaS server
+    - Get the next token in todo View
+    - Fetch the token parameters, e.g. input value
+    - Run main job (process_task.sh) with the input argument
+    - When done, return the exit code to the token
+    - Attach the logs to the token
+"""
 import argparse
 import logging
 import time
@@ -34,7 +40,9 @@ def arg_parser():
     returns: argparse object
     """
     parser = argparse.ArgumentParser(
-        description="Arguments used in the different classes in the example.")
+        description=__doc__,
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     parser.add_argument(
         "-t", "--task-type", default='echo_cmd', type=str,
         help="Select the type of task to be processed")
