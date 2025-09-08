@@ -130,11 +130,27 @@
 # %% [markdown]
 # [optional]
 # If you are running on a cluster you can not open the url directly in your browser.
-# You can now connect to the jupyterlab server using an ssh tunnel as explained in the
-# [documentation](https://doc.spider.surfsara.nl/en/latest/Pages/jupyter_notebooks.html)
+# You can now connect to the jupyterlab server using an ssh tunnel using the command below:
 
+# pick a random port on your local machine, e.g. 8888 (see below for a bash function that
+# gives you a random port)
 # %%
-! ssh -L 127.0.01:8888:127.0.0.1:8888 <user>@spider.surfsara.nl -N
+! ssh -L 127.0.0.1:8888:127.0.0.1:8888 my_user@spider.surf.nl -N
 
 # %% [markdown]
 # open your browser and go to the url: http://localhost:8888
+
+# %% [markdown]
+# [optional]
+# If you want to find a random port on your local machine you can use the following bash
+
+# %%
+%%bash
+random_unused_port ()
+{
+    ( netstat --listening --all --tcp --numeric | sed '1,2d; s/[^[:space:]]*[[:space:]]*[^[:space:]]*[[:space:]]*[^[:space:]]*[[:space:]]*[^[:space:]]*:\([0-9]*\)[[:space:]]*.*/\1/g' | sort -n | uniq;
+    seq 1 1000;
+    seq 1 65535 ) | sort -n | uniq -u | shuf -n 1
+}
+
+random_unused_port

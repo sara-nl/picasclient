@@ -35,3 +35,4 @@ examples/picasconfig.py
 *.err
 .venv
 venv
+.ipynb_checkpoints
