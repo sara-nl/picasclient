@@ -29,19 +29,16 @@
 # %% [markdown]
 ### Clone the picas client repository
 # %%
-! git clone https://github.com/sara-nl/picasclient.git
-! ls -l picasclient
+! git clone --branch 1.0.1 --depth 1 https://github.com/sara-nl/picasclient.git
 
 # %%
-%cd picasclient
-! git checkout 1.0.1   # .. todo:: update to latest version before the tutorial
-
-# %%
+# ensure that you are on the right branch
 ! git status
 ! ls
 
 # %% [markdown]
-### Setup virtual environemnt on clusters at SURF
+### Setup virtual environment on clusters at SURF
+#### [optional] if you are using your local machine you can skip this section
 
 #### Spider
 
@@ -64,15 +61,12 @@
 ! python3 -m venv .venv/picas-tutorial
 ! . .venv/picas-tutorial/bin/activate
 
-# %% [markdown]
-### Connect / execute example notebooks on the clusters
-# https://doc.spider.surfsara.nl/en/latest/Pages/jupyter_notebooks.html
 
 # %% [markdown]
 ### Activate the environment and install picas using pip
 # %%
 ! python3 -m pip install --upgrade pip
-! pip install --user picas
+! pip install picas
 
 # %% [markdown]
 ### [optional] Install PiCaS from the repo
@@ -89,6 +83,10 @@
 # The upcoming tutorials are based on the picasclient [README](https://github.com/sara-nl/picasclient/blob/mher/spd-512/course-material/README.md).
 #
 # The notebooks contain more details and explanations that can be be executed interactively.
+
+# %% [markdown]
+### Connect / execute example notebooks on the clusters
+# https://doc.spider.surfsara.nl/en/latest/Pages/jupyter_notebooks.html
 
 #### Run a jupyter notebook server
 # Install the jupyterlab package in the virtual environment
@@ -130,6 +128,8 @@
 ````
 
 # %% [markdown]
+# [optional]
+# If you are running on a cluster you can not open the url directly in your browser.
 # You can now connect to the jupyterlab server using an ssh tunnel as explained in the
 # [documentation](https://doc.spider.surfsara.nl/en/latest/Pages/jupyter_notebooks.html)
 
