@@ -98,7 +98,7 @@
 # run the jupyterlab server, this will work on all the platforms.
 
 # %%
-! jupyter lab --no-browser --ip="127.0.01"
+! jupyter lab --no-browser --ip="127.0.0.1"
 
 # %% [markdown]
 # the expected output should be something like:
