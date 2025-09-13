@@ -31,6 +31,30 @@ flake8 picas tests
 pytest tests
 ```
 
+### Development helper makefile
+
+Local development is possible by spinning up a couchdb server is a docker container. This
+functionality is provided in the `Makefile`.
+
+```
+make help
+```
+will show the available commands.
+
+#### Local couchdb server
+
+To start a local couchdb server, run:
+```
+make docker-compose-up
+```
+
+#### Examples and tutorials development
+
+Some of the examples and tutorials are developed in simple ``.py`` files with cells. These
+can be rendered into .ipynb files with:
+```
+make tutorial
+```
 
 ## Installing package
 
