@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Adds support for saving the picas password encrypted.
@@ -56,9 +56,8 @@ def generate_and_save_key(key_path=CRYPTO_KEY_PATH, skip_if_exists=True):
 
 
 def read_key():
-    f = open(CRYPTO_KEY_PATH, 'rb')
-    key = f.read()
-    f.close()
+    with open(CRYPTO_KEY_PATH, 'rb') as f:
+        key = f.read()
 
     return key
 
