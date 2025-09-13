@@ -117,7 +117,7 @@ filter on new, running, finished, and failed job tokens. Some pre-defined views 
 
 ```
 cd examples
-python createViews.py
+python create_views.py
 ```
 This will create the following views:
  * `Monitor/todo`: tasks that still need to be done
@@ -145,7 +145,7 @@ The file `quickExample.txt` contains three lines with commands to be executed. Y
 three job tokens in the PiCaS DB by running:
 
 ```
-python pushTokens.py quick
+python push_tokens.py quick
 ```
 
 Check the DB; you should see the tokens in the view `Monitor/todo`.
@@ -212,7 +212,7 @@ You can run this example on a login node of a SLURM cluster, e.g. Spider at SURF
 job which runs the PiCaS client, submit the `slurm-example.sh` script with:
 
 ```
-sbatch slurm-example.sh
+sbatch slurm_example.sh
 ```
 
 Now the work will be performed in parallel by a SLURM job array, and each job will start polling the
@@ -455,7 +455,7 @@ with views that can do so.
 This is already present in the `create_views.py` script. Run the script again with:
 
 ```
-python createViews.py autopilot
+python create_views.py autopilot
 ```
 
 This will create two extra design documents with the same views (todo, error, done, etc.) but with
@@ -470,7 +470,7 @@ In the database, these design docs and their views are present and can be used. 
 with the `cores` propery to the database, run:
 
 ```
-python push-tokens.py autopilot
+python push_tokens.py autopilot
 ```
 
 If you inspect the `pushTokens.py` script, you will see that the `cores` property is added, and set
