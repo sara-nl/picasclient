@@ -65,6 +65,7 @@ TOKENS_FILE_PATH = _TOKENS_FILE_PATH[0]
 # Compile and build the executable that runs the non trivial fractals code
 
 # %%
+! mkdir -p bin
 ! cc src/fractals.c -o bin/fractals -lm
 
 # %%
