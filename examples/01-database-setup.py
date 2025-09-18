@@ -19,7 +19,7 @@
 # - source .venv/picas-tutorial/bin/activate
 # - python3 -m poetry install
 # - python3 -m pip install jupyterlab
-# - jupyter lab --no-browser --ip="127.0.01"
+# - jupyter lab --no-browser --ip="127.0.0.1"
 
 # %%
 %cd ~/picas_tutorial/picasclient
