@@ -33,20 +33,13 @@ pytest tests
 
 ### Development helper makefile
 
-Local development is possible by spinning up a couchdb server is a docker container. This
+Local development is possible by spinning up a couchdb server in a docker container. This
 functionality is provided in the `Makefile`.
 
 ```
 make help
 ```
 will show the available commands.
-
-#### Local couchdb server
-
-To start a local couchdb server, run:
-```
-make docker-compose-up
-```
 
 #### Examples and tutorials development
 
@@ -55,6 +48,16 @@ can be rendered into .ipynb files with:
 ```
 make tutorial
 ```
+
+#### [Advanced] Local couchdb server
+
+Optionally for local development a couchdb server can be started by running:
+```
+make docker-compose-up
+```
+This will start a couchdb server on port 5984 with username `admin` and a default password
+specified in the `docker-compose.yml` file. You can change the password by editing the
+values of ``COUCHDB_USER`` and ``COUCHDB_PASSWORD`` in that file.
 
 ## Installing package
 
