@@ -41,6 +41,9 @@ test:
 #@help: the notebooks are generated in examples/notebooks
 tutorial:
 	@echo "running tutorial..."
+	@echo "jupytext must be installed in the current environment"
+	@echo "check that jupytext is installed, if it is not, install it"
+	@pip show jupytext >/dev/null || (echo "jupytext is not installed. Please install it with 'pip install jupytext'" && exit 1)
 	mkdir -p examples/notebooks
 	@cd examples && jupytext --to ipynb 00-environment-setup.py --output notebooks/00-environment-setup.ipynb
 	@cd examples && jupytext --to ipynb 01-database-setup.py --output notebooks/01-database-setup.ipynb
