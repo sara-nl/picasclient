@@ -106,9 +106,9 @@ BEGIN {
 	help = help $$0;
 }
 /^[a-zA-Z0-9_.@%\/\-]+:/ {
-	if (match($$0, /^([a-zA-Z0-9_.@%\/\-]+):/, var)) {
-		printf "  %-30s %s\n", var[1], help;
-	}
+	target = $$0;
+	sub(/:.*$$/, "", target);
+	printf "  %-30s %s\n", target, help;
 	help = "";
 }
 endef
