@@ -7,12 +7,12 @@ nothing:
 #@help: build the package
 build:
 	@echo "building picas..."
-	@python setup.py build
+	@poetry build
 
 #@help: cleanup the python build artifacts and uninstall picas if installed
 clean-build:
 	@echo "cleaning build artifacts..."
-	@rm -rf picas.egg-info picasclient.egg-info build dist
+	@rm -rf picas.egg-info picasclient.egg-info build dist || true
 	@python -m pip uninstall -y picas || true
 
 #@help: install the package in the current python environment
