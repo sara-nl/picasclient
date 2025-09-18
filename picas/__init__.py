@@ -11,6 +11,13 @@ infrastructure. Relies on a CouchDB server to keep track of the work itself.
 
 """
 
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="pkg_resources is deprecated as an API",  # regex matching the warning
+    category=UserWarning,
+)
+
 from .documents import Document, Task, Job, User
 from .clients import CouchDB
 from .iterators import (ViewIterator, TaskViewIterator, EndlessViewIterator,
