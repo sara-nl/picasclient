@@ -29,3 +29,10 @@ pip-log.txt
 
 # PiCaS DB information
 examples/picasconfig.py
+
+# output and error files
+*.out
+*.err
+.venv
+venv
+.ipynb_checkpoints

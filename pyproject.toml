@@ -10,14 +10,23 @@ readme = "README.md"
 python = "^3.10"
 couchdb = "^1.2"
 stopit = "^1.1.2"
-setuptools = "^66"
+setuptools = "^80"
+jsonschema = "^4.19.0"
+ipykernel = "^6.24.0"
+PyYAML = "^6.0.2"
+requests = "^2.31.0"
+cryptography = "^41.0.4"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.3"
 flake8 = "^7.1.1"
+pylint = "^3.3.8"
 
 [tool.poetry.group.test]
 optional = true
+
+[tool.poetry.scripts]
+picas-cli = "picas.apps.picas_cli:main"
 
 [build-system]
 requires = ["poetry-core"]
