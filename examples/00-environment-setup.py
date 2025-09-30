@@ -93,6 +93,7 @@ python3 -m poetry lock
 # %%
 %%bash
 cd ~/picas_tutorial && source .venv/picas-tutorial/bin/activate
+cd picasclient
 python3 -m poetry install
 
 # %% [markdown]
