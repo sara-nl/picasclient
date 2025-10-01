@@ -29,7 +29,15 @@
 # %% [markdown]
 ### Clone the picas client repository
 # %%
-! git clone --branch 1.0.1 --depth 1 https://github.com/sara-nl/picasclient.git
+! git clone https://github.com/sara-nl/picasclient.git
+
+# %%
+# cd into the picasclient directory and switch to a specific branch or tag if needed
+%cd picasclient
+# switch to a specific branch or tag
+#! git checkout some-branch-or-tag
+
+
 
 # %%
 # ensure that you are on the right branch
@@ -57,26 +65,36 @@
 # %% [markdown]
 ### Create the virtual environment and activate it
 # %%
-! mkdir .venv
-! python3 -m venv .venv/picas-tutorial
-! . .venv/picas-tutorial/bin/activate
-
+%%bash
+cd ~/picas_tutorial
+mkdir .venv
+python3 -m venv .venv/picas-tutorial
 
 # %% [markdown]
 ### Activate the environment and install picas using pip
 # %%
-! python3 -m pip install --upgrade pip
-! pip install picas
+%%bash
+cd ~/picas_tutorial && source .venv/picas-tutorial/bin/activate
+python3 -m pip install --upgrade pip
+pip install picas
 
 # %% [markdown]
 ### [optional] Install PiCaS from the repo
 # %%
-! python3 -m pip install --upgrade pip
-! python3 -m pip install poetry
+%%bash
+cd ~/picas_tutorial && source .venv/picas-tutorial/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install poetry
 # %%
-! python3 -m poetry lock
+%%bash
+cd ~/picas_tutorial && source .venv/picas-tutorial/bin/activate
+cd picasclient
+python3 -m poetry lock
 # %%
-! python3 -m poetry install
+%%bash
+cd ~/picas_tutorial && source .venv/picas-tutorial/bin/activate
+cd picasclient
+python3 -m poetry install
 
 # %% [markdown]
 ### Next tutorials
