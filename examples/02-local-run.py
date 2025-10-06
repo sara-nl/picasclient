@@ -12,12 +12,12 @@
 # - the main couchdb database: https://picas.surfsara.nl:6984
 # - the couchdb web ui login page: https://picas.grid.sara.nl:6984/_utils/#login
 # - the couchdb database for your project: https://picas.grid.sara.nl:6984/_utils/#database/<my_project_db>/_all_docs
-# - the push token example https://github.com/sara-nl/picasclient/blob/master/examples/pushTokens.py
+# - the push token example https://github.com/sara-nl/picasclient/blob/master/examples/push_tokens.py
 # - the run local examples script https://github.com/sara-nl/picasclient/blob/master/examples/local_example.py
 
 ### Minimum requirements
-# - Make sure that the [00-environment-setup](https://github.com/sara-nl/picasclient/blob/mher/spd-512/course-material/examples/notebooks/00-environment-setup.ipynb) notebook has been executed and that the virtual
-# - Make sure that the [01-database-setup](https://github.com/sara-nl/picasclient/blob/mher/spd-512/course-material/examples/notebooks/01-database-setup.ipynb) notebook has been executed and that the virtual
+# - Make sure that the [00-environment-setup](https://github.com/sara-nl/picasclient/blob/master/examples/notebooks/00-environment-setup.ipynb) notebook has been executed and that the virtual
+# - Make sure that the [01-database-setup](https://github.com/sara-nl/picasclient/blob/master/examples/notebooks/01-database-setup.ipynb) notebook has been executed and that the virtual
 
 # %%
 %cd ~/picas_tutorial
@@ -35,7 +35,7 @@
 #
 # The steps and components are:
 #   - Define / examine the set of parameters (tokens) that first need to be pushed to the database, e.g [quickExamples.txt](https://github.com/sara-nl/picasclient/blob/master/examples/quickExample.txt)
-#   - Push the tokens to the database ( e.g. [push_tokens.py](https://github.com/sara-nl/picasclient/blob/master/examples/pushTokens.py) )
+#   - Push the tokens to the database ( e.g. [push_tokens.py](https://github.com/sara-nl/picasclient/blob/master/examples/push_tokens.py) )
 #   - The script that runs a tasks (e.g. [process_task.sh](https://github.com/sara-nl/picasclient/blob/master/examples/process_task.sh)): just accepts the input parameters and print them in this tutorial
 #   - The runner script that is executed locally ( [local_example.py](https://github.com/sara-nl/picasclient/blob/master/examples/local_example.py) ), it pulls the tokens from the database and runs the tasks for each token.
 

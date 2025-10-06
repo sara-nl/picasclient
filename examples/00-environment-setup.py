@@ -145,6 +145,12 @@
 # %%
 ! ssh -L 127.0.0.1:8888:127.0.0.1:8888 my_user@spider.surf.nl -N
 
+# %%
+# (if needed - use -4 to force using ipv4)
+! ssh -4 -L 127.0.0.1:8888:127.0.0.1:8888 my_user@spider.surf.nl -N
+
+# %%
+# if needed - most likey yes, pick a random port on your local machine
 # %% [markdown]
 # open your browser and go to the url: http://localhost:8888
 
@@ -165,3 +171,18 @@ random_unused_port ()
 }
 
 random_unused_port
+
+
+# %% [markdown]
+# use ipv4 and a random port
+
+# %%
+%%bash
+NOTEBOOK_PORT=$(random_unused_port)
+echo "using port $NOTEBOOK_PORT"
+jupyter lab --no-browser --ip="127.0.0.1" --port=$NOTEBOOK_PORT
+
+# %%
+# on your local machine connect using
+NOTEBOOK_PORT="replace_with_value_from_above"
+ssh -4 -L 127.0.0.1:${NOTEBOOK_PORT}:127.0.0.1:${NOTEBOOK_PORT} my_user@spider.surf.nl -N
