@@ -29,7 +29,11 @@
 # %% [markdown]
 ### Clone the picas client repository
 # %%
-! git clone --branch 1.0.1 --depth 1 https://github.com/sara-nl/picasclient.git
+! git clone --branch 1.1.0 --depth 1 https://github.com/sara-nl/picasclient.git
+#! git clone --branch master --depth 1 https://github.com/sara-nl/picasclient.git
+
+# %%
+%cd picasclient
 
 # %%
 # ensure that you are on the right branch
@@ -56,6 +60,10 @@
 
 # %% [markdown]
 ### Create the virtual environment and activate it
+
+# %%
+%cd ..
+
 # %%
 ! mkdir .venv
 ! python3 -m venv .venv/picas-tutorial
@@ -148,9 +156,12 @@
 %%bash
 random_unused_port ()
 {
-    ( netstat --listening --all --tcp --numeric | sed '1,2d; s/[^[:space:]]*[[:space:]]*[^[:space:]]*[[:space:]]*[^[:space:]]*[[:space:]]*[^[:space:]]*:\([0-9]*\)[[:space:]]*.*/\1/g' | sort -n | uniq;
-    seq 1 1000;
-    seq 1 65535 ) | sort -n | uniq -u | shuf -n 1
+    ( netstat --listening --all --tcp --numeric |
+      sed '1,2d; s/.*:\([0-9]*\).*/\1/' |
+      sort -n | uniq;
+      seq 1 1000;
+      seq 1 65535
+    ) | sort -n | uniq -u | shuf -n 1
 }
 
 random_unused_port
