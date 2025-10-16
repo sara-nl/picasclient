@@ -88,7 +88,7 @@
 
 # %% [markdown]
 ### Next tutorials
-# The upcoming tutorials are based on the picasclient [README](https://github.com/sara-nl/picasclient/blob/mher/spd-512/course-material/README.md).
+# The upcoming tutorials are based on the picasclient [README](https://github.com/sara-nl/picasclient/blob/master/README.md).
 #
 # The notebooks contain more details and explanations that can be be executed interactively.
 
