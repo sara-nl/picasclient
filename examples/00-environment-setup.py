@@ -75,6 +75,8 @@
 # %%
 ! python3 -m pip install --upgrade pip
 ! pip install picas
+# verify that picas is installed
+! pip freeze | grep picas
 
 # %% [markdown]
 ### [optional] Install PiCaS from the repo
