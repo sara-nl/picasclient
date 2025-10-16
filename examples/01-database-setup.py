@@ -43,11 +43,23 @@ PICAS_DATABASE="mydatabase"
 PICAS_USERNAME="myusername"
 PICAS_PASSWORD="mypassword"
 
+#%% [markdown]
+# verify that you can authenticate (see below also for creating the views)
+#
+# .. todo:: add a snippet to verify the connection here
+
 # %% [markdown]
 ### Modern way: Using the picas exec cli
 
 # %%
 # prompt the user for the picas database password (masked input)
+# will create the file ~/.config/picas/conf.yml
+
+# %%
+# create the .config/picas directory if it does not exist
+! mkdir -p ~/.config/picas
+
+# %%
 import getpass
 db_password = getpass.getpass("Enter the picas database password: ")
 
@@ -113,4 +125,4 @@ new_db_password = getpass.getpass("Enter the picas database password: ")
 !python create_views.py
 # %% [markdown]
 # To verify that the views have been created, you can login to the CouchDB web UI:
-#   https://picas.grid.sara.nl:6984/_utils/#/database/mherawesomedb/_design/Monitor/_view/todo
+#   https://picas.grid.sara.nl:6984/_utils/#/database/YOUR_DATABASE_HERE/_design/Monitor/_view/todo
