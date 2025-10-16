@@ -69,6 +69,9 @@
 ! python3 -m venv .venv/picas-tutorial
 ! . .venv/picas-tutorial/bin/activate
 
+# don't forget to go back to the picasclient directory
+# %%
+% cd picasclient
 
 # %% [markdown]
 ### Activate the environment and install picas using pip
@@ -138,26 +141,25 @@
 ````
 
 # %% [markdown]
-# [optional]
-# If you are running on a cluster you can not open the url directly in your browser.
-# You can now connect to the jupyterlab server using an ssh tunnel using the command below:
+#### Optional: Switch back to your local terminal if you did the above on Spider
 
-# pick a random port on your local machine, e.g. 8888 (see below for a bash function that
-# gives you a random port)
+# pick a random available port on your local machine to connect with (e.g. 5767).
+# There is a script further down to find a random available port.
+
+# replace the ui number with the one you randomly ended on (either 1 or 2).
+
 # %%
-! ssh -L 127.0.0.1:8888:127.0.0.1:8888 my_user@spider.surf.nl -N
+! ssh -L 127.0.0.1:5767:127.0.0.1:8888 my_user@ui-01.spider.surfsara.nl -N
 
 # %%
 # (if needed - use -4 to force using ipv4)
-! ssh -4 -L 127.0.0.1:8888:127.0.0.1:8888 my_user@spider.surf.nl -N
+! ssh -4 -L 127.0.0.1:5767:127.0.0.1:8888 my_user@ui-01.spider.surf.nl -N
 
-# %%
-# if needed - most likey yes, pick a random port on your local machine
 # %% [markdown]
 # open your browser and go to the url: http://localhost:8888
 
+
 # %% [markdown]
-# [optional]
 # If you want to find a random port on your local machine you can use the following bash
 
 # %%
