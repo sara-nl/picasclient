@@ -4,7 +4,6 @@
 #
 # precedence of configuration variables (highest to lowest):
 #   - environment variables
-#   - command line flags
 #   - config.py
 
 PICAS_HOST_URL=""

@@ -90,16 +90,43 @@ class PicasConfig:
 
     def load_config(self):
         """
-        Load the configuration yaml file from the specified path and validate against schema.
+        Load the configuration with the following precedence (highest to lowest):
+          - environment variables
+          - the configuration file
+
+        Environment variables:
+          - PICAS_HOST_URL -> host_url
+          - PICAS_DATABASE -> database
+          - PICAS_USERNAME -> username
+          - PICAS_ENCRYPTED_PASSWORD -> the encrypted password
         """
         print(f"load the configuration from {self.config_path}")
         expanded_path = os.path.expanduser(self.config_path)
 
-        if not os.path.exists(expanded_path):
-            raise FileNotFoundError(f"configuration file not found: {self.config_path}")
+        # load from configuration file first (lowest precedence)
+        if os.path.exists(expanded_path):
+            with open(expanded_path, 'r') as fobj:
+                self.config = yaml.safe_load(fobj) or {}
+        else:
+            self.config = {}
 
-        with open(expanded_path, 'r') as fobj:
-            self.config = yaml.safe_load(fobj)
+        # Override with environment variables (highest precedence)
+        env_host_url = os.environ.get('PICAS_HOST_URL')
+        env_database = os.environ.get('PICAS_DATABASE')
+        env_username = os.environ.get('PICAS_USERNAME')
+        env_encrypted_password = os.environ.get('PICAS_ENCRYPTED_PASSWORD')
+
+        if env_host_url:
+            self.config['host_url'] = env_host_url
+
+        if env_database:
+            self.config['database'] = env_database
+
+        if env_username:
+            self.config['username'] = env_username
+
+        if env_encrypted_password:
+            self.config['encrypted_password'] = env_encrypted_password
 
         self.validate_config()
 
