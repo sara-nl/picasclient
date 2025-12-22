@@ -1,11 +1,7 @@
-# check the configuration in ~/.local/picas/config.py
-# if this file does not exist
-#   try to get the values from environment variables
-#
-# precedence of configuration variables (highest to lowest):
-#   - environment variables
-#   - command line flags
-#   - config.py
+# This is the template for the "old" picasconfig.py as used in local_example.py
+# In the new setup, as used in 02-local-run.py,
+# the configuration is read from  ~/.config/picas/conf.yml
+# for example how conf.yml is created, see 01-database-setup.py
 
 PICAS_HOST_URL=""
 PICAS_DATABASE=""
