@@ -7,9 +7,17 @@ Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as 
 
 
 # Installation
+We recommend working in a virtual environment. If you are running examples for the PiCaS tutorial, then first set this up with:
+```
+mkdir picas_tutorial
+cd picas_tutorial
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+```
 
 
-## Development & Testing
+## Development & Testing [from source]
 
 To install the PiCaS source code for development, first clone this repository and then use [Poetry](https://python-poetry.org/docs/) to install. Poetry is a tool for dependency managing and packaging in Python. If you don't have Poetry, install it first with `pipx install poetry`.
 ```
@@ -31,17 +39,15 @@ flake8 picas tests
 pytest tests
 ```
 
-### Development helper makefile
+### Development helper makefile [optional]
 
-Local development is possible by spinning up a couchdb server in a docker container. This
-functionality is provided in the `Makefile`.
-
+The  `Makefile` provides commands to help set up the development environment, install/build packages, and start a couchdb server (in case you don't have access to an existing one).
 ```
 make help
 ```
 will show the available commands.
 
-#### Examples and tutorials development
+#### Examples and tutorials development [optional]
 
 Some of the examples and tutorials are developed in simple ``.py`` files with cells. These
 can be rendered into .ipynb files with:
@@ -49,9 +55,9 @@ can be rendered into .ipynb files with:
 make tutorial
 ```
 
-#### [Advanced] Local couchdb server
-
-Optionally for local development a couchdb server can be started by running:
+#### Local couchdb server [optional]
+Local development is possible by spinning up a couchdb server in a docker container. This
+functionality is provided in the `Makefile` by running:
 ```
 make docker-compose-up
 ```
@@ -59,7 +65,7 @@ This will start a couchdb server on port 5984 with username `admin` and a defaul
 specified in the `docker-compose.yml` file. You can change the password by editing the
 values of ``COUCHDB_USER`` and ``COUCHDB_PASSWORD`` in that file.
 
-## Installing package
+## Installing package [from PyPi]
 
 Alternatively, the latest release of PiCaS can be installed as a package from PyPI with:
 ```
