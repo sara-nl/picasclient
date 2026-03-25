@@ -7,18 +7,17 @@ Python client using [CouchDB](https://docs.couchdb.org/en/stable/index.html) as 
 
 
 # Installation
-We recommend working in a virtual environment. If you are running examples for the PiCaS tutorial, then first set this up with:
-```
-mkdir picas_tutorial
-cd picas_tutorial
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-```
-Then clone this repository:
+To be able to do the examples below, you first need to clone this repository:
 ```
 git clone https://github.com/sara-nl/picasclient.git
 cd picasclient
+```
+
+We recommend working in a virtual environment. You can create one with:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
 ```
 
 <details closed>
@@ -35,11 +34,11 @@ Note that Poetry will create a virtual environment if it is not running within a
 If you prefer not to use Poetry, then you can install PiCaS with:
 ```
 pip install -U .
-pip install flake8 pytest
 ```
 
-To test, run:
+If you want to perform tests or linting, run:
 ```
+pip install flake8 pytest
 flake8 picas tests
 pytest tests
 ```
@@ -54,8 +53,8 @@ will show the available commands.
 
 ### [optional] Examples and tutorials development 
 
-Some of the examples and tutorials are developed in simple ``.py`` files with cells. These
-can be rendered into .ipynb files with:
+Some of the examples and tutorials are developed in simple `.py` files with cells. These
+can be rendered into `.ipynb` files with:
 ```
 make tutorial
 ```
@@ -63,12 +62,13 @@ make tutorial
 ### [optional] Local couchdb server 
 Local development is possible by spinning up a couchdb server in a docker container. This
 functionality is provided in the `Makefile` by running:
+
 ```
 make docker-compose-up
 ```
 This will start a couchdb server on port 5984 with username `admin` and a default password
 specified in the `docker-compose.yml` file. You can change the password by editing the
-values of ``COUCHDB_USER`` and ``COUCHDB_PASSWORD`` in that file.
+values of `COUCHDB_USER` and `COUCHDB_PASSWORD` in that file.
 
 </details>
 
@@ -77,6 +77,7 @@ values of ``COUCHDB_USER`` and ``COUCHDB_PASSWORD`` in that file.
 <summary>Install package from PyPi</summary>
 <br>
 Alternatively, the latest release of PiCaS can be installed as a package from PyPI with:
+
 ```
 pip install picas
 ```
