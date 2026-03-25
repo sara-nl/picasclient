@@ -7,6 +7,7 @@ from jsonschema import validate, ValidationError
 
 from .crypto import generate_and_save_key, encrypt_password, decrypt_password
 
+
 # .. todo:: use the picas logger instead of print statements
 class PicasConfigSchemaError(Exception):
     """
@@ -44,6 +45,7 @@ PICAS_CONFIG_SCHEMA = {
     'required': ['host_url', 'database', 'username', 'encrypted_password'],
     'additionalProperties': False
 }
+
 
 class PicasConfig:
     """
@@ -130,8 +132,8 @@ class PicasConfig:
         self.config['encrypted_password'] = encrypt_password(password).decode()
 
         # test decrypting the password and check if it matches the original
-        #_decrypted_password = decrypt_password(self.config['encrypted_password'])
-        #if _decrypted_password != password:
+        # _decrypted_password = decrypt_password(self.config['encrypted_password'])
+        # if _decrypted_password != password:
         #    breakpoint()
         #    msg = "The decrypted password does not match the original password."
         #    raise ValueError(msg)
@@ -151,7 +153,6 @@ class PicasConfig:
         config_dir = os.path.dirname(config_path)
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
-
 
         self.validate_config()
 
@@ -237,7 +238,6 @@ class PicasConfig:
 
         print("Password changed successfully on CouchDB server")
 
-
     def change_password(self, args):
         """
         Change the CouchDB password in the configuration.
@@ -263,8 +263,8 @@ class PicasConfig:
         # show the old and new un-encrypted passwords
         old_password = decrypt_password(self.config['encrypted_password'])
         # DEBUG
-        #print(f"old password: {old_password.decode('utf-8')}")
-        #print(f"new password: {new_password.decode('utf-8')}")
+        # print(f"old password: {old_password.decode('utf-8')}")
+        # print(f"new password: {new_password.decode('utf-8')}")
 
         self.change_couchdb_password(
             uri=self.config['host_url'],

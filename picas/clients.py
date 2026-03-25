@@ -22,7 +22,7 @@ class CouchDB:
     Client class to handle communication with the CouchDB back-end.
     """
     def __init__(self,
-                 url: str ="http://localhost:5984",
+                 url: str = "http://localhost:5984",
                  db: str = "test",
                  username: str = None,
                  password: str = "",

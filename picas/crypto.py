@@ -12,9 +12,9 @@ import os
 import stat
 
 from cryptography.fernet import Fernet
-import json
 
 CRYPTO_KEY_PATH = os.path.expanduser("~/.config/picas/key.dat")
+
 
 def generate_and_save_key(key_path=CRYPTO_KEY_PATH, skip_if_exists=True):
     """
@@ -63,10 +63,10 @@ def read_key():
 
 
 def encrypt_password(password, key=None):
-    if key is None: # if key is not given
-        key = read_key() # read it in
-    crypt_obj = Fernet(key) # create fernet object
-    encrypted = crypt_obj.encrypt(password) # encrypt password
+    if key is None:  # if key is not given
+        key = read_key()  # read it in
+    crypt_obj = Fernet(key)  # create fernet object
+    encrypted = crypt_obj.encrypt(password)  # encrypt password
 
     return encrypted
 

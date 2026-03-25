@@ -1,11 +1,11 @@
 import sys
 import argparse
 from argparse import RawTextHelpFormatter
-import yaml
 
 from picas.picas_config import PicasConfig, PicasConfigSchemaError, decrypt_password
 
 # .. todo:: use the picas logger instead of print statements
+
 
 def parse_args() -> argparse.ArgumentParser:
     """
@@ -149,6 +149,7 @@ def change_picas_password(parsed_args, *args, **kwargs):
     picas_config = PicasConfig(config_path=parsed_args.config_path)
     picas_config.change_password(parsed_args)
 
+
 def dump_picas_config(parsed_args, *_, **__):
     """
     Generate and print a picasconfig.py script based on the existing conf.yml.
@@ -198,6 +199,7 @@ PICAS_PASSWORD = {plain_pwd!r}
             sys.exit(1)
     else:
         print(script.rstrip())
+
 
 def main():
 
