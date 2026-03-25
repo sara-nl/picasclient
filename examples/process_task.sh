@@ -33,17 +33,10 @@ echo "------------ end input argument ---------------"
 # start processing
 #
 
-# execute the task based on the task type
-if [[ "${TASK_TYPE}" == "fractals" ]]; then
-    # long example, run the fractals program
-    bin/fractals -o $OUTPUT $INPUT
-elif [[ "${TASK_TYPE}" == "echo_cmd" ]]; then
-    # short example, just echo the input
-    bash -c "$INPUT"
-else
-    echo "Unknown task type: ${TASK_TYPE}"
-    exit 1
-fi
+# Use this command for the short example
+bash -c "$INPUT"
+# Use this command for the fractals example
+# bin/fractals -o $OUTPUT $INPUT
 
 if [[ "$?" != "0" ]]; then
     echo "Program interrupted. Exit now..."

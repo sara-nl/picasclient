@@ -333,6 +333,7 @@ generate tokens in the database.
 Next, the binary for the fractal calculation needs to be built:
 
 ```
+mkdir bin
 cc src/fractals.c -o bin/fractals -lm
 ```
 
