@@ -111,10 +111,18 @@ If you have a Grid or Spider project at SURF, you can request access through the
 <summary>Connect to the PiCaS server</summary>
 <br>
 
-To connect to the PiCaS server, create a file `examples/picasconfig.py` with the information needed
-to log in to your PiCaS account and the database you want to use for storing the work tokens. A
-template can be found in `examples/picasconfig_example.py`. Specifically, the information needed are:
+### Create config file
+To be able to connect to the PiCaS database (DB), you need a configuration file ` ~/.config/picas/conf.yml` with your credentials. The config file is created with:
+```
+cd examples
+python create_config.py
+```
+You will be asked to enter your account details. The password is stored encrypted.
 
+Note that, although not recommended, it is also possible to store the credentials as plain text.
+In that case, overwrite the file `examples/picasconfig.py` with the information needed
+to log into your PiCaS account and the database you want to use for storing the work tokens.
+Specifically, the information needed are:
 ```
 PICAS_HOST_URL="https://picas.surfsara.nl:6984"
 PICAS_DATABASE=""
@@ -135,7 +143,6 @@ tool used for querying and reporting on CouchDB documents. For example, you can 
 filter on new, running, finished, and failed job tokens. Some pre-defined views can be created with:
 
 ```
-cd examples
 python create_views.py
 ```
 This will create the following views:
