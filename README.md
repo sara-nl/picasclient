@@ -15,14 +15,19 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 ```
-
-
-## Development & Testing [from source]
-
-To install the PiCaS source code for development, first clone this repository and then use [Poetry](https://python-poetry.org/docs/) to install. Poetry is a tool for dependency managing and packaging in Python. If you don't have Poetry, install it first with `pipx install poetry`.
+Then clone this repository:
 ```
 git clone https://github.com/sara-nl/picasclient.git
 cd picasclient
+```
+
+<details closed>
+<summary>Install from source for development & testing</summary>
+<br>
+
+### Use Poetry or Pip
+If you are a developer, we recommend using [Poetry](https://python-poetry.org/docs/) to install, build, and distribute the package. Poetry is a tool for dependency managing and packaging in Python. If you don't have Poetry, install it first with `pipx install poetry`.
+```
 poetry install --with test
 ```
 Note that Poetry will create a virtual environment if it is not running within an activated virtual environment already. In that case, you will need to run `poetry run` before your commands to execute them within the Poetry virtual environment.
@@ -39,7 +44,7 @@ flake8 picas tests
 pytest tests
 ```
 
-### Development helper makefile [optional]
+### [optional] Development helper makefile 
 
 The  `Makefile` provides commands to help set up the development environment, install/build packages, and start a couchdb server (in case you don't have access to an existing one).
 ```
@@ -47,7 +52,7 @@ make help
 ```
 will show the available commands.
 
-#### Examples and tutorials development [optional]
+### [optional] Examples and tutorials development 
 
 Some of the examples and tutorials are developed in simple ``.py`` files with cells. These
 can be rendered into .ipynb files with:
@@ -55,7 +60,7 @@ can be rendered into .ipynb files with:
 make tutorial
 ```
 
-#### Local couchdb server [optional]
+### [optional] Local couchdb server 
 Local development is possible by spinning up a couchdb server in a docker container. This
 functionality is provided in the `Makefile` by running:
 ```
@@ -65,13 +70,18 @@ This will start a couchdb server on port 5984 with username `admin` and a defaul
 specified in the `docker-compose.yml` file. You can change the password by editing the
 values of ``COUCHDB_USER`` and ``COUCHDB_PASSWORD`` in that file.
 
-## Installing package [from PyPi]
+</details>
 
+
+<details closed>
+<summary>Install package from PyPi</summary>
+<br>
 Alternatively, the latest release of PiCaS can be installed as a package from PyPI with:
 ```
 pip install picas
 ```
 You can then write your custom Python program to use PiCaS as a library based on the examples below.
+</details>
 
 
 # Examples
