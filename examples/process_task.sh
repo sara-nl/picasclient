@@ -17,13 +17,11 @@ echo `date`
 echo ${HOSTNAME}
 
 # initialize job arguments
-TASK_TYPE=$1
-INPUT=$2
-TOKEN_ID=$3
+INPUT=$1      
+TOKENID=$2
+OUTPUT=output_${TOKENID}
 
-OUTPUT=output_${TOKEN_ID}
 echo "----------- input argument ----------------"
-echo "Task type: ${TASK_TYPE}"
 echo "Input command: ${INPUT}"
 echo "Token ID: ${TOKEN_ID}"
 echo "Output file: ${OUTPUT}"
@@ -43,8 +41,9 @@ if [[ "$?" != "0" ]]; then
     exit 1
 fi
 
-#Copy output to the remote storage, e.g.
-#globus-url-copy file:///${PWD}/${OUTPUT} gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lsgrid/homer/${OUTPUT}
+
+# Optionally, copy output to the remote storage, e.g. if run on the Grid:
+# globus-url-copy file:///${PWD}/${OUTPUT} gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lsgrid/homer/${OUTPUT}
 
 echo `date`
 

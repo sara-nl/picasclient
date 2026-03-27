@@ -8,7 +8,7 @@ from pathlib import Path
 import getpass
 
 homedir = Path.home()
-Path(os.path.join(homedir, "config", "picas")).mkdir(parents=True, exist_ok=True)
+Path(os.path.join(homedir, ".config", "picas")).mkdir(parents=True, exist_ok=True)
 db_database = getpass.getpass("Enter the picas database name: ")
 db_username = getpass.getpass("Enter the picas database username: ")
 db_password = getpass.getpass("Enter the picas database password: ")
