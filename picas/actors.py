@@ -82,7 +82,7 @@ class AbstractRunActor(object):
             log.info(msg)
             new_task = self.db.get(task.id)
             task['_rev'] = new_task.rev
-        except ssl.SSLEOFError as ex:
+        except (ssl.SSLEOFError, ssl.SSLError) as ex:
             # SSLEOFError can occur for long-lived connections, re-establish connection
             msg = f"Warning: {type(ex)} occurred while saving task to database: " + \
                 "Trying ro reconnect to database"
