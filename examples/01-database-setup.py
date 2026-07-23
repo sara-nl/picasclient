@@ -21,7 +21,14 @@
 # - python3 -m pip install jupyterlab
 # - jupyter lab --no-browser --ip="127.0.0.1"
 
+# If you never used jupyter lab before:
+# - open the jupyter lab in your browser (e.g. http://localhost:5767)
+# - log in with the token that is shown in the terminal where you started jupyter lab
+# - in the menu to the left, go to examples/notebooks/01-database-setup.ipynb
+# - select the cell to execute and press Shift+Enter to execute the cell (or the play button at the top)
+
 # %%
+# change to the picasclient directory
 %cd ~/picas_tutorial/picasclient
 
 # %%
